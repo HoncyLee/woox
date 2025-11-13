@@ -5,3 +5,12 @@
 2025-11-13 17:30:18,079 - Trade - INFO - No position currently held
 2025-11-13 17:31:16,396 - Trade - INFO - Trading bot stopped by user
 2025-11-13 17:31:16,397 - Trade - INFO - Trading bot shutdown complete
+2025-11-13 17:56:21,929 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT
+2025-11-13 17:56:21,929 - root - INFO - Trading bot started with API credentials - LIVE MODE
+2025-11-13 17:56:21,929 - Trade - INFO - Starting trading bot...
+2025-11-13 17:56:22,325 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 102766.1, Ask: 102766.11
+2025-11-13 17:56:22,431 - Trade - INFO - No position currently held
+2025-11-13 17:57:22,249 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 102818.78, Ask: 102818.79
+2025-11-13 17:57:22,361 - Trade - INFO - No position currently held
+2025-11-13 17:57:45,260 - Trade - INFO - Trading bot stopped by user
+2025-11-13 17:57:45,260 - Trade - INFO - Trading bot shutdown complete
