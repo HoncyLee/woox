@@ -3,7 +3,7 @@
 ## Step 1: Install Dependencies
 
 ```bash
-cd /Users/honcylee/myproj/woox
+cd /Users/user/woox
 pip install -r requirements.txt
 ```
 
