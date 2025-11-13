@@ -4,7 +4,6 @@ import logging
 import os
 import hmac
 import hashlib
-from datetime import datetime
 from collections import deque
 from typing import Optional, Dict, Any
 import json
@@ -93,7 +92,7 @@ class Trade:
         Returns:
             Dictionary of headers
         """
-        timestamp = round(datetime.now().timestamp() * 1000)
+        timestamp = round(time.time() * 1000)
         signature = self._generate_signature(timestamp, method, request_path, body)
         
         headers = {
@@ -159,7 +158,7 @@ class Trade:
                 'volume': self.current_volume,
                 'bid': self.current_bid,
                 'ask': self.current_ask,
-                'timestamp': datetime.now()
+                'timestamp': time.time()
             }
             
         except Exception as e:
@@ -403,7 +402,7 @@ class Trade:
                 'side': side,
                 'quantity': quantity,
                 'entry_price': price,
-                'open_time': datetime.now()
+                'open_time': time.time()
             }
             
             self.logger.info("Position opened successfully: %s", self.current_position)
