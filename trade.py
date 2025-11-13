@@ -499,36 +499,70 @@ class Trade:
         self.logger.info("Starting trading bot...")
         
         try:
+            last_update_time = 0
+            last_price_display_time = 0
+            update_interval = 60  # Full update every 60 seconds
+            price_display_interval = 5  # Display price every 5 seconds
+            
             while self.running:
-                # Get latest market data
-                trade_data = self.trade_update()
+                current_time = time.time()
                 
-                # Update price history
-                self.updateTradePxList(trade_data)
-                
-                # Check current position status
-                current_pos = self.hasPosition()
-                
-                if current_pos:
-                    # If we have a position, check if we should close it
-                    if self.determineStopTrade():
-                        self.closePosition(self.current_price)
-                else:
-                    # If no position, check if we should open one
-                    signal = self.determineOpenTrade()
+                # Full market update every 60 seconds
+                if current_time - last_update_time >= update_interval:
+                    # Get latest market data
+                    trade_data = self.trade_update()
                     
-                    if signal and self.current_price:
-                        # Calculate quantity (example: $100 worth of BTC)
-                        quantity = 100 / self.current_price
+                    # Update price history
+                    self.updateTradePxList(trade_data)
+                    
+                    # Check current position status
+                    current_pos = self.hasPosition()
+                    
+                    if current_pos:
+                        # If we have a position, check if we should close it
+                        if self.determineStopTrade():
+                            self.closePosition(self.current_price)
+                    else:
+                        # If no position, check if we should open one
+                        signal = self.determineOpenTrade()
                         
-                        # Use current ask/bid for limit price
-                        if signal == 'long' and self.current_ask:
-                            self.openPosition('long', self.current_ask, quantity)
-                        elif signal == 'short' and self.current_bid:
-                            self.openPosition('short', self.current_bid, quantity)
+                        if signal and self.current_price:
+                            # Calculate quantity (example: $100 worth of BTC)
+                            quantity = 100 / self.current_price
+                            
+                            # Use current ask/bid for limit price
+                            if signal == 'long' and self.current_ask:
+                                self.openPosition('long', self.current_ask, quantity)
+                            elif signal == 'short' and self.current_bid:
+                                self.openPosition('short', self.current_bid, quantity)
+                    
+                    last_update_time = current_time
                 
-                # Wait for 60 seconds before next update (1-minute intervals)
-                time.sleep(60)
+                # Quick price display every 5 seconds to show bot is running
+                if current_time - last_price_display_time >= price_display_interval:
+                    try:
+                        trades_url = f"{self.base_url}/v3/public/marketTrades"
+                        trades_response = requests.get(
+                            trades_url, 
+                            params={"symbol": self.symbol, "limit": 1},
+                            timeout=5
+                        )
+                        trades_data = trades_response.json()
+                        
+                        if trades_response.status_code == 200 and trades_data.get('success'):
+                            data = trades_data.get('data', {})
+                            recent_trades = data.get('rows', [])
+                            if recent_trades:
+                                latest_trade = recent_trades[0]
+                                current_price = float(latest_trade.get('price', 0))
+                                print(f"\r💹 BTC/USDT: ${current_price:,.2f} | Entries: {len(self.trade_px_list)}/1440 | Running...", end='', flush=True)
+                        
+                        last_price_display_time = current_time
+                    except Exception:
+                        pass  # Silently continue on quick price check errors
+                
+                # Sleep for minimal time to keep loop responsive
+                time.sleep(0.1)  # 100 milliseconds
                 
         except KeyboardInterrupt:
             self.logger.info("Trading bot stopped by user")
