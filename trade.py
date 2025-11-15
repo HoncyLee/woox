@@ -5,12 +5,63 @@ import os
 import hmac
 import hashlib
 from collections import deque
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Callable
 import json
+import functools
+import duckdb
 
-API_KEY = os.environ['WOOX_API_KEY'] 
-API_SECRET = os.environ['WOOX_API_SECRET'] 
+
+def cron(freq: str = 's', period: float = 1):
+    """
+    Decorator to control method execution frequency.
+    
+    Args:
+        freq: Frequency unit - 'ms' (milliseconds), 's' (seconds), 'm' (minutes)
+        period: Number of units between executions
+    
+    Example:
+        @cron(freq='s', period=5)  # Execute every 5 seconds
+        @cron(freq='m', period=1)  # Execute every 1 minute
+        @cron(freq='ms', period=100)  # Execute every 100 milliseconds
+    """
+    # Convert period to seconds based on frequency unit
+    if freq == 'ms':
+        interval = period / 1000  # milliseconds to seconds
+    elif freq == 's':
+        interval = period  # already in seconds
+    elif freq == 'm':
+        interval = period * 60  # minutes to seconds
+    else:
+        raise ValueError(f"Invalid frequency unit: {freq}. Must be 'ms', 's', or 'm'")
+    
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            # Store last execution time as an attribute on the wrapper function
+            attr_name = f'_last_exec_{func.__name__}'
+            
+            if not hasattr(wrapper, attr_name):
+                setattr(wrapper, attr_name, 0)
+            
+            current_time = time.time()
+            last_exec = getattr(wrapper, attr_name)
+            
+            # Check if enough time has passed
+            if current_time - last_exec >= interval:
+                result = func(self, *args, **kwargs)
+                setattr(wrapper, attr_name, current_time)
+                return result
+            
+            return None  # Skip execution if not enough time has passed
+        
+        return wrapper
+    
+    return decorator
+
+API_KEY = os.environ.get('WOOX_API_KEY', '')
+API_SECRET = os.environ.get('WOOX_API_SECRET', '')
 BASE_URL = 'https://api.woox.io'
+TRADE_MODE = os.environ.get('TRADE_MODE', 'paper')  # 'paper' or 'live'
 
 # Configure logging
 logging.basicConfig(
@@ -29,18 +80,20 @@ class Trade:
     and executes trading strategies.
     """
     
-    def __init__(self, api_key: Optional[str] = None, api_secret: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None, api_secret: Optional[str] = None, trade_mode: Optional[str] = None):
         """
         Initialize the Trade class.
         
         Args:
             api_key: WOOX API key for authenticated requests (optional)
             api_secret: WOOX API secret for authenticated requests (optional)
+            trade_mode: Trading mode - 'paper' or 'live' (optional, defaults to TRADE_MODE constant)
         """
         self.logger = logging.getLogger('Trade')
         self.base_url = BASE_URL
         self.api_key = api_key if api_key else os.environ.get('WOOX_API_KEY')
         self.api_secret = api_secret if api_secret else os.environ.get('WOOX_API_SECRET')
+        self.trade_mode = trade_mode if trade_mode else TRADE_MODE
         self.symbol = "SPOT_BTC_USDT"
         
         # Store 1440 minutes (24 hours) of price data
@@ -57,7 +110,81 @@ class Trade:
         
         self.running = True
         
-        self.logger.info("Trade class initialized for symbol: %s", self.symbol)
+        # Initialize database connection based on trade mode
+        db_file = 'live_transaction.db' if self.trade_mode == 'live' else 'paper_transaction.db'
+        self.db_conn = duckdb.connect(db_file)
+        self._init_database()
+        
+        self.logger.info("Trade class initialized for symbol: %s in %s mode", self.symbol, self.trade_mode.upper())
+    
+    def _init_database(self) -> None:
+        """Initialize the DuckDB database and create trades table if not exists."""
+        try:
+            self.db_conn.execute("""
+            CREATE TABLE IF NOT EXISTS trades (
+                acct_id TEXT,
+                symbol TEXT,
+                trade_datetime TIMESTAMP,
+                exchange TEXT,
+                signal TEXT,
+                trade_type TEXT,
+                quantity DOUBLE,
+                price DOUBLE,
+                proceeds DOUBLE,
+                commission DOUBLE,
+                fee DOUBLE,
+                order_type TEXT,
+                code TEXT
+            )
+            """)
+            self.logger.info("Database initialized successfully")
+        except Exception as e:
+            self.logger.error("Error initializing database: %s", str(e))
+    
+    def _record_transaction(self, trade_type: str, quantity: float, price: float, 
+                           signal: str = "MA_CROSS", order_type: str = "LMT", code: str = "O") -> None:
+        """Record a transaction to the database.
+        
+        Args:
+            trade_type: 'BUY' or 'SELL'
+            quantity: Quantity traded (positive for BUY, negative for SELL)
+            price: Execution price
+            signal: Trading signal that triggered the trade
+            order_type: Order type (LMT, MKT, etc.)
+            code: Transaction code (O=Open, C=Close)
+        """
+        try:
+            proceeds = -quantity * price if trade_type == 'BUY' else quantity * price
+            commission = 0.0  # Update if you have commission info
+            fee = 0.0  # Update if you have fee info
+            
+            # Use negative quantity for SELL in database
+            db_quantity = quantity if trade_type == 'BUY' else -quantity
+            
+            self.db_conn.execute("""
+            INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                os.environ.get('USER', 'TRADER'),  # acct_id
+                self.symbol,  # symbol
+                time.time(),  # trade_datetime (epoch time)
+                'woox',  # exchange
+                signal,  # signal
+                trade_type,  # trade_type
+                db_quantity,  # quantity
+                price,  # price
+                proceeds,  # proceeds
+                commission,  # commission
+                fee,  # fee
+                order_type,  # order_type
+                code  # code (O=Open, C=Close)
+            ))
+            
+            self.logger.info(
+                "Transaction recorded - Type: %s, Quantity: %.6f, Price: %.2f, Proceeds: %.2f",
+                trade_type, db_quantity, price, proceeds
+            )
+        except Exception as e:
+            self.logger.error("Error recording transaction: %s", str(e))
     
     def _generate_signature(self, timestamp: int, method: str, request_path: str, body: str = "") -> str:
         """
@@ -72,6 +199,9 @@ class Trade:
         Returns:
             Hex string signature
         """
+        if not self.api_secret:
+            raise ValueError("API secret is required for authenticated requests")
+        
         sign_string = str(timestamp) + method + request_path + body
         signature = hmac.new(
             bytes(self.api_secret, 'utf-8'),
@@ -106,6 +236,7 @@ class Trade:
             
         return headers
     
+    @cron(freq='s', period=60)
     def trade_update(self) -> Dict[str, Any]:
         """
         Fetch the latest spot price, volume, bid, and ask from WOOX API.
@@ -163,7 +294,7 @@ class Trade:
             
         except Exception as e:
             self.logger.error("Error fetching trade update: %s", str(e))
-            return {}
+            return None
     
     def updateTradePxList(self, trade_data: Dict[str, Any]) -> None:
         """
@@ -297,24 +428,27 @@ class Trade:
             Dictionary with position details or None if no position
         """
         try:
-            # For spot trading, check open orders via V3 API
-            if self.api_key and self.api_secret:
-                request_path = f"/v3/trade/orders"
-                headers = self._get_auth_headers('GET', request_path)
-                
-                response = requests.get(
-                    f"{self.base_url}{request_path}",
-                    headers=headers,
-                    params={"symbol": self.symbol},
-                    timeout=10
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get('success'):
-                        orders = data.get('data', {}).get('rows', [])
-                        if orders:
-                            self.logger.info("Found %d open orders", len(orders))
+            # For spot trading, check open orders via V3 API (only in live mode)
+            if self.trade_mode == 'live' and self.api_key and self.api_secret:
+                try:
+                    request_path = f"/v3/trade/orders"
+                    headers = self._get_auth_headers('GET', request_path)
+                    
+                    response = requests.get(
+                        f"{self.base_url}{request_path}",
+                        headers=headers,
+                        params={"symbol": self.symbol},
+                        timeout=10
+                    )
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get('success'):
+                            orders = data.get('data', {}).get('rows', [])
+                            if orders:
+                                self.logger.info("Found %d open orders", len(orders))
+                except Exception as api_error:
+                    self.logger.warning("Could not fetch open orders from API: %s", str(api_error))
             
             # Return local position tracking
             if self.current_position:
@@ -359,8 +493,8 @@ class Trade:
                 self.logger.warning("Short positions not supported for spot trading. Use perpetual futures.")
                 return False
             
-            # Use V3 API to place order if credentials are provided
-            if self.api_key and self.api_secret:
+            # Use V3 API to place order if in live mode and credentials are provided
+            if self.trade_mode == 'live' and self.api_key and self.api_secret:
                 order_body = {
                     "symbol": self.symbol,
                     "side": "BUY",
@@ -385,15 +519,15 @@ class Trade:
                 if response.status_code == 200 and result.get('success'):
                     order_data = result.get('data', {})
                     self.logger.info(
-                        "Order placed successfully - Order ID: %s, Side: %s, Price: %.2f, Quantity: %.6f",
+                        "[LIVE] Order placed successfully - Order ID: %s, Side: %s, Price: %.2f, Quantity: %.6f",
                         order_data.get('orderId'), order_data.get('side'), price, quantity
                     )
                 else:
-                    self.logger.error("Failed to place order: %s", result)
+                    self.logger.error("[LIVE] Failed to place order: %s", result)
                     return False
             else:
                 self.logger.info(
-                    "Simulating order (no API credentials) - Opening %s position - Price: %.2f, Quantity: %.6f",
+                    "[PAPER] Simulating order - Opening %s position - Price: %.2f, Quantity: %.6f",
                     side.upper(), price, quantity
                 )
             
@@ -404,6 +538,16 @@ class Trade:
                 'entry_price': price,
                 'open_time': time.time()
             }
+            
+            # Record transaction in database
+            self._record_transaction(
+                trade_type='BUY',
+                quantity=quantity,
+                price=price,
+                signal='MA_CROSS',
+                order_type='LMT',
+                code='O'  # O = Open position
+            )
             
             self.logger.info("Position opened successfully: %s", self.current_position)
             return True
@@ -439,8 +583,8 @@ class Trade:
                 pnl = (entry_price - price) * quantity
                 pnl_pct = ((entry_price - price) / entry_price) * 100
             
-            # Use V3 API to place sell order if credentials are provided
-            if self.api_key and self.api_secret:
+            # Use V3 API to place sell order if in live mode and credentials are provided
+            if self.trade_mode == 'live' and self.api_key and self.api_secret:
                 order_body = {
                     "symbol": self.symbol,
                     "side": "SELL",
@@ -465,17 +609,27 @@ class Trade:
                 if response.status_code == 200 and result.get('success'):
                     order_data = result.get('data', {})
                     self.logger.info(
-                        "Close order placed successfully - Order ID: %s",
+                        "[LIVE] Close order placed successfully - Order ID: %s",
                         order_data.get('orderId')
                     )
                 else:
-                    self.logger.error("Failed to place close order: %s", result)
+                    self.logger.error("[LIVE] Failed to place close order: %s", result)
                     return False
             else:
                 self.logger.info(
-                    "Simulating close order (no API credentials) - Closing %s position - Entry: %.2f, Exit: %.2f, Quantity: %.6f",
+                    "[PAPER] Simulating close order - Closing %s position - Entry: %.2f, Exit: %.2f, Quantity: %.6f",
                     side.upper(), entry_price, price, quantity
                 )
+            
+            # Record transaction in database
+            self._record_transaction(
+                trade_type='SELL',
+                quantity=quantity,
+                price=price,
+                signal='STOP_LOSS' if pnl_pct <= -2.0 else 'TAKE_PROFIT',
+                order_type='LMT',
+                code='C'  # C = Close position
+            )
             
             self.logger.info(
                 "Position closed - Entry: %.2f, Exit: %.2f, Quantity: %.6f, PnL: %.2f (%.2f%%)",
@@ -499,19 +653,17 @@ class Trade:
         self.logger.info("Starting trading bot...")
         
         try:
-            last_update_time = 0
             last_price_display_time = 0
-            update_interval = 60  # Full update every 60 seconds
             price_display_interval = 5  # Display price every 5 seconds
             
             while self.running:
                 current_time = time.time()
                 
-                # Full market update every 60 seconds
-                if current_time - last_update_time >= update_interval:
-                    # Get latest market data
-                    trade_data = self.trade_update()
-                    
+                # Call trade_update (will execute based on @cron decorator timing)
+                trade_data = self.trade_update()
+                
+                # If trade_data was returned (not None), process it
+                if trade_data:
                     # Update price history
                     self.updateTradePxList(trade_data)
                     
@@ -535,8 +687,6 @@ class Trade:
                                 self.openPosition('long', self.current_ask, quantity)
                             elif signal == 'short' and self.current_bid:
                                 self.openPosition('short', self.current_bid, quantity)
-                    
-                    last_update_time = current_time
                 
                 # Quick price display every 5 seconds to show bot is running
                 if current_time - last_price_display_time >= price_display_interval:
@@ -576,6 +726,11 @@ class Trade:
                 self.logger.info("Closing position before shutdown...")
                 self.closePosition(self.current_price)
             
+            # Close database connection
+            if hasattr(self, 'db_conn'):
+                self.db_conn.close()
+                self.logger.info("Database connection closed")
+            
             self.logger.info("Trading bot shutdown complete")
     
     def stop(self) -> None:
@@ -595,14 +750,14 @@ if __name__ == "__main__":
     try:
         api_key = os.environ.get('WOOX_API_KEY')
         api_secret = os.environ.get('WOOX_API_SECRET')
+        trade_mode = os.environ.get('TRADE_MODE', 'paper')
         
-        if api_key and api_secret:
-            trader = Trade(api_key, api_secret)
-            logging.info("Trading bot started with API credentials - LIVE MODE")
+        trader = Trade(api_key, api_secret, trade_mode)
+        
+        if trade_mode == 'live' and api_key and api_secret:
+            logging.info("Trading bot started in LIVE MODE - Real orders will be placed!")
         else:
-            # Create instance without credentials for simulation
-            trader = Trade(None, None)
-            logging.info("Trading bot started without API credentials - SIMULATION MODE")
+            logging.info("Trading bot started in PAPER MODE - Simulating orders only")
         
         trader.run()
     except KeyError as e:
