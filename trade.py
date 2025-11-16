@@ -335,8 +335,8 @@ class Trade:
                 recent_trades = data.get('rows', [])
                 if recent_trades:
                     latest_trade = recent_trades[0]
-                    self.current_price = float(latest_trade.get('price', 0))
-                    self.current_volume = float(latest_trade.get('size', 0))
+                    self.current_price = float(latest_trade.get('executedPrice', 0))
+                    self.current_volume = float(latest_trade.get('executedQuantity', 0))
             
             # Fallback to mid-price if no recent trades
             if not self.current_price and self.orderbook.get('mid_price'):

@@ -8,7 +8,7 @@ import requests
 import json
 
 BASE_URL = 'https://api.woox.io'
-SYMBOL = 'SPOT_BTC_USDT'
+SYMBOL = 'PERP_BTC_USDT'
 
 def test_orderbook():
     """Test orderbook endpoint"""
@@ -49,8 +49,9 @@ def test_market_trades():
             print(f"✓ Market trades retrieved successfully")
             if trades:
                 latest = trades[0]
-                print(f"  Latest Price: {latest.get('price')}")
-                print(f"  Latest Volume: {latest.get('size')}")
+                print(f"  Latest Price: {latest.get('executedPrice')}")
+                print(f"  Latest Volume: {latest.get('executedQuantity')}")
+                print(f"  Side: {latest.get('side')}")
                 print(f"  Number of trades: {len(trades)}")
             return True
         else:
