@@ -29,21 +29,23 @@ Testing orderbook endpoint...
 ✓ All tests passed! API connection is working.
 ```
 
-## Step 3: Configure API Credentials (For Live Trading)
+## Step 3: Configure Trading Mode and API Credentials
 
-### Option A: Environment Variables (Recommended)
+### Set Trading Mode
+
+```bash
+# Paper trading (simulation - default, safe)
+export TRADE_MODE='paper'
+
+# Live trading (real money - use with caution)
+export TRADE_MODE='live'
+```
+
+### Configure API Credentials (Required for Live Mode)
 
 ```bash
 export WOOX_API_KEY='your_api_key_here'
 export WOOX_API_SECRET='your_api_secret_here'
-```
-
-### Option B: Create .env file (Optional)
-
-```bash
-cp .env.template .env
-# Edit .env file with your credentials
-nano .env
 ```
 
 **To get API credentials:**
@@ -55,30 +57,59 @@ nano .env
 
 ## Step 4: Run the Trading Bot
 
-### Simulation Mode (No real trades)
+### Paper Trading Mode (Simulation - Recommended)
 
 ```bash
+export TRADE_MODE='paper'
 python trade.py
 ```
 
-This mode will:
+Paper mode will:
 
 - ✓ Fetch real market data
 - ✓ Calculate trading signals
-- ✓ Log all decisions
-- ✗ NOT place real orders
+- ✓ Simulate orders (no real trades)
+- ✓ Record transactions in `paper_transaction.db`
+- ✓ Display live price updates every 5 seconds
 
-### Live Trading Mode (Real trades)
+### Live Trading Mode (Real Money)
 
 ```bash
 export WOOX_API_KEY='your_actual_key'
 export WOOX_API_SECRET='your_actual_secret'
+export TRADE_MODE='live'
 python trade.py
 ```
 
 ⚠️ **Warning**: This will place real orders with real money!
 
-## Step 5: Monitor the Bot
+Live mode will:
+
+- ✓ Place actual BUY/SELL orders on exchange
+- ✓ Record transactions in `live_transaction.db`
+- ✓ Log with `[LIVE]` prefix
+- ✓ Display live price updates every 5 seconds
+
+## Step 5: View Account Summary
+
+Check your trading account status, P&L, and transaction history:
+
+```bash
+# View paper trading account
+python account.py
+
+# View live trading account
+python account.py live
+```
+
+Account summary shows:
+- 📊 API account balances (live mode only)
+- 📈 Transaction summary (total trades, buy/sell volumes)
+- 💼 Open positions with unrealized P&L
+- 📋 Recent trade history (last 10 trades)
+- 💰 Net realized P&L
+
+## Step 6: Monitor the Bot
 
 ### View Real-time Logs
 
@@ -99,55 +130,74 @@ Press `Ctrl+C` to gracefully stop the bot. It will:
 
 ## Understanding the Output
 
+### Live Price Display (every 5 seconds)
 ```
-2025-11-13 10:30:00 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT
+💹 BTC/USDT: $37,250.50 | Entries: 120/1440 | Running...
 ```
 
-Bot started successfully
-
+### Initialization
 ```
-2025-11-13 10:30:01 - Trade - INFO - Trade update - Price: 37250.5, Volume: 0.15, Bid: 37248.2, Ask: 37252.8
+2025-11-16 10:30:00 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 10:30:00 - Trade - INFO - Database initialized successfully
+```
+
+Bot started successfully in paper mode
+
+### Market Data Updates
+```
+2025-11-16 10:30:01 - Trade - INFO - Trade update - Price: 37250.5, Volume: 0.15, Bid: 37248.2, Ask: 37252.8
 ```
 
 Current market data retrieved
 
+### Trading Signals
 ```
-2025-11-13 10:30:01 - Trade - INFO - Trade price list updated - Total entries: 120, Latest price: 37250.5
-```
-
-Price history being recorded (needs 50+ for signals)
-
-```
-2025-11-13 10:35:00 - Trade - INFO - LONG signal detected - Short MA: 37260.00 crossed above Long MA: 37240.00
+2025-11-16 10:35:00 - Trade - INFO - LONG signal detected - Short MA: 37260.00 crossed above Long MA: 37240.00
 ```
 
 Buy signal generated
 
+### Order Execution (Paper Mode)
 ```
-2025-11-13 10:35:01 - Trade - INFO - Opening LONG position - Price: 37252.80, Quantity: 0.002684
-```
-
-Position opened
-
-```
-2025-11-13 10:45:00 - Trade - INFO - Take profit triggered (PnL: 3.15%)
+2025-11-16 10:35:01 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 37252.80, Quantity: 0.002684
+2025-11-16 10:35:01 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.002684, Price: 37252.80
 ```
 
-Position being closed for profit
+### Order Execution (Live Mode)
+```
+2025-11-16 10:35:01 - Trade - INFO - [LIVE] Order placed successfully - Order ID: 123456
+```
+
+### Position Closing
+```
+2025-11-16 10:45:00 - Trade - INFO - Take profit triggered (PnL: 3.15%)
+2025-11-16 10:45:01 - Trade - INFO - Position closed - Entry: 37252.80, Exit: 38427.00, PnL: 31.50 (3.15%)
+```
+
+Position closed for profit
 
 ## Trading Strategy Overview
 
 - **Entry**: Moving average crossover (20-period vs 50-period)
 - **Exit**: Stop-loss at 2% loss OR take-profit at 3% gain
-- **Update Frequency**: Every 60 seconds
+- **Update Frequency**: Every 60 seconds (customizable via @cron decorator)
+- **Price Display**: Every 5 seconds for user feedback
 - **Data History**: Last 1440 minutes (24 hours)
 - **Position Limit**: 1 position at a time
+- **Transaction Recording**: All trades saved to DuckDB
 
 ## Common Issues
 
 ### Issue: "Missing environment variable"
 
-**Solution**: Set WOOX_API_KEY and WOOX_API_SECRET environment variables
+**Solution**: Set WOOX_API_KEY and WOOX_API_SECRET environment variables (required for live mode only)
+
+### Issue: Bot runs in paper mode when expecting live mode
+
+**Solution**: Ensure `TRADE_MODE='live'` is set:
+```bash
+export TRADE_MODE='live'
+```
 
 ### Issue: API connection timeout
 
@@ -157,29 +207,40 @@ Position being closed for profit
 
 **Solution**: This is normal. Bot only holds one position at a time
 
-### Issue: Order placement failed
+### Issue: Order placement failed in live mode
 
 **Solution**:
 
 - Check API credentials are correct
 - Verify API key has trading permissions
 - Ensure sufficient balance in account
+- Check TRADE_MODE is set to 'live'
+
+### Issue: Database file not found when running account.py
+
+**Solution**: Run trade.py first to create the database file
 
 ## Safety Tips
 
-1. **Start with simulation mode** to understand the bot's behavior
-2. **Use small amounts** when first testing live trading
-3. **Monitor regularly** - automated trading requires oversight
-4. **Set up alerts** - consider adding notification systems
-5. **Understand the risks** - past performance doesn't guarantee future results
+1. **Always start with paper mode** - Test thoroughly before live trading
+2. **Review transaction history** - Use `python account.py` to check all trades
+3. **Use small amounts** when first testing live trading
+4. **Monitor regularly** - Check `trade.log` and console output
+5. **Separate databases** - Paper and live trades stored separately for clarity
+6. **Set alerts** - Consider adding notification systems
+7. **Understand the risks** - Automated trading can result in losses
+8. **Check TRADE_MODE** - Always verify which mode you're running in
 
 ## Next Steps
 
-- Customize trading parameters in `trade.py`
+- Review transaction database with `python account.py`
+- Customize @cron decorator timing in `trade.py`
 - Adjust stop-loss and take-profit levels
-- Modify moving average periods
+- Modify moving average periods (currently 20/50)
 - Add additional trading strategies
 - Implement notification systems (email, Telegram, etc.)
+- Analyze P&L patterns in paper mode before going live
+- Query DuckDB directly for advanced analytics
 
 ## Support
 

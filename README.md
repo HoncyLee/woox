@@ -9,8 +9,12 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Automated Trading Strategy**: Implements moving average crossover strategy
 - **Risk Management**: Built-in stop-loss (2%) and take-profit (3%) mechanisms
 - **Position Management**: Tracks open positions and manages entries/exits
+- **Paper/Live Trading**: Switch between simulation (paper) and real (live) trading modes
+- **Transaction Database**: Records all trades in DuckDB (separate databases for paper/live)
+- **Account Management**: View balances, P&L, and transaction history
+- **Customizable Execution Frequency**: Control method execution with @cron decorator (milliseconds, seconds, minutes)
+- **Live Price Display**: Real-time BTC price updates every 5 seconds
 - **Comprehensive Logging**: All actions logged to file and console
-- **Simulation Mode**: Can run without API credentials for testing
 
 ## Requirements
 
@@ -50,31 +54,72 @@ export WOOX_API_SECRET='your_api_secret_here'
 
 To create API credentials, visit: https://support.woox.io/hc/en-us/articles/4410291152793--API-creation
 
+### Trading Mode Configuration
+
+Set the trading mode using the `TRADE_MODE` environment variable:
+
+```bash
+export TRADE_MODE='paper'  # Safe simulation mode (default)
+export TRADE_MODE='live'   # Real trading with actual money
+```
+
+**Paper Mode**: Simulates all trades without placing real orders
+**Live Mode**: Places actual orders on the exchange (requires valid API credentials)
+
 ### Symbol Configuration
 
 Currently configured for `SPOT_BTC_USDT`. To change the trading pair, modify the `symbol` in the `__init__` method.
 
 ## Usage
 
-### With API Credentials (Live Trading)
+### Paper Trading Mode (Simulation - Default)
+
+```bash
+export TRADE_MODE='paper'
+python trade.py
+```
+
+Paper mode will:
+
+- Fetch real market data from public endpoints
+- Simulate order placement without executing real trades
+- Record all trades in `paper_transaction.db`
+- Log all trading decisions with `[PAPER]` prefix
+
+### Live Trading Mode (Real Money)
 
 ```bash
 export WOOX_API_KEY='your_api_key'
 export WOOX_API_SECRET='your_api_secret'
+export TRADE_MODE='live'
 python trade.py
 ```
 
-### Without API Credentials (Simulation Mode)
+⚠️ **Warning**: Live mode places real orders with real money!
+
+Live mode will:
+
+- Place actual BUY/SELL orders on WOOX exchange
+- Record all trades in `live_transaction.db`
+- Log all trading decisions with `[LIVE]` prefix
+
+### View Account Summary
 
 ```bash
-python trade.py
+# View paper trading account
+python account.py
+
+# View live trading account
+python account.py live
 ```
 
-In simulation mode, the bot will:
+Displays:
 
-- Fetch real market data from public endpoints
-- Simulate order placement without executing real trades
-- Log all trading decisions and actions
+- API account balances (live mode)
+- Transaction summary (buy/sell counts, volumes)
+- Realized P&L from closed positions
+- Open positions with unrealized P&L
+- Recent trade history
 
 ## Trading Strategy
 
@@ -144,6 +189,57 @@ Main loop that continuously monitors market and executes trading logic.
 
 Gracefully stop the trading bot.
 
+### Cron Decorator
+
+Control method execution frequency using the `@cron` decorator:
+
+```python
+@cron(freq='s', period=60)  # Execute every 60 seconds
+def trade_update(self):
+    pass
+
+@cron(freq='m', period=1)   # Execute every 1 minute
+def some_method(self):
+    pass
+
+@cron(freq='ms', period=500)  # Execute every 500 milliseconds
+def fast_method(self):
+    pass
+```
+
+Supported frequencies:
+
+- `'ms'`: Milliseconds
+- `'s'`: Seconds
+- `'m'`: Minutes
+
+## Transaction Database
+
+All trades are automatically recorded in DuckDB:
+
+- **paper_transaction.db**: Paper trading transactions
+- **live_transaction.db**: Live trading transactions
+
+Database schema:
+
+```sql
+CREATE TABLE trades (
+    acct_id TEXT,
+    symbol TEXT,
+    trade_datetime TIMESTAMP,
+    exchange TEXT,
+    signal TEXT,
+    trade_type TEXT,
+    quantity DOUBLE,
+    price DOUBLE,
+    proceeds DOUBLE,
+    commission DOUBLE,
+    fee DOUBLE,
+    order_type TEXT,
+    code TEXT  -- O=Open, C=Close
+)
+```
+
 ## Logging
 
 All activities are logged to:
@@ -160,28 +256,35 @@ Log levels:
 ## Example Output
 
 ```
-2025-11-13 10:30:00 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT
-2025-11-13 10:30:00 - Trade - INFO - Starting trading bot...
-2025-11-13 10:30:01 - Trade - INFO - Trade update - Price: 37250.5, Volume: 0.15, Bid: 37248.2, Ask: 37252.8
-2025-11-13 10:30:01 - Trade - INFO - Trade price list updated - Total entries: 1, Latest price: 37250.5
-2025-11-13 10:30:01 - Trade - INFO - No position currently held
+2025-11-16 10:30:00 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 10:30:00 - Trade - INFO - Database initialized successfully
+2025-11-16 10:30:00 - Trade - INFO - Starting trading bot...
+💹 BTC/USDT: $37,250.50 | Entries: 45/1440 | Running...
+2025-11-16 10:30:01 - Trade - INFO - Trade update - Price: 37250.5, Volume: 0.15, Bid: 37248.2, Ask: 37252.8
+2025-11-16 10:35:00 - Trade - INFO - LONG signal detected - Short MA: 37260.00 crossed above Long MA: 37240.00
+2025-11-16 10:35:01 - Trade - INFO - [PAPER] Simulating order - Opening LONG position
+2025-11-16 10:35:01 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.002684, Price: 37252.80
 ```
 
 ## Safety Features
 
-- Validates side parameter (only 'long' for spot trading)
-- Checks for existing position before opening new one
-- Graceful shutdown with position cleanup
-- Error handling with detailed logging
-- Timeout on all API requests (10 seconds)
+- **Paper mode by default**: Prevents accidental live trading
+- **Separate databases**: Paper and live transactions stored separately
+- **Trade mode validation**: Only places real orders when explicitly in 'live' mode
+- **Position validation**: Checks for existing position before opening new one
+- **Graceful shutdown**: Closes positions and database connections cleanly
+- **Error handling**: Comprehensive try-catch blocks with detailed logging
+- **API timeout**: All requests timeout after 10 seconds
+- **Spot trading only**: Short positions not supported (validation built-in)
 
 ## Notes
 
-- **Spot Trading Only**: Short positions are not supported in spot markets
-- **Test First**: Always test in simulation mode before live trading
+- **Default Mode**: Paper trading (safe simulation)
+- **Test First**: Always test in paper mode before switching to live
 - **API Rate Limits**: Be aware of WOOX API rate limits
 - **Network**: Requires stable internet connection
 - **Capital**: Default trade size is $100 worth of BTC (configurable in code)
+- **Database Files**: Excluded from git via .gitignore
 
 ## Disclaimer
 

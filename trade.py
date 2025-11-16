@@ -154,6 +154,8 @@ class Trade:
             code: Transaction code (O=Open, C=Close)
         """
         try:
+            from datetime import datetime
+            
             proceeds = -quantity * price if trade_type == 'BUY' else quantity * price
             commission = 0.0  # Update if you have commission info
             fee = 0.0  # Update if you have fee info
@@ -166,7 +168,7 @@ class Trade:
             """, (
                 os.environ.get('USER', 'TRADER'),  # acct_id
                 self.symbol,  # symbol
-                time.time(),  # trade_datetime (epoch time)
+                datetime.fromtimestamp(time.time()),  # trade_datetime as TIMESTAMP
                 'woox',  # exchange
                 signal,  # signal
                 trade_type,  # trade_type

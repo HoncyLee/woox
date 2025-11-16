@@ -14,3 +14,33 @@
 2025-11-13 17:57:22,361 - Trade - INFO - No position currently held
 2025-11-13 17:57:45,260 - Trade - INFO - Trading bot stopped by user
 2025-11-13 17:57:45,260 - Trade - INFO - Trading bot shutdown complete
+2025-11-15 16:27:38,196 - Trade - INFO - Database initialized successfully
+2025-11-15 16:27:38,196 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-15 16:27:38,196 - root - INFO - Trading bot started in PAPER MODE - Simulating orders only
+2025-11-15 16:27:38,196 - Trade - INFO - Starting trading bot...
+2025-11-15 16:27:38,573 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95894.48, Ask: 95898.13
+2025-11-15 16:27:38,578 - Trade - INFO - No position currently held
+2025-11-15 16:28:38,438 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95903.44, Ask: 95919.32
+2025-11-15 16:28:38,444 - Trade - INFO - No position currently held
+2025-11-15 16:29:38,523 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95964.55, Ask: 95971.29
+2025-11-15 16:29:38,528 - Trade - INFO - No position currently held
+2025-11-15 16:30:15,586 - Trade - INFO - Trading bot stopped by user
+2025-11-15 16:30:15,590 - Trade - INFO - Database connection closed
+2025-11-15 16:30:15,590 - Trade - INFO - Trading bot shutdown complete
+2025-11-15 19:09:40,581 - Trade - INFO - Database initialized successfully
+2025-11-15 19:09:40,582 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-15 19:09:40,582 - root - INFO - Trading bot started in PAPER MODE - Simulating orders only
+2025-11-15 19:09:40,582 - Trade - INFO - Starting trading bot...
+2025-11-15 19:09:40,834 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95847.52, Ask: 95847.53
+2025-11-15 19:09:40,837 - Trade - INFO - No position currently held
+2025-11-15 19:10:40,831 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95847.52, Ask: 95847.53
+2025-11-15 19:10:40,836 - Trade - INFO - No position currently held
+2025-11-15 19:11:40,835 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95835.71, Ask: 95840.45
+2025-11-15 19:11:40,838 - Trade - INFO - No position currently held
+2025-11-15 19:12:40,877 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95879.72, Ask: 95879.73
+2025-11-15 19:12:40,881 - Trade - INFO - No position currently held
+2025-11-15 19:13:40,871 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 95858.96, Ask: 95861.13
+2025-11-15 19:13:40,876 - Trade - INFO - No position currently held
+2025-11-15 19:13:51,772 - Trade - INFO - Trading bot stopped by user
+2025-11-15 19:13:51,776 - Trade - INFO - Database connection closed
+2025-11-15 19:13:51,776 - Trade - INFO - Trading bot shutdown complete
