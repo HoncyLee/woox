@@ -29,6 +29,43 @@ Testing orderbook endpoint...
 ✓ All tests passed! API connection is working.
 ```
 
+## Step 2.5: Initialize Database (Optional)
+
+The trading bot automatically creates the database on first run, but you can view the database structure beforehand:
+
+```bash
+python createDuckDB.py
+```
+
+This will:
+
+- Create a sample `paper_transaction.db` or `live_transaction.db`
+- Show the trades table schema
+- Insert sample transaction data
+- Display all records
+
+**Database Schema:**
+
+```sql
+CREATE TABLE trades (
+    acct_id TEXT,
+    symbol TEXT,
+    trade_datetime TIMESTAMP,
+    exchange TEXT,
+    signal TEXT,
+    trade_type TEXT,
+    quantity DOUBLE,
+    price DOUBLE,
+    proceeds DOUBLE,
+    commission DOUBLE,
+    fee DOUBLE,
+    order_type TEXT,
+    code TEXT  -- O=Open, C=Close
+)
+```
+
+You can skip this step - the bot will create the database automatically when you run it.
+
 ## Step 3: Configure Trading Mode and API Credentials
 
 ### Set Trading Mode
@@ -103,6 +140,7 @@ python account.py live
 ```
 
 Account summary shows:
+
 - 📊 API account balances (live mode only)
 - 📈 Transaction summary (total trades, buy/sell volumes)
 - 💼 Open positions with unrealized P&L
@@ -131,11 +169,13 @@ Press `Ctrl+C` to gracefully stop the bot. It will:
 ## Understanding the Output
 
 ### Live Price Display (every 5 seconds)
+
 ```
 💹 BTC/USDT: $37,250.50 | Entries: 120/1440 | Running...
 ```
 
 ### Initialization
+
 ```
 2025-11-16 10:30:00 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
 2025-11-16 10:30:00 - Trade - INFO - Database initialized successfully
@@ -144,6 +184,7 @@ Press `Ctrl+C` to gracefully stop the bot. It will:
 Bot started successfully in paper mode
 
 ### Market Data Updates
+
 ```
 2025-11-16 10:30:01 - Trade - INFO - Trade update - Price: 37250.5, Volume: 0.15, Bid: 37248.2, Ask: 37252.8
 ```
@@ -151,6 +192,7 @@ Bot started successfully in paper mode
 Current market data retrieved
 
 ### Trading Signals
+
 ```
 2025-11-16 10:35:00 - Trade - INFO - LONG signal detected - Short MA: 37260.00 crossed above Long MA: 37240.00
 ```
@@ -158,17 +200,20 @@ Current market data retrieved
 Buy signal generated
 
 ### Order Execution (Paper Mode)
+
 ```
 2025-11-16 10:35:01 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 37252.80, Quantity: 0.002684
 2025-11-16 10:35:01 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.002684, Price: 37252.80
 ```
 
 ### Order Execution (Live Mode)
+
 ```
 2025-11-16 10:35:01 - Trade - INFO - [LIVE] Order placed successfully - Order ID: 123456
 ```
 
 ### Position Closing
+
 ```
 2025-11-16 10:45:00 - Trade - INFO - Take profit triggered (PnL: 3.15%)
 2025-11-16 10:45:01 - Trade - INFO - Position closed - Entry: 37252.80, Exit: 38427.00, PnL: 31.50 (3.15%)
@@ -195,6 +240,7 @@ Position closed for profit
 ### Issue: Bot runs in paper mode when expecting live mode
 
 **Solution**: Ensure `TRADE_MODE='live'` is set:
+
 ```bash
 export TRADE_MODE='live'
 ```

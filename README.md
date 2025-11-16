@@ -70,6 +70,28 @@ export TRADE_MODE='live'   # Real trading with actual money
 
 Currently configured for `SPOT_BTC_USDT`. To change the trading pair, modify the `symbol` in the `__init__` method.
 
+## Database Setup
+
+The bot automatically creates transaction databases on first run. However, you can manually initialize or inspect the database structure:
+
+```bash
+# View and create sample database structure
+python createDuckDB.py
+```
+
+This script:
+
+- Creates a DuckDB database with the trades table schema
+- Inserts sample transaction data for reference
+- Displays the database structure
+
+The trading bot will create:
+
+- `paper_transaction.db` for paper trading
+- `live_transaction.db` for live trading
+
+Both use the same schema defined in `createDuckDB.py`.
+
 ## Usage
 
 ### Paper Trading Mode (Simulation - Default)
