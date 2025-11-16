@@ -256,10 +256,11 @@ Position closed for profit
 
 ### Issue: Bot runs in paper mode when expecting live mode
 
-**Solution**: Ensure `TRADE_MODE='live'` is set:
+**Solution**: Ensure `TRADE_MODE=live` is set in the `.config` file (no quotes needed):
 
 ```bash
-export TRADE_MODE='live'
+# In .config file
+TRADE_MODE=live
 ```
 
 ### Issue: API connection timeout
