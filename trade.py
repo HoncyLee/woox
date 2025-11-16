@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any, Callable
 import json
 import functools
 import duckdb
+from config_loader import CONFIG, get_config_value
 
 
 def cron(freq: str = 's', period: float = 1):
@@ -58,17 +59,20 @@ def cron(freq: str = 's', period: float = 1):
     
     return decorator
 
-API_KEY = os.environ.get('WOOX_API_KEY', '')
-API_SECRET = os.environ.get('WOOX_API_SECRET', '')
-BASE_URL = 'https://api.woox.io'
-TRADE_MODE = os.environ.get('TRADE_MODE', 'paper')  # 'paper' or 'live'
+API_KEY = CONFIG.get('WOOX_API_KEY', '')
+API_SECRET = CONFIG.get('WOOX_API_SECRET', '')
+BASE_URL = CONFIG.get('BASE_URL', 'https://api.woox.io')
+TRADE_MODE = CONFIG.get('TRADE_MODE', 'paper')  # 'paper' or 'live'
 
 # Configure logging
+log_level = getattr(logging, CONFIG.get('LOG_LEVEL', 'INFO'))
+log_file = CONFIG.get('LOG_FILE', 'trade.log')
+
 logging.basicConfig(
-    level=logging.INFO,
+    level=log_level,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('trade.log'),
+        logging.FileHandler(log_file),
         logging.StreamHandler()
     ]
 )
@@ -91,8 +95,8 @@ class Trade:
         """
         self.logger = logging.getLogger('Trade')
         self.base_url = BASE_URL
-        self.api_key = api_key if api_key else os.environ.get('WOOX_API_KEY')
-        self.api_secret = api_secret if api_secret else os.environ.get('WOOX_API_SECRET')
+        self.api_key = api_key if api_key else CONFIG.get('WOOX_API_KEY')
+        self.api_secret = api_secret if api_secret else CONFIG.get('WOOX_API_SECRET')
         self.trade_mode = trade_mode if trade_mode else TRADE_MODE
         self.symbol = "SPOT_BTC_USDT"
         
@@ -166,7 +170,7 @@ class Trade:
             self.db_conn.execute("""
             INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                os.environ.get('USER', 'TRADER'),  # acct_id
+                CONFIG.get('USER', 'TRADER'),  # acct_id
                 self.symbol,  # symbol
                 datetime.fromtimestamp(time.time()),  # trade_datetime as TIMESTAMP
                 'woox',  # exchange
@@ -750,9 +754,9 @@ if __name__ == "__main__":
     # and only fetch public market data without placing real orders
     
     try:
-        api_key = os.environ.get('WOOX_API_KEY')
-        api_secret = os.environ.get('WOOX_API_SECRET')
-        trade_mode = os.environ.get('TRADE_MODE', 'paper')
+        api_key = CONFIG.get('WOOX_API_KEY')
+        api_secret = CONFIG.get('WOOX_API_SECRET')
+        trade_mode = CONFIG.get('TRADE_MODE', 'paper')
         
         trader = Trade(api_key, api_secret, trade_mode)
         

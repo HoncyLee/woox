@@ -32,9 +32,9 @@ class Account:
         """
         self.logger = logging.getLogger('Account')
         self.trade_mode = trade_mode
-        self.api_key = api_key or os.environ.get('WOOX_API_KEY', '')
-        self.api_secret = api_secret or os.environ.get('WOOX_API_SECRET', '')
-        self.base_url = 'https://api.woox.io'
+        self.api_key = api_key or CONFIG.get('WOOX_API_KEY', '')
+        self.api_secret = api_secret or CONFIG.get('WOOX_API_SECRET', '')
+        self.base_url = CONFIG.get('BASE_URL', 'https://api.woox.io')
         
         # Connect to appropriate database
         db_file = 'live_transaction.db' if trade_mode == 'live' else 'paper_transaction.db'
@@ -308,10 +308,8 @@ class Account:
 
 
 def main():
-    """Main function to display account summary."""
-    import sys
-    
-    trade_mode = os.environ.get('TRADE_MODE', 'paper')
+    """Main entry point for account summary."""
+    trade_mode = CONFIG.get('TRADE_MODE', 'paper')
     
     # Allow mode override from command line
     if len(sys.argv) > 1:

@@ -43,28 +43,49 @@ This bot uses WOOX V3 REST API:
 
 ## Configuration
 
-### Environment Variables
+Configuration settings are stored in the `.config` file, with API credentials loaded from environment variables.
 
-Set your WOOX API credentials as environment variables:
+### API Credentials (from .zshrc)
+
+Set your WOOX API credentials as environment variables in your `.zshrc` file:
 
 ```bash
 export WOOX_API_KEY='your_api_key_here'
 export WOOX_API_SECRET='your_api_secret_here'
 ```
 
+Then reload your shell: `source ~/.zshrc`
+
+To create API credentials, visit: https://support.woox.io/hc/en-us/articles/4410291152793--API-creation
+
+### Trading Configuration (.config file)
+
+Edit the `.config` file and set your trading parameters:
+
+```bash
+# Trading Configuration
+
+# Trading Configuration
+TRADE_MODE=paper  # 'paper' or 'live'
+SYMBOL=SPOT_BTC_USDT
+BASE_URL=https://api.woox.io
+
+# Strategy Parameters
+SHORT_MA_PERIOD=20
+LONG_MA_PERIOD=50
+STOP_LOSS_PCT=2.0
+TAKE_PROFIT_PCT=3.0
+
+# Trading Parameters
+TRADE_AMOUNT_USD=100
+```
+
 To create API credentials, visit: https://support.woox.io/hc/en-us/articles/4410291152793--API-creation
 
 ### Trading Mode Configuration
 
-Set the trading mode using the `TRADE_MODE` environment variable:
-
-```bash
-export TRADE_MODE='paper'  # Safe simulation mode (default)
-export TRADE_MODE='live'   # Real trading with actual money
-```
-
-**Paper Mode**: Simulates all trades without placing real orders
-**Live Mode**: Places actual orders on the exchange (requires valid API credentials)
+**Paper Mode** (`TRADE_MODE=paper`): Simulates all trades without placing real orders
+**Live Mode** (`TRADE_MODE=live`): Places actual orders on the exchange (requires valid API credentials)
 
 ### Symbol Configuration
 
@@ -96,8 +117,9 @@ Both use the same schema defined in `createDuckDB.py`.
 
 ### Paper Trading Mode (Simulation - Default)
 
+Set `TRADE_MODE=paper` in `.config`, then:
+
 ```bash
-export TRADE_MODE='paper'
 python trade.py
 ```
 
@@ -110,10 +132,9 @@ Paper mode will:
 
 ### Live Trading Mode (Real Money)
 
+Set `TRADE_MODE=live` in `.config` and ensure your API credentials are configured, then:
+
 ```bash
-export WOOX_API_KEY='your_api_key'
-export WOOX_API_SECRET='your_api_secret'
-export TRADE_MODE='live'
 python trade.py
 ```
 

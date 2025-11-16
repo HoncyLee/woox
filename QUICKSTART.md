@@ -70,20 +70,26 @@ You can skip this step - the bot will create the database automatically when you
 
 ### Set Trading Mode
 
+Edit the `.config` file in the project root:
+
 ```bash
 # Paper trading (simulation - default, safe)
-export TRADE_MODE='paper'
+TRADE_MODE=paper
 
 # Live trading (real money - use with caution)
-export TRADE_MODE='live'
+TRADE_MODE=live
 ```
 
 ### Configure API Credentials (Required for Live Mode)
+
+Add your credentials to `.zshrc` as environment variables:
 
 ```bash
 export WOOX_API_KEY='your_api_key_here'
 export WOOX_API_SECRET='your_api_secret_here'
 ```
+
+Then reload: `source ~/.zshrc`
 
 **To get API credentials:**
 
@@ -96,8 +102,9 @@ export WOOX_API_SECRET='your_api_secret_here'
 
 ### Paper Trading Mode (Simulation - Recommended)
 
+Set `TRADE_MODE=paper` in `.config`, then:
+
 ```bash
-export TRADE_MODE='paper'
 python trade.py
 ```
 
@@ -111,10 +118,9 @@ Paper mode will:
 
 ### Live Trading Mode (Real Money)
 
+Set `TRADE_MODE=live` in `.config` and ensure your API credentials are configured, then:
+
 ```bash
-export WOOX_API_KEY='your_actual_key'
-export WOOX_API_SECRET='your_actual_secret'
-export TRADE_MODE='live'
 python trade.py
 ```
 
