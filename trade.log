@@ -128,3 +128,8 @@
 2025-11-16 19:02:19,788 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
 2025-11-16 19:02:20,096 - Trade - INFO - Trade update - Price: 96447.5, Volume: 0.0, Bid: 96447.0, Ask: 96448.0
 2025-11-16 19:02:20,214 - Trade - INFO - Trade price list updated - Total entries: 1, Latest price: 96447.5
+2025-11-16 19:36:14,244 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-16 19:36:14,258 - Trade - INFO - Database initialized successfully
+2025-11-16 19:36:14,258 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
+2025-11-16 19:36:14,518 - Trade - INFO - Trade update - Price: 95751.5, Volume: 0.0, Bid: 95751.0, Ask: 95752.0
+2025-11-16 19:36:14,518 - Trade - INFO - Trade price list updated - Total entries: 1, Latest price: 95751.5

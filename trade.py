@@ -110,15 +110,15 @@ class Trade:
         self.current_bid = None
         self.current_ask = None
         
-        # Orderbook data - store multiple levels of bids and asks
+        # Orderbook data storage (up to 30 levels each side)
         self.orderbook = {
-            'bids': [],  # List of {'price': float, 'quantity': float}
-            'asks': [],  # List of {'price': float, 'quantity': float}
-            'bid_depth': 0.0,  # Total quantity on bid side
-            'ask_depth': 0.0,  # Total quantity on ask side
-            'spread': 0.0,  # Bid-ask spread
-            'mid_price': None,  # Mid price between best bid and ask
-            'timestamp': None
+            'bids': [],  # [{'price': float, 'quantity': float}, ...]
+            'asks': [],  # [{'price': float, 'quantity': float}, ...]
+            'bid_depth': 0.0,    # Total quantity on bid side
+            'ask_depth': 0.0,    # Total quantity on ask side
+            'spread': 0.0,       # Ask - Bid
+            'mid_price': None,   # (Ask + Bid) / 2
+            'timestamp': None    # Unix timestamp
         }
         
         # Position tracking
@@ -278,11 +278,11 @@ class Trade:
             Dictionary containing price, volume, bid, ask, and orderbook data
         """
         try:
-            # Get full orderbook with multiple levels (V3 API)
+            # Get orderbook with up to 30 levels (V3 API)
             orderbook_url = f"{self.base_url}/v3/public/orderbook"
             orderbook_response = requests.get(
-                orderbook_url, 
-                params={"symbol": self.symbol, "maxLevel": 100},
+                orderbook_url,
+                params={"symbol": self.symbol, "maxLevel": 30},
                 timeout=10
             )
             orderbook_data = orderbook_response.json()
@@ -309,11 +309,11 @@ class Trade:
                 # Process and store full orderbook
                 self.orderbook['bids'] = [
                     {'price': float(bid['price']), 'quantity': float(bid['quantity'])}
-                    for bid in bids[:100]  # Store up to 100 levels
+                    for bid in bids[:30]  # Store up to 30 levels
                 ]
                 self.orderbook['asks'] = [
                     {'price': float(ask['price']), 'quantity': float(ask['quantity'])}
-                    for ask in asks[:100]  # Store up to 100 levels
+                    for ask in asks[:30]  # Store up to 30 levels
                 ]
                 
                 # Calculate orderbook metrics
