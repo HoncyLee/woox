@@ -7,6 +7,7 @@ import duckdb
 import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
+from config_loader import CONFIG
 
 # Configure logging
 logging.basicConfig(

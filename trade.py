@@ -333,8 +333,8 @@ class Trade:
         Determine the logic to open a position (long or short).
         
         Uses simple moving average crossover strategy:
-        - If we have enough data (50+ points)
-        - Calculate short-term (20) and long-term (50) moving averages
+        - If we have enough data (configured via LONG_MA_PERIOD)
+        - Calculate short-term and long-term moving averages (from config)
         - Signal LONG when short MA crosses above long MA
         - Signal SHORT when short MA crosses below long MA
         
@@ -342,22 +342,25 @@ class Trade:
             'long', 'short', or None
         """
         try:
-            if len(self.trade_px_list) < 50:
+            short_period = int(CONFIG.get('SHORT_MA_PERIOD', 20))
+            long_period = int(CONFIG.get('LONG_MA_PERIOD', 50))
+            
+            if len(self.trade_px_list) < long_period:
                 self.logger.debug("Not enough data for trade determination: %d entries", len(self.trade_px_list))
                 return None
             
             # Calculate moving averages
             prices = [entry['price'] for entry in self.trade_px_list if entry['price']]
             
-            if len(prices) < 50:
+            if len(prices) < long_period:
                 return None
             
-            short_ma = sum(prices[-20:]) / 20
-            long_ma = sum(prices[-50:]) / 50
+            short_ma = sum(prices[-short_period:]) / short_period
+            long_ma = sum(prices[-long_period:]) / long_period
             
             # Previous moving averages (for crossover detection)
-            prev_short_ma = sum(prices[-21:-1]) / 20
-            prev_long_ma = sum(prices[-51:-1]) / 50
+            prev_short_ma = sum(prices[-short_period-1:-1]) / short_period
+            prev_long_ma = sum(prices[-long_period-1:-1]) / long_period
             
             # Detect crossover
             signal = None
@@ -384,9 +387,9 @@ class Trade:
         """
         Determine when to close a position.
         
-        Uses simple stop-loss/take-profit logic:
-        - Stop loss: 2% loss
-        - Take profit: 3% gain
+        Uses stop-loss/take-profit logic from config:
+        - Stop loss: STOP_LOSS_PCT% loss
+        - Take profit: TAKE_PROFIT_PCT% gain
         
         Returns:
             True if position should be closed, False otherwise
@@ -394,6 +397,9 @@ class Trade:
         try:
             if not self.current_position or not self.current_price:
                 return False
+            
+            stop_loss_pct = float(CONFIG.get('STOP_LOSS_PCT', 2.0))
+            take_profit_pct = float(CONFIG.get('TAKE_PROFIT_PCT', 3.0))
             
             entry_price = self.current_position['entry_price']
             side = self.current_position['side']
@@ -406,10 +412,10 @@ class Trade:
             should_close = False
             reason = ""
             
-            if pnl_pct <= -2.0:
+            if pnl_pct <= -stop_loss_pct:
                 should_close = True
                 reason = f"Stop loss triggered (PnL: {pnl_pct:.2f}%)"
-            elif pnl_pct >= 3.0:
+            elif pnl_pct >= take_profit_pct:
                 should_close = True
                 reason = f"Take profit triggered (PnL: {pnl_pct:.2f}%)"
             
@@ -628,11 +634,14 @@ class Trade:
                 )
             
             # Record transaction in database
+            stop_loss_pct = float(CONFIG.get('STOP_LOSS_PCT', 2.0))
+            signal = 'STOP_LOSS' if pnl_pct <= -stop_loss_pct else 'TAKE_PROFIT'
+            
             self._record_transaction(
                 trade_type='SELL',
                 quantity=quantity,
                 price=price,
-                signal='STOP_LOSS' if pnl_pct <= -2.0 else 'TAKE_PROFIT',
+                signal=signal,
                 order_type='LMT',
                 code='C'  # C = Close position
             )
@@ -685,8 +694,9 @@ class Trade:
                         signal = self.determineOpenTrade()
                         
                         if signal and self.current_price:
-                            # Calculate quantity (example: $100 worth of BTC)
-                            quantity = 100 / self.current_price
+                            # Calculate quantity based on configured trade amount
+                            trade_amount_usd = float(CONFIG.get('TRADE_AMOUNT_USD', 100))
+                            quantity = trade_amount_usd / self.current_price
                             
                             # Use current ask/bid for limit price
                             if signal == 'long' and self.current_ask:
