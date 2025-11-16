@@ -60,8 +60,8 @@ def cron(freq: str = 's', period: float = 1):
     
     return decorator
 
-API_KEY = CONFIG.get('WOOX_API_KEY', '')
-API_SECRET = CONFIG.get('WOOX_API_SECRET', '')
+API_KEY = os.environ.get('WOOX_API_KEY')
+API_SECRET = os.environ.get('WOOX_API_SECRET')
 BASE_URL = CONFIG.get('BASE_URL', 'https://api.woox.io')
 TRADE_MODE = CONFIG.get('TRADE_MODE', 'paper')  # 'paper' or 'live'
 
@@ -258,10 +258,10 @@ class Trade:
             
         return headers
     
-    @cron(freq='s', period=60)
     def trade_update(self) -> Dict[str, Any]:
         """
         Fetch the latest spot price, volume, bid, and ask from WOOX API.
+        Called frequently to keep data fresh.
         
         Returns:
             Dictionary containing price, volume, bid, ask data
@@ -616,19 +616,25 @@ class Trade:
         
         try:
             last_price_display_time = 0
+            last_trade_check_time = 0
             price_display_interval = 5  # Display price every 5 seconds
+            trade_check_interval = float(CONFIG.get('UPDATE_INTERVAL_SECONDS', 60))  # Trading decisions interval
             
             while self.running:
                 current_time = time.time()
                 
-                # Call trade_update (will execute based on @cron decorator timing)
-                trade_data = self.trade_update()
-                
-                # If trade_data was returned (not None), process it
-                if trade_data:
-                    # Update price history
-                    self.updateTradePxList(trade_data)
+                # Fetch current market data every 5 seconds to keep entries updated
+                if current_time - last_price_display_time >= price_display_interval:
+                    trade_data = self.trade_update()
                     
+                    # If trade_data was returned, update price history
+                    if trade_data:
+                        self.updateTradePxList(trade_data)
+                    
+                    last_price_display_time = current_time
+                
+                # Make trading decisions at configured interval (default 60s)
+                if current_time - last_trade_check_time >= trade_check_interval:
                     # Check current position status
                     current_pos = self.hasPosition()
                     
@@ -650,29 +656,13 @@ class Trade:
                                 self.openPosition('long', self.current_ask, quantity)
                             elif signal == 'short' and self.current_bid:
                                 self.openPosition('short', self.current_bid, quantity)
+                    
+                    last_trade_check_time = current_time
+                    last_trade_check_time = current_time
                 
-                # Quick price display every 5 seconds to show bot is running
-                if current_time - last_price_display_time >= price_display_interval:
-                    try:
-                        trades_url = f"{self.base_url}/v3/public/marketTrades"
-                        trades_response = requests.get(
-                            trades_url, 
-                            params={"symbol": self.symbol, "limit": 1},
-                            timeout=5
-                        )
-                        trades_data = trades_response.json()
-                        
-                        if trades_response.status_code == 200 and trades_data.get('success'):
-                            data = trades_data.get('data', {})
-                            recent_trades = data.get('rows', [])
-                            if recent_trades:
-                                latest_trade = recent_trades[0]
-                                current_price = float(latest_trade.get('price', 0))
-                                print(f"\r💹 BTC/USDT: ${current_price:,.2f} | Entries: {len(self.trade_px_list)}/1440 | Running...", end='', flush=True)
-                        
-                        last_price_display_time = current_time
-                    except Exception:
-                        pass  # Silently continue on quick price check errors
+                # Display current price and entries count
+                if self.current_price:
+                    print(f"\r💹 BTC/USDT: ${self.current_price:,.2f} | Entries: {len(self.trade_px_list)}/1440 | Running...", end='', flush=True)
                 
                 # Sleep for minimal time to keep loop responsive
                 time.sleep(0.1)  # 100 milliseconds

@@ -44,3 +44,69 @@
 2025-11-15 19:13:51,772 - Trade - INFO - Trading bot stopped by user
 2025-11-15 19:13:51,776 - Trade - INFO - Database connection closed
 2025-11-15 19:13:51,776 - Trade - INFO - Trading bot shutdown complete
+2025-11-16 17:45:39,273 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-16 17:45:39,284 - Trade - INFO - Database initialized successfully
+2025-11-16 17:45:39,284 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 17:45:39,284 - root - INFO - Trading bot started in PAPER MODE - Simulating orders only
+2025-11-16 17:45:39,284 - Trade - INFO - Starting trading bot...
+2025-11-16 17:45:39,504 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96166.36, Ask: 96172.33
+2025-11-16 17:45:39,507 - Trade - INFO - No position currently held
+2025-11-16 17:46:39,595 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96214.54, Ask: 96218.41
+2025-11-16 17:46:39,601 - Trade - INFO - No position currently held
+2025-11-16 17:47:39,530 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96183.61, Ask: 96189.24
+2025-11-16 17:47:39,535 - Trade - INFO - No position currently held
+2025-11-16 17:48:07,249 - Trade - INFO - Trading bot stopped by user
+2025-11-16 17:48:07,256 - Trade - INFO - Database connection closed
+2025-11-16 17:48:07,256 - Trade - INFO - Trading bot shutdown complete
+2025-11-16 18:02:42,008 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-16 18:02:42,022 - Trade - INFO - Database initialized successfully
+2025-11-16 18:02:42,022 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 18:02:42,022 - root - INFO - Trading bot started in PAPER MODE - Simulating orders only
+2025-11-16 18:02:42,022 - Trade - INFO - Starting trading bot...
+2025-11-16 18:02:42,289 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96507.42, Ask: 96512.81
+2025-11-16 18:02:42,291 - Trade - INFO - No position currently held
+2025-11-16 18:02:47,276 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96488.56, Ask: 96488.57
+2025-11-16 18:02:52,364 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96496.24, Ask: 96497.42
+2025-11-16 18:02:57,449 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96515.02, Ask: 96518.89
+2025-11-16 18:03:02,547 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96498.12, Ask: 96501.56
+2025-11-16 18:03:08,096 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96490.42, Ask: 96493.76
+2025-11-16 18:03:12,835 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96495.17, Ask: 96501.56
+2025-11-16 18:03:17,718 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96489.56, Ask: 96492.53
+2025-11-16 18:03:22,713 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96492.07, Ask: 96492.53
+2025-11-16 18:03:27,732 - Trade - INFO - Trade update - Price: 0.0, Volume: 0.0, Bid: 96506.79, Ask: 96512.05
+2025-11-16 18:03:31,577 - Trade - INFO - Trading bot stopped by user
+2025-11-16 18:03:31,583 - Trade - INFO - Database connection closed
+2025-11-16 18:03:31,583 - Trade - INFO - Trading bot shutdown complete
+2025-11-16 18:10:08,146 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-16 18:10:08,159 - Trade - INFO - Database initialized successfully
+2025-11-16 18:10:08,159 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 18:10:08,162 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-16 18:10:21,377 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-16 18:10:21,377 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763287808.1627789}
+2025-11-16 18:10:21,377 - MovingAverageCrossover - INFO - Exit signal - Stop loss triggered (PnL: -2.50%) | Side: long, Entry: 95000.00, Current: 92625.00, PnL: -2.50%
+2025-11-16 18:10:21,378 - Trade - INFO - [PAPER] Simulating close order - Closing LONG position - Entry: 95000.00, Exit: 92625.00, Quantity: 0.001053
+2025-11-16 18:10:21,379 - Trade - INFO - Transaction recorded - Type: SELL, Quantity: -0.001053, Price: 92625.00, Proceeds: 97.50
+2025-11-16 18:10:21,379 - Trade - INFO - Position closed - Entry: 95000.00, Exit: 92625.00, Quantity: 0.001053, PnL: -2.50 (-2.50%)
+2025-11-16 18:10:21,379 - Trade - INFO - Position closed successfully
+2025-11-16 18:11:13,372 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-16 18:11:13,392 - Trade - INFO - Database initialized successfully
+2025-11-16 18:11:13,392 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 18:11:13,422 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-16 18:11:13,921 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-16 18:11:13,921 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763287873.422647}
+2025-11-16 18:11:13,921 - MovingAverageCrossover - INFO - Exit signal - Stop loss triggered (PnL: -2.50%) | Side: long, Entry: 95000.00, Current: 92625.00, PnL: -2.50%
+2025-11-16 18:11:13,921 - Trade - INFO - [PAPER] Simulating close order - Closing LONG position - Entry: 95000.00, Exit: 92625.00, Quantity: 0.001053
+2025-11-16 18:11:13,921 - Trade - INFO - Transaction recorded - Type: SELL, Quantity: -0.001053, Price: 92625.00, Proceeds: 97.50
+2025-11-16 18:11:13,921 - Trade - INFO - Position closed - Entry: 95000.00, Exit: 92625.00, Quantity: 0.001053, PnL: -2.50 (-2.50%)
+2025-11-16 18:11:13,921 - Trade - INFO - Position closed successfully
+2025-11-16 18:11:56,102 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-16 18:11:56,111 - Trade - INFO - Database initialized successfully
+2025-11-16 18:11:56,111 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+2025-11-16 18:11:56,136 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-16 18:11:56,646 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-16 18:11:56,646 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763287916.136653}
+2025-11-16 18:11:56,646 - MovingAverageCrossover - INFO - Exit signal - Stop loss triggered (PnL: -2.50%) | Side: long, Entry: 95000.00, Current: 92625.00, PnL: -2.50%
+2025-11-16 18:11:56,646 - Trade - INFO - [PAPER] Simulating close order - Closing LONG position - Entry: 95000.00, Exit: 92625.00, Quantity: 0.001053
+2025-11-16 18:11:56,647 - Trade - INFO - Transaction recorded - Type: SELL, Quantity: -0.001053, Price: 92625.00, Proceeds: 97.50
+2025-11-16 18:11:56,647 - Trade - INFO - Position closed - Entry: 95000.00, Exit: 92625.00, Quantity: 0.001053, PnL: -2.50 (-2.50%)
+2025-11-16 18:11:56,647 - Trade - INFO - Position closed successfully
