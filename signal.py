@@ -20,30 +20,31 @@ class BaseStrategy:
         self.config = config
         self.logger = logging.getLogger(self.__class__.__name__)
     
-    def generate_entry_signal(self, price_history: deque) -> Optional[str]:
+    def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
-        Generate entry signal based on price history.
+        Generate entry signal based on price history and optional orderbook data.
         
         Args:
             price_history: Deque of price data dictionaries
+            orderbook: Optional orderbook data with bids, asks, depth metrics
             
         Returns:
             'long', 'short', or None
         """
         raise NotImplementedError("Subclasses must implement generate_entry_signal")
     
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Generate exit signal based on current position and price.
+        Generate exit signal based on RSI returning to neutral zone.
         
         Args:
-            position: Dictionary with position details (side, quantity, entry_price, open_time)
+            position: Dictionary with position details
             current_price: Current market price
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
-            True if position should be closed, False otherwise
+            True if RSI indicates reversal, False otherwise
         """
-        raise NotImplementedError("Subclasses must implement generate_exit_signal")
 
 
 class MovingAverageCrossover(BaseStrategy):
@@ -196,12 +197,13 @@ class RSIStrategy(BaseStrategy):
             self.logger.error("Error calculating RSI: %s", str(e))
             return None
     
-    def generate_entry_signal(self, price_history: deque) -> Optional[str]:
+    def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
         Generate entry signal using RSI.
         
         Args:
             price_history: Deque of price data dictionaries
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
             'long' when RSI crosses above oversold threshold (30)
@@ -242,13 +244,14 @@ class RSIStrategy(BaseStrategy):
             self.logger.error("Error generating RSI entry signal: %s", str(e))
             return None
     
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
         Generate exit signal using stop-loss and take-profit.
         
         Args:
             position: Current position details
             current_price: Current market price
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
             True if position should be closed
@@ -329,12 +332,13 @@ class BollingerBandsStrategy(BaseStrategy):
             self.logger.error("Error calculating Bollinger Bands: %s", str(e))
             return None
     
-    def generate_entry_signal(self, price_history: deque) -> Optional[str]:
+    def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
         Generate entry signal using Bollinger Bands.
         
         Args:
             price_history: Deque of price data dictionaries
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
             'long' when price touches lower band
@@ -381,14 +385,15 @@ class BollingerBandsStrategy(BaseStrategy):
         except Exception as e:
             self.logger.error("Error generating Bollinger Bands entry signal: %s", str(e))
             return None
-    
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float) -> bool:
+
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
         Generate exit signal using stop-loss and take-profit.
         
         Args:
             position: Current position details
             current_price: Current market price
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
             True if position should be closed

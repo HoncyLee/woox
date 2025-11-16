@@ -99,7 +99,7 @@ class Trade:
         self.api_key = api_key if api_key else CONFIG.get('WOOX_API_KEY')
         self.api_secret = api_secret if api_secret else CONFIG.get('WOOX_API_SECRET')
         self.trade_mode = trade_mode if trade_mode else TRADE_MODE
-        self.symbol = "SPOT_BTC_USDT"
+        self.symbol = CONFIG.get('SYMBOL', 'PERP_BTC_USDT')
         
         # Store 1440 minutes (24 hours) of price data
         self.trade_px_list = deque(maxlen=1440)
@@ -109,6 +109,17 @@ class Trade:
         self.current_volume = None
         self.current_bid = None
         self.current_ask = None
+        
+        # Orderbook data - store multiple levels of bids and asks
+        self.orderbook = {
+            'bids': [],  # List of {'price': float, 'quantity': float}
+            'asks': [],  # List of {'price': float, 'quantity': float}
+            'bid_depth': 0.0,  # Total quantity on bid side
+            'ask_depth': 0.0,  # Total quantity on ask side
+            'spread': 0.0,  # Bid-ask spread
+            'mid_price': None,  # Mid price between best bid and ask
+            'timestamp': None
+        }
         
         # Position tracking
         self.current_position = None  # {'side': 'long'/'short', 'quantity': float, 'entry_price': float}
@@ -260,18 +271,18 @@ class Trade:
     
     def trade_update(self) -> Dict[str, Any]:
         """
-        Fetch the latest spot price, volume, bid, and ask from WOOX API.
+        Fetch the latest price, volume, and full orderbook from WOOX API.
         Called frequently to keep data fresh.
         
         Returns:
-            Dictionary containing price, volume, bid, ask data
+            Dictionary containing price, volume, bid, ask, and orderbook data
         """
         try:
-            # Get orderbook for bid/ask (V3 API)
+            # Get full orderbook with multiple levels (V3 API)
             orderbook_url = f"{self.base_url}/v3/public/orderbook"
             orderbook_response = requests.get(
                 orderbook_url, 
-                params={"symbol": self.symbol},
+                params={"symbol": self.symbol, "maxLevel": 100},
                 timeout=10
             )
             orderbook_data = orderbook_response.json()
@@ -285,13 +296,39 @@ class Trade:
             )
             trades_data = trades_response.json()
             
+            # Process orderbook data
             if orderbook_response.status_code == 200 and orderbook_data.get('success'):
                 data = orderbook_data.get('data', {})
                 asks = data.get('asks', [])
                 bids = data.get('bids', [])
                 
+                # Store best bid/ask
                 self.current_ask = float(asks[0]['price']) if asks else None
                 self.current_bid = float(bids[0]['price']) if bids else None
+                
+                # Process and store full orderbook
+                self.orderbook['bids'] = [
+                    {'price': float(bid['price']), 'quantity': float(bid['quantity'])}
+                    for bid in bids[:100]  # Store up to 100 levels
+                ]
+                self.orderbook['asks'] = [
+                    {'price': float(ask['price']), 'quantity': float(ask['quantity'])}
+                    for ask in asks[:100]  # Store up to 100 levels
+                ]
+                
+                # Calculate orderbook metrics
+                if self.orderbook['bids'] and self.orderbook['asks']:
+                    self.orderbook['bid_depth'] = sum(b['quantity'] for b in self.orderbook['bids'])
+                    self.orderbook['ask_depth'] = sum(a['quantity'] for a in self.orderbook['asks'])
+                    self.orderbook['spread'] = self.current_ask - self.current_bid
+                    self.orderbook['mid_price'] = (self.current_ask + self.current_bid) / 2
+                    self.orderbook['timestamp'] = time.time()
+                    
+                    self.logger.debug(
+                        "Orderbook - Bid Depth: %.4f, Ask Depth: %.4f, Spread: %.2f, Levels: %d/%d",
+                        self.orderbook['bid_depth'], self.orderbook['ask_depth'],
+                        self.orderbook['spread'], len(self.orderbook['bids']), len(self.orderbook['asks'])
+                    )
             
             if trades_response.status_code == 200 and trades_data.get('success'):
                 data = trades_data.get('data', {})
@@ -300,6 +337,10 @@ class Trade:
                     latest_trade = recent_trades[0]
                     self.current_price = float(latest_trade.get('price', 0))
                     self.current_volume = float(latest_trade.get('size', 0))
+            
+            # Fallback to mid-price if no recent trades
+            if not self.current_price and self.orderbook.get('mid_price'):
+                self.current_price = self.orderbook['mid_price']
             
             self.logger.info(
                 "Trade update - Price: %s, Volume: %s, Bid: %s, Ask: %s",
@@ -311,6 +352,7 @@ class Trade:
                 'volume': self.current_volume,
                 'bid': self.current_bid,
                 'ask': self.current_ask,
+                'orderbook': self.orderbook.copy(),  # Include full orderbook data
                 'timestamp': time.time()
             }
             
@@ -320,10 +362,10 @@ class Trade:
     
     def updateTradePxList(self, trade_data: Dict[str, Any]) -> None:
         """
-        Monitor and record 1440 spot minute data (24 hours).
+        Monitor and record price data with orderbook information.
         
         Args:
-            trade_data: Dictionary containing trade information
+            trade_data: Dictionary containing trade and orderbook information
         """
         try:
             if trade_data and trade_data.get('price'):
@@ -332,6 +374,7 @@ class Trade:
                     'volume': trade_data['volume'],
                     'bid': trade_data['bid'],
                     'ask': trade_data['ask'],
+                    'orderbook': trade_data.get('orderbook', {}),  # Include orderbook snapshot
                     'timestamp': trade_data['timestamp']
                 }
                 
@@ -344,6 +387,71 @@ class Trade:
         except Exception as e:
             self.logger.error("Error updating trade price list: %s", str(e))
     
+    def get_orderbook_imbalance(self) -> Optional[float]:
+        """
+        Calculate orderbook imbalance ratio.
+        Positive value indicates more buying pressure (bid depth > ask depth).
+        Negative value indicates more selling pressure (ask depth > bid depth).
+        
+        Returns:
+            Imbalance ratio between -1.0 and 1.0, or None if no data
+        """
+        try:
+            if not self.orderbook.get('bid_depth') or not self.orderbook.get('ask_depth'):
+                return None
+            
+            bid_depth = self.orderbook['bid_depth']
+            ask_depth = self.orderbook['ask_depth']
+            
+            # Calculate imbalance: (bid - ask) / (bid + ask)
+            total_depth = bid_depth + ask_depth
+            if total_depth == 0:
+                return 0.0
+            
+            imbalance = (bid_depth - ask_depth) / total_depth
+            return imbalance
+            
+        except Exception as e:
+            self.logger.error("Error calculating orderbook imbalance: %s", str(e))
+            return None
+    
+    def get_orderbook_support_resistance(self, levels: int = 10) -> Dict[str, Any]:
+        """
+        Identify potential support and resistance levels from orderbook.
+        
+        Args:
+            levels: Number of top levels to analyze
+            
+        Returns:
+            Dictionary with support/resistance prices and strengths
+        """
+        try:
+            if not self.orderbook.get('bids') or not self.orderbook.get('asks'):
+                return {}
+            
+            # Get top N bids (potential support)
+            top_bids = sorted(
+                self.orderbook['bids'][:levels],
+                key=lambda x: x['quantity'],
+                reverse=True
+            )[:3]  # Top 3 strongest support levels
+            
+            # Get top N asks (potential resistance)
+            top_asks = sorted(
+                self.orderbook['asks'][:levels],
+                key=lambda x: x['quantity'],
+                reverse=True
+            )[:3]  # Top 3 strongest resistance levels
+            
+            return {
+                'support_levels': [{'price': b['price'], 'strength': b['quantity']} for b in top_bids],
+                'resistance_levels': [{'price': a['price'], 'strength': a['quantity']} for a in top_asks],
+            }
+            
+        except Exception as e:
+            self.logger.error("Error calculating support/resistance: %s", str(e))
+            return {}
+    
     def determineOpenTrade(self) -> Optional[str]:
         """
         Determine the logic to open a position (long or short).
@@ -353,7 +461,10 @@ class Trade:
             'long', 'short', or None
         """
         try:
-            return self.entry_strategy.generate_entry_signal(self.trade_px_list)
+            return self.entry_strategy.generate_entry_signal(
+                self.trade_px_list,
+                self.orderbook
+            )
         except Exception as e:
             self.logger.error("Error determining open trade: %s", str(e))
             return None
@@ -372,7 +483,8 @@ class Trade:
             
             return self.exit_strategy.generate_exit_signal(
                 self.current_position,
-                self.current_price
+                self.current_price,
+                self.orderbook
             )
         except Exception as e:
             self.logger.error("Error determining stop trade: %s", str(e))
@@ -443,20 +555,24 @@ class Trade:
                 self.logger.warning("Cannot open position - already holding a position")
                 return False
             
-            # For spot trading, only BUY orders make sense (long position)
+            # Validate side
             if side not in ['long', 'short']:
                 self.logger.error("Invalid side: %s. Must be 'long' or 'short'", side)
                 return False
             
-            if side == 'short':
-                self.logger.warning("Short positions not supported for spot trading. Use perpetual futures.")
+            # Check if symbol supports short positions (PERP allows short, SPOT doesn't)
+            if side == 'short' and self.symbol.startswith('SPOT_'):
+                self.logger.warning("Short positions not supported for spot trading. Use perpetual futures (PERP_).")
                 return False
             
             # Use V3 API to place order if in live mode and credentials are provided
             if self.trade_mode == 'live' and self.api_key and self.api_secret:
+                # Determine order side based on position type
+                order_side = "BUY" if side == "long" else "SELL"
+                
                 order_body = {
                     "symbol": self.symbol,
-                    "side": "BUY",
+                    "side": order_side,
                     "type": "LIMIT",
                     "price": str(price),
                     "quantity": str(quantity)
@@ -538,15 +654,18 @@ class Trade:
             if side == 'long':
                 pnl = (price - entry_price) * quantity
                 pnl_pct = ((price - entry_price) / entry_price) * 100
-            else:  # short (not applicable for spot, but keep logic)
+            else:  # short
                 pnl = (entry_price - price) * quantity
                 pnl_pct = ((entry_price - price) / entry_price) * 100
             
-            # Use V3 API to place sell order if in live mode and credentials are provided
+            # Use V3 API to place closing order if in live mode and credentials are provided
             if self.trade_mode == 'live' and self.api_key and self.api_secret:
+                # Determine closing order side (opposite of position)
+                close_side = "SELL" if side == "long" else "BUY"
+                
                 order_body = {
                     "symbol": self.symbol,
-                    "side": "SELL",
+                    "side": close_side,
                     "type": "LIMIT",
                     "price": str(price),
                     "quantity": str(quantity)

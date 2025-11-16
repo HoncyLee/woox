@@ -4,12 +4,14 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 
 ## Features
 
-- **Real-time Market Data**: Fetches latest BTC_USDT spot price, volume, bid, and ask using WOOX V3 API
-- **Historical Data Tracking**: Monitors and records up to 1440 minutes (24 hours) of price data
+- **Real-time Market Data**: Fetches latest BTC_USDT price, volume, bid, and ask using WOOX V3 API
+- **Deep Orderbook Data**: Collects up to 100 bid/ask levels with quantities, depth metrics, and imbalance analysis
+- **Historical Data Tracking**: Monitors and records up to 1440 minutes (24 hours) of price and orderbook data
 - **Multiple Trading Strategies**: Choose from MA Crossover, RSI, or Bollinger Bands strategies (extensible)
 - **Modular Signal System**: Separate `signal.py` module for easy strategy development and testing
+- **Advanced Market Analysis**: Orderbook imbalance detection, support/resistance identification from depth
 - **Risk Management**: Built-in stop-loss and take-profit mechanisms (configurable)
-- **Position Management**: Tracks open positions and manages entries/exits
+- **Position Management**: Tracks open positions and manages entries/exits (long and short for PERP)
 - **Paper/Live Trading**: Switch between simulation (paper) and real (live) trading modes
 - **Transaction Database**: Records all trades in DuckDB (separate databases for paper/live)
 - **Account Management**: View balances, P&L, and transaction history
@@ -34,13 +36,61 @@ This bot uses WOOX V3 REST API:
 
 - **Public Market Data** (no authentication required):
 
-  - `GET /v3/public/orderbook` - Get orderbook for bid/ask prices
+  - `GET /v3/public/orderbook` - Get orderbook for bid/ask prices (supports maxLevel=100 for deep data)
   - `GET /v3/public/marketTrades` - Get recent market trades
 
 - **Authenticated Trading** (requires API key):
   - `GET /v3/trade/orders` - Get open orders
   - `POST /v3/trade/order` - Place a new order
   - `DELETE /v3/trade/order` - Cancel an order
+
+## Orderbook Data Collection
+
+The bot collects comprehensive orderbook data for advanced analysis:
+
+### Data Collected
+
+- **Up to 100 bid/ask levels**: Price and quantity for each level
+- **Bid/Ask Depth**: Total quantity on bid and ask sides
+- **Spread**: Difference between best ask and best bid
+- **Mid Price**: Average of best bid and best ask
+- **Historical Snapshots**: Orderbook stored with each price update
+
+### Available Analysis Methods
+
+```python
+# Get orderbook imbalance (-1.0 to 1.0)
+# Positive = more buying pressure, Negative = more selling pressure
+imbalance = trader.get_orderbook_imbalance()
+
+# Identify support and resistance levels from orderbook depth
+levels = trader.get_orderbook_support_resistance(levels=20)
+# Returns: {'support_levels': [...], 'resistance_levels': [...]}
+```
+
+### Accessing Orderbook in Strategies
+
+Strategies can optionally use orderbook data for signal generation:
+
+```python
+def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None):
+    if orderbook:
+        # Access orderbook metrics
+        bid_depth = orderbook.get('bid_depth', 0)
+        ask_depth = orderbook.get('ask_depth', 0)
+        imbalance = (bid_depth - ask_depth) / (bid_depth + ask_depth)
+
+        # Access bid/ask levels
+        bids = orderbook.get('bids', [])  # List of {'price': float, 'quantity': float}
+        asks = orderbook.get('asks', [])
+
+        # Use in signal logic
+        if imbalance > 0.3:  # Strong buying pressure
+            return 'long'
+
+    # Fallback to price-based logic
+    ...
+```
 
 ## Configuration
 
@@ -95,12 +145,35 @@ To create API credentials, visit: https://support.woox.io/hc/en-us/articles/4410
 
 ### Trading Mode Configuration
 
-**Paper Mode** (`TRADE_MODE=paper`): Simulates all trades without placing real orders
+**Paper Mode** (`TRADE_MODE=paper`): Simulates all trades without placing real orders  
 **Live Mode** (`TRADE_MODE=live`): Places actual orders on the exchange (requires valid API credentials)
 
 ### Symbol Configuration
 
-Currently configured for `SPOT_BTC_USDT`. To change the trading pair, modify the `symbol` in the `__init__` method.
+The bot supports both SPOT and PERP (perpetual futures) symbols:
+
+- **SPOT_BTC_USDT**: Spot trading (long positions only)
+- **PERP_BTC_USDT**: Perpetual futures (supports both long and short positions)
+
+Configure the symbol in your `.config` file:
+
+```bash
+SYMBOL=PERP_BTC_USDT  # For perpetual futures with short support
+# or
+SYMBOL=SPOT_BTC_USDT  # For spot trading (long only)
+```
+
+**PERP advantages:**
+
+- Can profit from both rising (long) and falling (short) markets
+- Typically higher liquidity and tighter spreads
+- Better for strategy testing with orderbook depth
+
+**SPOT advantages:**
+
+- No funding fees
+- Direct ownership of assets
+- Simpler for buy-and-hold strategies
 
 ## Database Setup
 
@@ -352,6 +425,57 @@ Log levels:
 - `WARNING`: Important alerts (e.g., cannot open position)
 - `ERROR`: Errors and exceptions
 
+## Testing
+
+The project includes comprehensive test scripts:
+
+### Test Orderbook Data Collection
+
+```bash
+python test_orderbook.py
+```
+
+Tests:
+
+- Orderbook API with 100 bid/ask levels
+- Depth metrics calculation (bid_depth, ask_depth, spread, mid_price)
+- Orderbook imbalance analysis
+- Support/resistance level identification
+- Historical orderbook storage
+
+### Test Trading Workflow
+
+```bash
+python test_trade_workflow.py
+```
+
+Tests:
+
+- Signal generation for both long and short positions
+- Position lifecycle (open → monitor → close)
+- Database transaction recording
+- Stop-loss/take-profit triggers
+
+### Test Signals
+
+```bash
+python test_signals.py
+```
+
+Tests all available strategies:
+
+- Moving Average Crossover
+- RSI (Relative Strength Index)
+- Bollinger Bands
+
+### Test API Connection
+
+```bash
+python test_api.py
+```
+
+Tests basic WOOX API connectivity and authentication.
+
 ## Example Output
 
 ```
@@ -374,7 +498,8 @@ Log levels:
 - **Graceful shutdown**: Closes positions and database connections cleanly
 - **Error handling**: Comprehensive try-catch blocks with detailed logging
 - **API timeout**: All requests timeout after 10 seconds
-- **Spot trading only**: Short positions not supported (validation built-in)
+- **PERP support**: Both long and short positions for perpetual futures
+- **SPOT restrictions**: Only long positions for spot trading (validation built-in)
 
 ## Notes
 
@@ -382,6 +507,8 @@ Log levels:
 - **Test First**: Always test in paper mode before switching to live
 - **API Rate Limits**: Be aware of WOOX API rate limits
 - **Network**: Requires stable internet connection
+- **Orderbook Depth**: Full 100-level orderbook updated every 5 seconds
+- **Symbol Choice**: Use PERP for short support, SPOT for simple buy/hold
 - **Capital**: Default trade size is $100 worth of BTC (configurable in code)
 - **Database Files**: Excluded from git via .gitignore
 
