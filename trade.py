@@ -10,6 +10,7 @@ import json
 import functools
 import duckdb
 from config_loader import CONFIG, get_config_value
+from signal import get_strategy
 
 
 def cron(freq: str = 's', period: float = 1):
@@ -111,6 +112,21 @@ class Trade:
         
         # Position tracking
         self.current_position = None  # {'side': 'long'/'short', 'quantity': float, 'entry_price': float}
+        
+        # Initialize trading strategies
+        entry_strategy_name = CONFIG.get('ENTRY_STRATEGY', 'ma_crossover')
+        exit_strategy_name = CONFIG.get('EXIT_STRATEGY', 'ma_crossover')
+        
+        try:
+            self.entry_strategy = get_strategy(entry_strategy_name, CONFIG)
+            self.exit_strategy = get_strategy(exit_strategy_name, CONFIG)
+            self.logger.info(
+                "Strategies loaded - Entry: %s, Exit: %s",
+                entry_strategy_name, exit_strategy_name
+            )
+        except ValueError as e:
+            self.logger.error("Strategy initialization error: %s", str(e))
+            raise
         
         self.running = True
         
@@ -331,54 +347,13 @@ class Trade:
     def determineOpenTrade(self) -> Optional[str]:
         """
         Determine the logic to open a position (long or short).
-        
-        Uses simple moving average crossover strategy:
-        - If we have enough data (configured via LONG_MA_PERIOD)
-        - Calculate short-term and long-term moving averages (from config)
-        - Signal LONG when short MA crosses above long MA
-        - Signal SHORT when short MA crosses below long MA
+        Uses the configured entry strategy from signal module.
         
         Returns:
             'long', 'short', or None
         """
         try:
-            short_period = int(CONFIG.get('SHORT_MA_PERIOD', 20))
-            long_period = int(CONFIG.get('LONG_MA_PERIOD', 50))
-            
-            if len(self.trade_px_list) < long_period:
-                self.logger.debug("Not enough data for trade determination: %d entries", len(self.trade_px_list))
-                return None
-            
-            # Calculate moving averages
-            prices = [entry['price'] for entry in self.trade_px_list if entry['price']]
-            
-            if len(prices) < long_period:
-                return None
-            
-            short_ma = sum(prices[-short_period:]) / short_period
-            long_ma = sum(prices[-long_period:]) / long_period
-            
-            # Previous moving averages (for crossover detection)
-            prev_short_ma = sum(prices[-short_period-1:-1]) / short_period
-            prev_long_ma = sum(prices[-long_period-1:-1]) / long_period
-            
-            # Detect crossover
-            signal = None
-            if prev_short_ma <= prev_long_ma and short_ma > long_ma:
-                signal = 'long'
-                self.logger.info(
-                    "LONG signal detected - Short MA: %.2f crossed above Long MA: %.2f",
-                    short_ma, long_ma
-                )
-            elif prev_short_ma >= prev_long_ma and short_ma < long_ma:
-                signal = 'short'
-                self.logger.info(
-                    "SHORT signal detected - Short MA: %.2f crossed below Long MA: %.2f",
-                    short_ma, long_ma
-                )
-            
-            return signal
-            
+            return self.entry_strategy.generate_entry_signal(self.trade_px_list)
         except Exception as e:
             self.logger.error("Error determining open trade: %s", str(e))
             return None
@@ -386,10 +361,7 @@ class Trade:
     def determineStopTrade(self) -> bool:
         """
         Determine when to close a position.
-        
-        Uses stop-loss/take-profit logic from config:
-        - Stop loss: STOP_LOSS_PCT% loss
-        - Take profit: TAKE_PROFIT_PCT% gain
+        Uses the configured exit strategy from signal module.
         
         Returns:
             True if position should be closed, False otherwise
@@ -398,35 +370,10 @@ class Trade:
             if not self.current_position or not self.current_price:
                 return False
             
-            stop_loss_pct = float(CONFIG.get('STOP_LOSS_PCT', 2.0))
-            take_profit_pct = float(CONFIG.get('TAKE_PROFIT_PCT', 3.0))
-            
-            entry_price = self.current_position['entry_price']
-            side = self.current_position['side']
-            
-            if side == 'long':
-                pnl_pct = ((self.current_price - entry_price) / entry_price) * 100
-            else:  # short
-                pnl_pct = ((entry_price - self.current_price) / entry_price) * 100
-            
-            should_close = False
-            reason = ""
-            
-            if pnl_pct <= -stop_loss_pct:
-                should_close = True
-                reason = f"Stop loss triggered (PnL: {pnl_pct:.2f}%)"
-            elif pnl_pct >= take_profit_pct:
-                should_close = True
-                reason = f"Take profit triggered (PnL: {pnl_pct:.2f}%)"
-            
-            if should_close:
-                self.logger.info(
-                    "Close position signal - %s | Side: %s, Entry: %.2f, Current: %.2f, PnL: %.2f%%",
-                    reason, side, entry_price, self.current_price, pnl_pct
-                )
-            
-            return should_close
-            
+            return self.exit_strategy.generate_exit_signal(
+                self.current_position,
+                self.current_price
+            )
         except Exception as e:
             self.logger.error("Error determining stop trade: %s", str(e))
             return False

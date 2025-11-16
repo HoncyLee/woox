@@ -6,8 +6,9 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 
 - **Real-time Market Data**: Fetches latest BTC_USDT spot price, volume, bid, and ask using WOOX V3 API
 - **Historical Data Tracking**: Monitors and records up to 1440 minutes (24 hours) of price data
-- **Automated Trading Strategy**: Implements moving average crossover strategy
-- **Risk Management**: Built-in stop-loss (2%) and take-profit (3%) mechanisms
+- **Multiple Trading Strategies**: Choose from MA Crossover, RSI, or Bollinger Bands strategies (extensible)
+- **Modular Signal System**: Separate `signal.py` module for easy strategy development and testing
+- **Risk Management**: Built-in stop-loss and take-profit mechanisms (configurable)
 - **Position Management**: Tracks open positions and manages entries/exits
 - **Paper/Live Trading**: Switch between simulation (paper) and real (live) trading modes
 - **Transaction Database**: Records all trades in DuckDB (separate databases for paper/live)
@@ -64,6 +65,16 @@ Edit the `.config` file and set your trading parameters:
 
 ```bash
 # Trading Configuration
+TRADE_MODE=paper  # 'paper' or 'live'
+SYMBOL=SPOT_BTC_USDT
+BASE_URL=https://api.woox.io
+
+# Strategy Selection
+# Available strategies: ma_crossover, rsi, bollinger_bands
+ENTRY_STRATEGY=ma_crossover
+EXIT_STRATEGY=ma_crossover
+
+# Strategy Parameters - Moving Average Crossover
 
 # Trading Configuration
 TRADE_MODE=paper  # 'paper' or 'live'
@@ -112,6 +123,51 @@ The trading bot will create:
 - `live_transaction.db` for live trading
 
 Both use the same schema defined in `createDuckDB.py`.
+
+## Trading Strategies
+
+The bot supports multiple entry and exit strategies through the `signal.py` module. Configure your preferred strategy in the `.config` file.
+
+### Available Strategies
+
+**1. Moving Average Crossover (`ma_crossover`)**
+
+- **Entry**: Long when short MA crosses above long MA, Short when short MA crosses below long MA
+- **Parameters**: `SHORT_MA_PERIOD` (default: 20), `LONG_MA_PERIOD` (default: 50)
+- **Exit**: Stop-loss and take-profit based on percentages
+
+**2. RSI Strategy (`rsi`)**
+
+- **Entry**: Long when RSI crosses above oversold threshold (30), Short when RSI crosses below overbought threshold (70)
+- **Parameters**: `RSI_PERIOD` (default: 14), `RSI_OVERSOLD` (default: 30), `RSI_OVERBOUGHT` (default: 70)
+- **Exit**: Stop-loss and take-profit based on percentages
+
+**3. Bollinger Bands Strategy (`bollinger_bands`)**
+
+- **Entry**: Long when price touches lower band, Short when price touches upper band
+- **Parameters**: `BB_PERIOD` (default: 20), `BB_STD_DEV` (default: 2.0)
+- **Exit**: Stop-loss and take-profit based on percentages
+
+### Strategy Configuration
+
+In `.config` file:
+
+```bash
+# Select strategies
+ENTRY_STRATEGY=ma_crossover  # or rsi, bollinger_bands
+EXIT_STRATEGY=ma_crossover   # or rsi, bollinger_bands
+
+# Exit parameters (used by all strategies)
+STOP_LOSS_PCT=2.0      # Stop loss at 2% loss
+TAKE_PROFIT_PCT=3.0    # Take profit at 3% gain
+```
+
+### Adding Custom Strategies
+
+1. Create a new strategy class in `signal.py` that inherits from `BaseStrategy`
+2. Implement `generate_entry_signal()` and `generate_exit_signal()` methods
+3. Add your strategy to the `STRATEGY_REGISTRY` dictionary
+4. Set your strategy name in `.config`
 
 ## Usage
 

@@ -68,7 +68,7 @@ You can skip this step - the bot will create the database automatically when you
 
 ## Step 3: Configure Trading Mode and API Credentials
 
-### Set Trading Mode
+### Set Trading Mode and Strategy
 
 Edit the `.config` file in the project root:
 
@@ -78,7 +78,18 @@ TRADE_MODE=paper
 
 # Live trading (real money - use with caution)
 TRADE_MODE=live
+
+# Strategy Selection
+# Available: ma_crossover, rsi, bollinger_bands
+ENTRY_STRATEGY=ma_crossover
+EXIT_STRATEGY=ma_crossover
 ```
+
+**Available Strategies:**
+
+- `ma_crossover`: Moving Average Crossover (default)
+- `rsi`: RSI Oversold/Overbought
+- `bollinger_bands`: Bollinger Bands Breakout
 
 ### Configure API Credentials (Required for Live Mode)
 
