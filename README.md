@@ -320,4 +320,6 @@ This is educational software. Trading cryptocurrencies carries significant risk.
 
 ## License
 
-Use at your own risk.
+BSD 3-Clause License - See [LICENSE](https://github.com/HoncyLee/woox?tab=BSD-3-Clause-1-ov-file#readme) for details.
+
+**Risk Disclaimer**: Use at your own risk. This software is provided "as is" without warranty of any kind. Trading cryptocurrencies carries significant financial risk.
