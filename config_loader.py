@@ -45,9 +45,14 @@ def load_config(config_path: str = '.config') -> Dict[str, Any]:
                 elif value.startswith("'") and value.endswith("'"):
                     value = value[1:-1]
                 
-                # Convert numeric values
-                if value.replace('.', '', 1).isdigit():
-                    value = float(value) if '.' in value else int(value)
+                # Convert numeric values (only if purely numeric)
+                try:
+                    # Check if it's a valid number
+                    if value.replace('.', '', 1).replace('-', '', 1).isdigit():
+                        value = float(value) if '.' in value else int(value)
+                except (ValueError, AttributeError):
+                    # Keep as string if conversion fails
+                    pass
                 
                 config[key] = value
     

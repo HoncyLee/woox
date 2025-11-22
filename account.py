@@ -33,8 +33,8 @@ class Account:
         """
         self.logger = logging.getLogger('Account')
         self.trade_mode = trade_mode
-        self.api_key = api_key or CONFIG.get('WOOX_API_KEY', '')
-        self.api_secret = api_secret or CONFIG.get('WOOX_API_SECRET', '')
+        self.api_key = os.environ.get('WOOX_API_KEY')
+        self.api_secret = os.environ.get('WOOX_API_SECRET')
         self.base_url = CONFIG.get('BASE_URL', 'https://api.woox.io')
         
         # Connect to appropriate database
