@@ -292,7 +292,7 @@ def main():
     """Run all tests."""
     print("\n" + "█"*70)
     print("█" + " "*68 + "█")
-    print("█" + " "*15 + "TRADE WORKFLOW TEST SUITE" + " "*29 + "█")
+    print("█" + " "*15 + "TRADE WORKFLOW TEST SUITE" + " "*28 + "█")
     print("█" + " "*68 + "█")
     print("█"*70)
     

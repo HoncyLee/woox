@@ -278,6 +278,9 @@ Live mode will:
 ### View Account Summary
 
 ```bash
+# Activate virtual environment first
+workon woox
+
 # View paper trading account
 python account.py
 
@@ -292,6 +295,22 @@ Displays:
 - Realized P&L from closed positions
 - Open positions with unrealized P&L
 - Recent trade history
+
+### Portfolio Analysis (Jupyter Notebook)
+
+```bash
+workon woox
+cd portfolio_analysis
+jupyter notebook portfolio_monitor.ipynb
+```
+
+Interactive notebook for:
+
+- Live API balance updates
+- Transaction history analysis
+- Profit & Loss visualization
+- Portfolio performance metrics
+- Export capabilities to CSV/Excel
 
 ## Trading Strategy
 
@@ -429,6 +448,22 @@ Log levels:
 
 The project includes comprehensive test scripts:
 
+### Verify Signal Generation and Stop-Loss Logic
+
+```bash
+workon woox
+python verify_signals.py
+```
+
+**Recommended for validation**: This standalone script verifies core trading logic works correctly:
+
+- **Signal Generation**: Tests MA crossover with clear bullish/bearish patterns
+- **Stop-Loss Triggers**: Verifies stop-loss activates when losses exceed threshold (-3.09%)
+- **Take-Profit Triggers**: Verifies take-profit activates when gains exceed threshold (+5%)
+- **No Exit Scenarios**: Confirms positions remain open when P&L is within range
+
+This test provides clear pass/fail results for each scenario and helps verify your configuration settings are working as expected.
+
 ### Test Orderbook Data Collection
 
 ```bash
@@ -521,6 +556,30 @@ This is educational software. Trading cryptocurrencies carries significant risk.
 - Never invest more than you can afford to lose
 - Understand the risks of automated trading
 - Monitor your bot regularly
+
+## Documentation
+
+**📚 Full documentation is available in the `docs/` directory.**
+
+Build and view the documentation:
+
+```bash
+cd docs
+make html
+open _build/html/index.html  # macOS
+# or
+xdg-open _build/html/index.html  # Linux
+```
+
+Online documentation: [Read the full documentation](docs/_build/html/index.html)
+
+Documentation includes:
+- **Getting Started** - Installation and setup guide
+- **Configuration** - Complete configuration reference
+- **Strategies** - Trading strategy guide and customization
+- **API Reference** - Detailed code documentation
+- **Testing** - Testing and verification guide
+- **Deployment** - Production deployment guide
 
 ## License
 

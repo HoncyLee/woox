@@ -133,3 +133,31 @@
 2025-11-16 19:36:14,258 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
 2025-11-16 19:36:14,518 - Trade - INFO - Trade update - Price: 95751.5, Volume: 0.0, Bid: 95751.0, Ask: 95752.0
 2025-11-16 19:36:14,518 - Trade - INFO - Trade price list updated - Total entries: 1, Latest price: 95751.5
+2025-11-23 13:52:02,792 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-23 13:52:02,797 - Trade - INFO - Database initialized successfully
+2025-11-23 13:52:02,798 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
+2025-11-23 13:52:02,805 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-23 13:52:04,203 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-23 13:52:04,203 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763877122.80577}
+2025-11-23 13:52:04,203 - Trade - ERROR - Error determining stop trade: MovingAverageCrossover.generate_exit_signal() takes 3 positional arguments but 4 were given
+2025-11-23 13:53:00,134 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-23 13:53:00,140 - Trade - INFO - Database initialized successfully
+2025-11-23 13:53:00,140 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
+2025-11-23 13:53:00,151 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-23 13:53:00,370 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-23 13:53:00,370 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763877180.1515672}
+2025-11-23 13:53:00,370 - Trade - ERROR - Error determining stop trade: MovingAverageCrossover.generate_exit_signal() takes 3 positional arguments but 4 were given
+2025-11-23 13:55:18,465 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-23 13:55:18,471 - Trade - INFO - Database initialized successfully
+2025-11-23 13:55:18,471 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
+2025-11-23 13:55:18,478 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-23 13:55:18,669 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-23 13:55:18,669 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763877318.478167}
+2025-11-23 13:55:18,669 - Trade - ERROR - Error determining stop trade: MovingAverageCrossover.generate_exit_signal() takes 3 positional arguments but 4 were given
+2025-11-23 14:10:07,343 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-23 14:10:07,348 - Trade - INFO - Database initialized successfully
+2025-11-23 14:10:07,348 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in PAPER mode
+2025-11-23 14:10:07,355 - Trade - INFO - [PAPER] Simulating order - Opening LONG position - Price: 95000.00, Quantity: 0.001053
+2025-11-23 14:10:07,589 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
+2025-11-23 14:10:07,589 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763878207.3550751}
+2025-11-23 14:10:07,589 - Trade - ERROR - Error determining stop trade: MovingAverageCrossover.generate_exit_signal() takes 3 positional arguments but 4 were given

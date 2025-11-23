@@ -35,16 +35,18 @@ class BaseStrategy:
     
     def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Generate exit signal based on RSI returning to neutral zone.
+        Generate exit signal for closing a position.
+        Subclasses should implement strategy-specific exit logic.
         
         Args:
-            position: Dictionary with position details
+            position: Dictionary with position details (side, entry_price, quantity)
             current_price: Current market price
-            orderbook: Optional orderbook data (unused in this strategy)
+            orderbook: Optional orderbook data for advanced exit strategies
             
         Returns:
-            True if RSI indicates reversal, False otherwise
+            True if position should be closed, False otherwise
         """
+        raise NotImplementedError("Subclasses must implement generate_exit_signal")
 
 
 class MovingAverageCrossover(BaseStrategy):
@@ -110,13 +112,14 @@ class MovingAverageCrossover(BaseStrategy):
             self.logger.error("Error generating entry signal: %s", str(e))
             return None
     
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
         Generate exit signal using stop-loss and take-profit.
         
         Args:
             position: Current position details
             current_price: Current market price
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
             True if position should be closed
