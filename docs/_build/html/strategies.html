@@ -1,0 +1,807 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Strategies &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1d87fc8b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api_reference.html" />
+    <link rel="prev" title="Configuration Guide" href="configuration.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            WOOX Trading Bot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#api-credentials-setup">API Credentials Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#first-run-paper-trading">First Run - Paper Trading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#verify-setup">Verify Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#view-account-summary">View Account Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#portfolio-analysis">Portfolio Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-mode">Trading Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#symbol-configuration">Symbol Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-selection">Strategy Selection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#entry-strategy">Entry Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#exit-strategy">Exit Strategy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-parameters">Strategy Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#risk-management">Risk Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#stop-loss">Stop Loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#take-profit">Take Profit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-parameters">Trading Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#trade-amount">Trade Amount</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#update-interval">Update Interval</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#logging-configuration">Logging Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#api-configuration">API Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#base-url">Base URL</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#example-configurations">Example Configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#conservative-recommended-for-beginners">Conservative (Recommended for Beginners)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#aggressive-higher-risk-reward">Aggressive (Higher Risk/Reward)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#scalping-very-active-trading">Scalping (Very Active Trading)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-validation">Configuration Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Trading Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#strategy-architecture">Strategy Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-strategies">Built-in Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#exit-strategies">Exit Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stop-loss-exit">Stop-Loss Exit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#take-profit-exit">Take-Profit Exit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-custom-strategies">Creating Custom Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-template">Basic Template</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#register-your-strategy">Register Your Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-in-configuration">Use in Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-using-orderbook-data">Advanced: Using Orderbook Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strategy-selection-guide">Strategy Selection Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#choose-based-on-market-conditions">Choose Based on Market Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#choose-based-on-trading-style">Choose Based on Trading Style</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#backtesting-strategies">Backtesting Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strategy-performance-metrics">Strategy Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-pitfalls">Common Pitfalls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#core-modules">Core Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-signal">signal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.signal"><code class="docutils literal notranslate"><span class="pre">signal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.getsignal"><code class="docutils literal notranslate"><span class="pre">getsignal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.pthread_sigmask"><code class="docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigpending"><code class="docutils literal notranslate"><span class="pre">sigpending()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigwait"><code class="docutils literal notranslate"><span class="pre">sigwait()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.valid_signals"><code class="docutils literal notranslate"><span class="pre">valid_signals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Handlers"><code class="docutils literal notranslate"><span class="pre">Handlers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.ItimerError"><code class="docutils literal notranslate"><span class="pre">ItimerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Sigmasks"><code class="docutils literal notranslate"><span class="pre">Sigmasks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Signals"><code class="docutils literal notranslate"><span class="pre">Signals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#basestrategy">BaseStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#movingaveragecrossover">MovingAverageCrossover</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#rsistrategy">RSIStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#bollingerbandsstrategy">BollingerBandsStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#strategy-registry">Strategy Registry</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-account">account</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account-class">Account Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-config_loader">config_loader</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.get_config_value"><code class="docutils literal notranslate"><span class="pre">get_config_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#configuration-functions">Configuration Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#utility-modules">Utility Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-createDuckDB">createDuckDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-balance_summary">balance_summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.get_current_price"><code class="docutils literal notranslate"><span class="pre">get_current_price()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_currency"><code class="docutils literal notranslate"><span class="pre">format_currency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_quantity"><code class="docutils literal notranslate"><span class="pre">format_quantity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.print_separator"><code class="docutils literal notranslate"><span class="pre">print_separator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_api_balance"><code class="docutils literal notranslate"><span class="pre">display_api_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_open_positions"><code class="docutils literal notranslate"><span class="pre">display_open_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_transaction_summary"><code class="docutils literal notranslate"><span class="pre">display_transaction_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_recent_trades"><code class="docutils literal notranslate"><span class="pre">display_recent_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#test-modules">Test Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-orderbook">test_orderbook</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_api">test_api</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_instruments"><code class="docutils literal notranslate"><span class="pre">test_instruments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#data-structures">Data Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#position-dictionary">Position Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade-data-dictionary">Trade Data Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#orderbook-dictionary">Orderbook Dictionary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#database-schema">Database Schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trades-table">trades Table</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#constants">Constants</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#default-configuration-values">Default Configuration Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#api-endpoints">API Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#exceptions-and-errors">Exceptions and Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#type-hints-reference">Type Hints Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-suite-overview">Test Suite Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-verification-recommended-first">Signal Verification (Recommended First)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#trading-workflow-test">Trading Workflow Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#strategy-tests">Strategy Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#orderbook-tests">Orderbook Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-connectivity-test">API Connectivity Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#running-all-tests">Running All Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-scenarios">Test Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-tests">Signal Generation Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#stop-loss-tests">Stop-Loss Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#take-profit-tests">Take-Profit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#position-holding-test">Position Holding Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-tests">Database Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#interpreting-test-results">Interpreting Test Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#success-indicators">Success Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#failure-indicators">Failure Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#warning-indicators">Warning Indicators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-output-analysis">Test Output Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#understanding-results">Understanding Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#troubleshooting-failed-tests">Troubleshooting Failed Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-issues">Signal Generation Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-issues">Database Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-issues">API Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#manual-testing">Manual Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#paper-trading-test">Paper Trading Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#portfolio-analysis-test">Portfolio Analysis Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#configuration-validation">Configuration Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pre-deployment-testing">Pre-Deployment Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#regular-testing">Regular Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#continuous-integration">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-coverage">Test Coverage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#current-test-coverage">Current Test Coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#areas-not-covered">Areas Not Covered</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#adding-new-tests">Adding New Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#pre-deployment-checklist">Pre-Deployment Checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#infrastructure">Infrastructure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#monitoring">Monitoring</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#live-trading-setup">Live Trading Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-1-final-configuration">Step 1: Final Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-2-verify-api-credentials">Step 2: Verify API Credentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-3-database-preparation">Step 3: Database Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-4-initial-live-test">Step 4: Initial Live Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-5-full-deployment">Step 5: Full Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#production-deployment-options">Production Deployment Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-1-screen-tmux-simple">Option 1: Screen/Tmux (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-2-systemd-service-recommended">Option 2: Systemd Service (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-3-supervisor-alternative">Option 3: Supervisor (Alternative)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-4-docker-advanced">Option 4: Docker (Advanced)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#monitoring-and-alerting">Monitoring and Alerting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#log-monitoring">Log Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#email-alerts-simple">Email Alerts (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#performance-monitoring">Performance Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#scheduled-health-checks">Scheduled Health Checks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#backup-strategy">Backup Strategy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#database-backups">Database Backups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#configuration-backups">Configuration Backups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#disaster-recovery">Disaster Recovery</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#bot-crashes">Bot Crashes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#database-corruption">Database Corruption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#lost-position">Lost Position</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#security-best-practices">Security Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#api-key-security">API Key Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#server-security">Server Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#code-security">Code Security</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#scaling-considerations">Scaling Considerations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#multiple-symbols">Multiple Symbols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#multiple-strategies">Multiple Strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#performance-tuning">Performance Tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#troubleshooting-production-issues">Troubleshooting Production Issues</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#high-cpu-usage">High CPU Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#memory-leaks">Memory Leaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#api-rate-limits">API Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WOOX Trading Bot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Trading Strategies</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/strategies.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="trading-strategies">
+<h1>Trading Strategies<a class="headerlink" href="#trading-strategies" title="Link to this heading"></a></h1>
+<p>The WOOX Trading Bot supports multiple trading strategies through a modular design. This guide explains each strategy and how to create custom ones.</p>
+<section id="strategy-architecture">
+<h2>Strategy Architecture<a class="headerlink" href="#strategy-architecture" title="Link to this heading"></a></h2>
+<p>All strategies inherit from <code class="docutils literal notranslate"><span class="pre">BaseStrategy</span></code> and implement two methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">generate_entry_signal(price_history,</span> <span class="pre">orderbook)</span></code> - Determines when to open positions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">generate_exit_signal(position,</span> <span class="pre">current_price,</span> <span class="pre">orderbook)</span></code> - Determines when to close positions</p></li>
+</ul>
+</section>
+<section id="built-in-strategies">
+<h2>Built-in Strategies<a class="headerlink" href="#built-in-strategies" title="Link to this heading"></a></h2>
+<section id="moving-average-crossover">
+<h3>Moving Average Crossover<a class="headerlink" href="#moving-average-crossover" title="Link to this heading"></a></h3>
+<p><strong>How It Works</strong></p>
+<p>Uses two moving averages (fast and slow) to identify trend changes:</p>
+<ol class="arabic simple">
+<li><p>Calculate short-term MA (default: 20 periods)</p></li>
+<li><p>Calculate long-term MA (default: 50 periods)</p></li>
+<li><p><strong>Long Signal</strong>: Short MA crosses above Long MA (golden cross)</p></li>
+<li><p><strong>Short Signal</strong>: Short MA crosses below Long MA (death cross)</p></li>
+</ol>
+<p><strong>Configuration</strong></p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">ENTRY_STRATEGY</span><span class="o">=</span><span class="s">ma_crossover</span>
+<span class="na">SHORT_MA_PERIOD</span><span class="o">=</span><span class="s">20</span>
+<span class="na">LONG_MA_PERIOD</span><span class="o">=</span><span class="s">50</span>
+</pre></div>
+</div>
+<p><strong>Advantages</strong></p>
+<ul class="simple">
+<li><p>Simple and reliable</p></li>
+<li><p>Works well in trending markets</p></li>
+<li><p>Clear entry signals</p></li>
+<li><p>Fewer false signals than oscillators</p></li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul class="simple">
+<li><p>Lagging indicator (late entries)</p></li>
+<li><p>Poor performance in ranging markets</p></li>
+<li><p>Requires longer history (50+ candles)</p></li>
+</ul>
+<p><strong>Best For</strong></p>
+<ul class="simple">
+<li><p>Trending markets (strong up/down moves)</p></li>
+<li><p>Longer timeframes (1 hour+)</p></li>
+<li><p>Conservative traders</p></li>
+</ul>
+<p><strong>Example Code</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">MovingAverageCrossover</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">config_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG</span>
+
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">MovingAverageCrossover</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">)</span>
+<span class="n">signal</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_entry_signal</span><span class="p">(</span><span class="n">price_history</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">signal</span> <span class="o">==</span> <span class="s1">&#39;long&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Buy signal - Bullish crossover&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sell signal - Bearish crossover&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="rsi-strategy">
+<h3>RSI Strategy<a class="headerlink" href="#rsi-strategy" title="Link to this heading"></a></h3>
+<p><strong>How It Works</strong></p>
+<p>Uses Relative Strength Index to identify overbought/oversold conditions:</p>
+<ol class="arabic simple">
+<li><p>Calculate RSI over 14 periods (default)</p></li>
+<li><p><strong>Long Signal</strong>: RSI crosses above 30 (oversold → recovery)</p></li>
+<li><p><strong>Short Signal</strong>: RSI crosses below 70 (overbought → reversal)</p></li>
+</ol>
+<p><strong>Configuration</strong></p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">ENTRY_STRATEGY</span><span class="o">=</span><span class="s">rsi</span>
+<span class="na">RSI_PERIOD</span><span class="o">=</span><span class="s">14</span>
+<span class="na">RSI_OVERSOLD</span><span class="o">=</span><span class="s">30</span>
+<span class="na">RSI_OVERBOUGHT</span><span class="o">=</span><span class="s">70</span>
+</pre></div>
+</div>
+<p><strong>Advantages</strong></p>
+<ul class="simple">
+<li><p>Catches reversals early</p></li>
+<li><p>Works in ranging markets</p></li>
+<li><p>Clear overbought/oversold levels</p></li>
+<li><p>Fast response to price changes</p></li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul class="simple">
+<li><p>Can stay oversold/overbought for extended periods</p></li>
+<li><p>False signals in strong trends</p></li>
+<li><p>Requires tuning for different markets</p></li>
+</ul>
+<p><strong>Best For</strong></p>
+<ul class="simple">
+<li><p>Ranging/choppy markets</p></li>
+<li><p>Mean reversion trading</p></li>
+<li><p>Shorter timeframes (5-30 minutes)</p></li>
+<li><p>Active traders</p></li>
+</ul>
+<p><strong>RSI Interpretation</strong></p>
+<ul class="simple">
+<li><p><strong>0-30</strong>: Oversold (potential buy)</p></li>
+<li><p><strong>30-70</strong>: Neutral zone</p></li>
+<li><p><strong>70-100</strong>: Overbought (potential sell)</p></li>
+</ul>
+<p><strong>Example Code</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">RSIStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">config_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG</span>
+
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">RSIStrategy</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">)</span>
+<span class="n">signal</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_entry_signal</span><span class="p">(</span><span class="n">price_history</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">signal</span> <span class="o">==</span> <span class="s1">&#39;long&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Buy signal - RSI oversold reversal&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="bollinger-bands">
+<h3>Bollinger Bands<a class="headerlink" href="#bollinger-bands" title="Link to this heading"></a></h3>
+<p><strong>How It Works</strong></p>
+<p>Uses price volatility bands to identify extreme price levels:</p>
+<ol class="arabic simple">
+<li><p>Calculate 20-period moving average (middle band)</p></li>
+<li><p>Calculate standard deviation</p></li>
+<li><p>Upper band = MA + (2 × std dev)</p></li>
+<li><p>Lower band = MA - (2 × std dev)</p></li>
+<li><p><strong>Long Signal</strong>: Price touches/breaks lower band</p></li>
+<li><p><strong>Short Signal</strong>: Price touches/breaks upper band</p></li>
+</ol>
+<p><strong>Configuration</strong></p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">ENTRY_STRATEGY</span><span class="o">=</span><span class="s">bollinger_bands</span>
+<span class="na">BB_PERIOD</span><span class="o">=</span><span class="s">20</span>
+<span class="na">BB_STD_DEV</span><span class="o">=</span><span class="s">2.0</span>
+</pre></div>
+</div>
+<p><strong>Advantages</strong></p>
+<ul class="simple">
+<li><p>Adapts to volatility automatically</p></li>
+<li><p>Visual price extremes</p></li>
+<li><p>Works in various market conditions</p></li>
+<li><p>Good for mean reversion</p></li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul class="simple">
+<li><p>Can “walk the band” in strong trends</p></li>
+<li><p>Requires adjustment for different volatility</p></li>
+<li><p>May generate signals in continued trends</p></li>
+</ul>
+<p><strong>Best For</strong></p>
+<ul class="simple">
+<li><p>Mean reversion strategies</p></li>
+<li><p>Volatility trading</p></li>
+<li><p>Range-bound markets</p></li>
+<li><p>Medium timeframes (15-60 minutes)</p></li>
+</ul>
+<p><strong>Band Interpretation</strong></p>
+<ul class="simple">
+<li><p><strong>Price at lower band</strong>: Potentially oversold</p></li>
+<li><p><strong>Price at middle band</strong>: Fair value</p></li>
+<li><p><strong>Price at upper band</strong>: Potentially overbought</p></li>
+<li><p><strong>Narrow bands</strong>: Low volatility (breakout coming)</p></li>
+<li><p><strong>Wide bands</strong>: High volatility</p></li>
+</ul>
+<p><strong>Example Code</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">BollingerBandsStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">config_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG</span>
+
+<span class="n">strategy</span> <span class="o">=</span> <span class="n">BollingerBandsStrategy</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">)</span>
+<span class="n">signal</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_entry_signal</span><span class="p">(</span><span class="n">price_history</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="exit-strategies">
+<h2>Exit Strategies<a class="headerlink" href="#exit-strategies" title="Link to this heading"></a></h2>
+<p>All strategies use the same exit logic by default:</p>
+<section id="stop-loss-exit">
+<h3>Stop-Loss Exit<a class="headerlink" href="#stop-loss-exit" title="Link to this heading"></a></h3>
+<p>Closes position when losses exceed threshold:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Long position</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">current_price</span> <span class="o">-</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">STOP_LOSS_PCT</span><span class="p">:</span>
+    <span class="n">close_position</span><span class="p">()</span>
+
+<span class="c1"># Short position</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">entry_price</span> <span class="o">-</span> <span class="n">current_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="n">STOP_LOSS_PCT</span><span class="p">:</span>
+    <span class="n">close_position</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="take-profit-exit">
+<h3>Take-Profit Exit<a class="headerlink" href="#take-profit-exit" title="Link to this heading"></a></h3>
+<p>Closes position when profits exceed threshold:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Long position</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">current_price</span> <span class="o">-</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">&gt;=</span> <span class="n">TAKE_PROFIT_PCT</span><span class="p">:</span>
+    <span class="n">close_position</span><span class="p">()</span>
+
+<span class="c1"># Short position</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">entry_price</span> <span class="o">-</span> <span class="n">current_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">&gt;=</span> <span class="n">TAKE_PROFIT_PCT</span><span class="p">:</span>
+    <span class="n">close_position</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="creating-custom-strategies">
+<h2>Creating Custom Strategies<a class="headerlink" href="#creating-custom-strategies" title="Link to this heading"></a></h2>
+<section id="basic-template">
+<h3>Basic Template<a class="headerlink" href="#basic-template" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyCustomStrategy</span><span class="p">(</span><span class="n">BaseStrategy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Your custom trading strategy.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price_history</span><span class="p">:</span> <span class="n">deque</span><span class="p">,</span>
+                             <span class="n">orderbook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate entry signal.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            &#39;long&#39;, &#39;short&#39;, or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Your logic here</span>
+        <span class="k">if</span> <span class="n">some_condition</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;long&#39;</span>
+        <span class="k">elif</span> <span class="n">other_condition</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;short&#39;</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                            <span class="n">current_price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                            <span class="n">orderbook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate exit signal.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True to close position, False to hold</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Usually use default stop-loss/take-profit</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">current_price</span><span class="p">,</span> <span class="n">orderbook</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="register-your-strategy">
+<h3>Register Your Strategy<a class="headerlink" href="#register-your-strategy" title="Link to this heading"></a></h3>
+<p>Add to <code class="docutils literal notranslate"><span class="pre">signal.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">STRATEGY_REGISTRY</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ma_crossover&#39;</span><span class="p">:</span> <span class="n">MovingAverageCrossover</span><span class="p">,</span>
+    <span class="s1">&#39;rsi&#39;</span><span class="p">:</span> <span class="n">RSIStrategy</span><span class="p">,</span>
+    <span class="s1">&#39;bollinger_bands&#39;</span><span class="p">:</span> <span class="n">BollingerBandsStrategy</span><span class="p">,</span>
+    <span class="s1">&#39;my_strategy&#39;</span><span class="p">:</span> <span class="n">MyCustomStrategy</span><span class="p">,</span>  <span class="c1"># Add yours here</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="use-in-configuration">
+<h3>Use in Configuration<a class="headerlink" href="#use-in-configuration" title="Link to this heading"></a></h3>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">ENTRY_STRATEGY</span><span class="o">=</span><span class="s">my_strategy</span>
+<span class="na">EXIT_STRATEGY</span><span class="o">=</span><span class="s">my_strategy</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-using-orderbook-data">
+<h2>Advanced: Using Orderbook Data<a class="headerlink" href="#advanced-using-orderbook-data" title="Link to this heading"></a></h2>
+<p>Strategies can access deep orderbook data for advanced analysis:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">generate_entry_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">price_history</span><span class="p">:</span> <span class="n">deque</span><span class="p">,</span>
+                         <span class="n">orderbook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">orderbook</span><span class="p">:</span>
+        <span class="c1"># Access orderbook metrics</span>
+        <span class="n">bid_depth</span> <span class="o">=</span> <span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bid_depth&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">ask_depth</span> <span class="o">=</span> <span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ask_depth&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">imbalance</span> <span class="o">=</span> <span class="p">(</span><span class="n">bid_depth</span> <span class="o">-</span> <span class="n">ask_depth</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">bid_depth</span> <span class="o">+</span> <span class="n">ask_depth</span><span class="p">)</span>
+
+        <span class="c1"># Use in decision making</span>
+        <span class="k">if</span> <span class="n">imbalance</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">:</span>  <span class="c1"># Strong buying pressure</span>
+            <span class="k">return</span> <span class="s1">&#39;long&#39;</span>
+        <span class="k">elif</span> <span class="n">imbalance</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">:</span>  <span class="c1"># Strong selling pressure</span>
+            <span class="k">return</span> <span class="s1">&#39;short&#39;</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</section>
+<section id="strategy-selection-guide">
+<h2>Strategy Selection Guide<a class="headerlink" href="#strategy-selection-guide" title="Link to this heading"></a></h2>
+<section id="choose-based-on-market-conditions">
+<h3>Choose Based on Market Conditions<a class="headerlink" href="#choose-based-on-market-conditions" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><strong>Trending Markets</strong> (clear up/down direction):</dt><dd><ul class="simple">
+<li><p>Moving Average Crossover</p></li>
+<li><p>Trend-following strategies</p></li>
+</ul>
+</dd>
+<dt><strong>Ranging Markets</strong> (sideways movement):</dt><dd><ul class="simple">
+<li><p>RSI Strategy</p></li>
+<li><p>Bollinger Bands</p></li>
+<li><p>Mean reversion strategies</p></li>
+</ul>
+</dd>
+<dt><strong>High Volatility</strong>:</dt><dd><ul class="simple">
+<li><p>Bollinger Bands</p></li>
+<li><p>Wider stop losses</p></li>
+<li><p>Shorter timeframes</p></li>
+</ul>
+</dd>
+<dt><strong>Low Volatility</strong>:</dt><dd><ul class="simple">
+<li><p>Moving averages with shorter periods</p></li>
+<li><p>Breakout strategies</p></li>
+<li><p>Longer holding periods</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="choose-based-on-trading-style">
+<h3>Choose Based on Trading Style<a class="headerlink" href="#choose-based-on-trading-style" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><strong>Swing Trading</strong> (days to weeks):</dt><dd><ul class="simple">
+<li><p>MA Crossover (50/200)</p></li>
+<li><p>Longer timeframes</p></li>
+<li><p>Wider stop losses (3-5%)</p></li>
+</ul>
+</dd>
+<dt><strong>Day Trading</strong> (hours to days):</dt><dd><ul class="simple">
+<li><p>MA Crossover (20/50)</p></li>
+<li><p>RSI Strategy</p></li>
+<li><p>Medium stop losses (2-3%)</p></li>
+</ul>
+</dd>
+<dt><strong>Scalping</strong> (minutes to hours):</dt><dd><ul class="simple">
+<li><p>Bollinger Bands</p></li>
+<li><p>RSI with tight settings</p></li>
+<li><p>Tight stop losses (0.5-1%)</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</section>
+<section id="backtesting-strategies">
+<h2>Backtesting Strategies<a class="headerlink" href="#backtesting-strategies" title="Link to this heading"></a></h2>
+<p>Test your strategy before deploying:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test signal generation</span>
+python<span class="w"> </span>test_signals.py
+
+<span class="c1"># Test complete workflow</span>
+python<span class="w"> </span>test_trade_workflow.py
+
+<span class="c1"># Verify signal logic</span>
+python<span class="w"> </span>verify_signals.py
+</pre></div>
+</div>
+</section>
+<section id="strategy-performance-metrics">
+<h2>Strategy Performance Metrics<a class="headerlink" href="#strategy-performance-metrics" title="Link to this heading"></a></h2>
+<p>Track these metrics to evaluate strategy performance:</p>
+<ul class="simple">
+<li><p><strong>Win Rate</strong>: % of profitable trades</p></li>
+<li><p><strong>Profit Factor</strong>: Gross profit / Gross loss</p></li>
+<li><p><strong>Average Win/Loss</strong>: Mean profit vs mean loss</p></li>
+<li><p><strong>Max Drawdown</strong>: Largest peak-to-trough decline</p></li>
+<li><p><strong>Sharpe Ratio</strong>: Risk-adjusted returns</p></li>
+</ul>
+<p>Use the portfolio analysis notebook to calculate these.</p>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Test thoroughly</strong> in paper mode first</p></li>
+<li><p><strong>Understand the strategy</strong> before using it</p></li>
+<li><p><strong>Don’t over-optimize</strong> on limited data</p></li>
+<li><p><strong>Use appropriate timeframes</strong> for each strategy</p></li>
+<li><p><strong>Adjust parameters</strong> based on market conditions</p></li>
+<li><p><strong>Monitor performance</strong> and adapt</p></li>
+<li><p><strong>Keep stop losses</strong> reasonable</p></li>
+<li><p><strong>Don’t mix conflicting strategies</strong></p></li>
+<li><p><strong>Consider market volatility</strong></p></li>
+<li><p><strong>Review trades regularly</strong></p></li>
+</ol>
+</section>
+<section id="common-pitfalls">
+<h2>Common Pitfalls<a class="headerlink" href="#common-pitfalls" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Curve Fitting</strong></dt><dd><p>Optimizing too much on historical data. Strategy fails in live trading.</p>
+</dd>
+<dt><strong>Ignoring Market Conditions</strong></dt><dd><p>Using trend strategy in ranging market (or vice versa).</p>
+</dd>
+<dt><strong>Too Many Signals</strong></dt><dd><p>Short MA periods generate excessive trades and fees.</p>
+</dd>
+<dt><strong>Ignoring Risk Management</strong></dt><dd><p>No stop loss or take profit. One bad trade wipes out profits.</p>
+</dd>
+<dt><strong>Emotional Override</strong></dt><dd><p>Manually closing positions against strategy signals.</p>
+</dd>
+</dl>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="configuration.html"><span class="doc">Configuration Guide</span></a> - Configure strategy parameters</p></li>
+<li><p><a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> - Test strategies thoroughly</p></li>
+<li><p><a class="reference internal" href="api_reference.html"><span class="doc">API Reference</span></a> - Detailed code documentation</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="configuration.html" class="btn btn-neutral float-left" title="Configuration Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_reference.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, HoncyLee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

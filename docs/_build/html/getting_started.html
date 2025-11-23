@@ -1,0 +1,568 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1d87fc8b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration Guide" href="configuration.html" />
+    <link rel="prev" title="WOOX Trading Bot Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            WOOX Trading Bot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#api-credentials-setup">API Credentials Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#first-run-paper-trading">First Run - Paper Trading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verify-setup">Verify Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#view-account-summary">View Account Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#portfolio-analysis">Portfolio Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-mode">Trading Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#symbol-configuration">Symbol Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-selection">Strategy Selection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#entry-strategy">Entry Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#exit-strategy">Exit Strategy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-parameters">Strategy Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#risk-management">Risk Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#stop-loss">Stop Loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#take-profit">Take Profit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-parameters">Trading Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#trade-amount">Trade Amount</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#update-interval">Update Interval</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#logging-configuration">Logging Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#api-configuration">API Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#base-url">Base URL</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#example-configurations">Example Configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#conservative-recommended-for-beginners">Conservative (Recommended for Beginners)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#aggressive-higher-risk-reward">Aggressive (Higher Risk/Reward)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#scalping-very-active-trading">Scalping (Very Active Trading)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-validation">Configuration Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="strategies.html">Trading Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-architecture">Strategy Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#built-in-strategies">Built-in Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#exit-strategies">Exit Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#stop-loss-exit">Stop-Loss Exit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#take-profit-exit">Take-Profit Exit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#creating-custom-strategies">Creating Custom Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#basic-template">Basic Template</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#register-your-strategy">Register Your Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#use-in-configuration">Use in Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#advanced-using-orderbook-data">Advanced: Using Orderbook Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-selection-guide">Strategy Selection Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#choose-based-on-market-conditions">Choose Based on Market Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#choose-based-on-trading-style">Choose Based on Trading Style</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#backtesting-strategies">Backtesting Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-performance-metrics">Strategy Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#common-pitfalls">Common Pitfalls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#core-modules">Core Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-signal">signal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.signal"><code class="docutils literal notranslate"><span class="pre">signal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.getsignal"><code class="docutils literal notranslate"><span class="pre">getsignal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.pthread_sigmask"><code class="docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigpending"><code class="docutils literal notranslate"><span class="pre">sigpending()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigwait"><code class="docutils literal notranslate"><span class="pre">sigwait()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.valid_signals"><code class="docutils literal notranslate"><span class="pre">valid_signals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Handlers"><code class="docutils literal notranslate"><span class="pre">Handlers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.ItimerError"><code class="docutils literal notranslate"><span class="pre">ItimerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Sigmasks"><code class="docutils literal notranslate"><span class="pre">Sigmasks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Signals"><code class="docutils literal notranslate"><span class="pre">Signals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#basestrategy">BaseStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#movingaveragecrossover">MovingAverageCrossover</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#rsistrategy">RSIStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#bollingerbandsstrategy">BollingerBandsStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#strategy-registry">Strategy Registry</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-account">account</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account-class">Account Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-config_loader">config_loader</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.get_config_value"><code class="docutils literal notranslate"><span class="pre">get_config_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#configuration-functions">Configuration Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#utility-modules">Utility Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-createDuckDB">createDuckDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-balance_summary">balance_summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.get_current_price"><code class="docutils literal notranslate"><span class="pre">get_current_price()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_currency"><code class="docutils literal notranslate"><span class="pre">format_currency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_quantity"><code class="docutils literal notranslate"><span class="pre">format_quantity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.print_separator"><code class="docutils literal notranslate"><span class="pre">print_separator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_api_balance"><code class="docutils literal notranslate"><span class="pre">display_api_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_open_positions"><code class="docutils literal notranslate"><span class="pre">display_open_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_transaction_summary"><code class="docutils literal notranslate"><span class="pre">display_transaction_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_recent_trades"><code class="docutils literal notranslate"><span class="pre">display_recent_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#test-modules">Test Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-orderbook">test_orderbook</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_api">test_api</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_instruments"><code class="docutils literal notranslate"><span class="pre">test_instruments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#data-structures">Data Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#position-dictionary">Position Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade-data-dictionary">Trade Data Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#orderbook-dictionary">Orderbook Dictionary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#database-schema">Database Schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trades-table">trades Table</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#constants">Constants</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#default-configuration-values">Default Configuration Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#api-endpoints">API Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#exceptions-and-errors">Exceptions and Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#type-hints-reference">Type Hints Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-suite-overview">Test Suite Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-verification-recommended-first">Signal Verification (Recommended First)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#trading-workflow-test">Trading Workflow Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#strategy-tests">Strategy Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#orderbook-tests">Orderbook Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-connectivity-test">API Connectivity Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#running-all-tests">Running All Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-scenarios">Test Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-tests">Signal Generation Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#stop-loss-tests">Stop-Loss Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#take-profit-tests">Take-Profit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#position-holding-test">Position Holding Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-tests">Database Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#interpreting-test-results">Interpreting Test Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#success-indicators">Success Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#failure-indicators">Failure Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#warning-indicators">Warning Indicators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-output-analysis">Test Output Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#understanding-results">Understanding Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#troubleshooting-failed-tests">Troubleshooting Failed Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-issues">Signal Generation Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-issues">Database Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-issues">API Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#manual-testing">Manual Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#paper-trading-test">Paper Trading Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#portfolio-analysis-test">Portfolio Analysis Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#configuration-validation">Configuration Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pre-deployment-testing">Pre-Deployment Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#regular-testing">Regular Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#continuous-integration">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-coverage">Test Coverage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#current-test-coverage">Current Test Coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#areas-not-covered">Areas Not Covered</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#adding-new-tests">Adding New Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#pre-deployment-checklist">Pre-Deployment Checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#infrastructure">Infrastructure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#monitoring">Monitoring</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#live-trading-setup">Live Trading Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-1-final-configuration">Step 1: Final Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-2-verify-api-credentials">Step 2: Verify API Credentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-3-database-preparation">Step 3: Database Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-4-initial-live-test">Step 4: Initial Live Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-5-full-deployment">Step 5: Full Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#production-deployment-options">Production Deployment Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-1-screen-tmux-simple">Option 1: Screen/Tmux (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-2-systemd-service-recommended">Option 2: Systemd Service (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-3-supervisor-alternative">Option 3: Supervisor (Alternative)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-4-docker-advanced">Option 4: Docker (Advanced)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#monitoring-and-alerting">Monitoring and Alerting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#log-monitoring">Log Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#email-alerts-simple">Email Alerts (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#performance-monitoring">Performance Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#scheduled-health-checks">Scheduled Health Checks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#backup-strategy">Backup Strategy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#database-backups">Database Backups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#configuration-backups">Configuration Backups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#disaster-recovery">Disaster Recovery</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#bot-crashes">Bot Crashes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#database-corruption">Database Corruption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#lost-position">Lost Position</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#security-best-practices">Security Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#api-key-security">API Key Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#server-security">Server Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#code-security">Code Security</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#scaling-considerations">Scaling Considerations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#multiple-symbols">Multiple Symbols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#multiple-strategies">Multiple Strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#performance-tuning">Performance Tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#troubleshooting-production-issues">Troubleshooting Production Issues</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#high-cpu-usage">High CPU Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#memory-leaks">Memory Leaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#api-rate-limits">API Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WOOX Trading Bot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<p>This guide will help you set up and run the WOOX Trading Bot.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Python 3.8 or higher</p></li>
+<li><p>WOOX API account and credentials</p></li>
+<li><p>Virtual environment (recommended)</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p>Clone the repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/HoncyLee/AlgoTradeWooxAPI.git
+<span class="nb">cd</span><span class="w"> </span>AlgoTradeWooxAPI
+</pre></div>
+</div>
+</li>
+<li><p>Create and activate virtual environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using virtualenvwrapper</span>
+mkvirtualenv<span class="w"> </span>woox
+workon<span class="w"> </span>woox
+
+<span class="c1"># Or using venv</span>
+python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+<span class="nb">source</span><span class="w"> </span>venv/bin/activate<span class="w">  </span><span class="c1"># On macOS/Linux</span>
+venv<span class="se">\\</span>Scripts<span class="se">\\</span>activate<span class="w">   </span><span class="c1"># On Windows</span>
+</pre></div>
+</div>
+</li>
+<li><p>Install dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+</li>
+<li><p>Install Sphinx for documentation (optional):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>sphinx<span class="w"> </span>sphinx-rtd-theme<span class="w"> </span>sphinx-autodoc-typehints
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="api-credentials-setup">
+<h2>API Credentials Setup<a class="headerlink" href="#api-credentials-setup" title="Link to this heading"></a></h2>
+<p>You need to create API credentials on WOOX exchange:</p>
+<ol class="arabic simple">
+<li><p>Visit <a class="reference external" href="https://support.woox.io/hc/en-us/articles/4410291152793--API-creation">https://support.woox.io/hc/en-us/articles/4410291152793–API-creation</a></p></li>
+<li><p>Create API key with trading permissions</p></li>
+<li><p>Add credentials to your shell configuration</p></li>
+</ol>
+<p>For <strong>macOS/Linux</strong> users, add to <code class="docutils literal notranslate"><span class="pre">~/.zshrc</span></code> or <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">WOOX_API_KEY</span><span class="o">=</span><span class="s1">&#39;your_api_key_here&#39;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">WOOX_API_SECRET</span><span class="o">=</span><span class="s1">&#39;your_api_secret_here&#39;</span>
+</pre></div>
+</div>
+<p>Then reload:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>~/.zshrc<span class="w">  </span><span class="c1"># or source ~/.bashrc</span>
+</pre></div>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
+<p>Edit the <code class="docutils literal notranslate"><span class="pre">.config</span></code> file in the project root:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Trading Configuration</span>
+<span class="na">TRADE_MODE</span><span class="o">=</span><span class="s">paper</span><span class="w">          </span><span class="c1"># &#39;paper&#39; or &#39;live&#39;</span>
+<span class="na">SYMBOL</span><span class="o">=</span><span class="s">SPOT_BTC_USDT</span><span class="w">      </span><span class="c1"># Trading pair</span>
+<span class="na">BASE_URL</span><span class="o">=</span><span class="s">https://api.woox.io</span>
+
+<span class="c1"># Strategy Selection</span>
+<span class="na">ENTRY_STRATEGY</span><span class="o">=</span><span class="s">ma_crossover</span><span class="w">    </span><span class="c1"># ma_crossover, rsi, bollinger_bands</span>
+<span class="na">EXIT_STRATEGY</span><span class="o">=</span><span class="s">ma_crossover</span>
+
+<span class="c1"># Strategy Parameters</span>
+<span class="na">SHORT_MA_PERIOD</span><span class="o">=</span><span class="s">20</span>
+<span class="na">LONG_MA_PERIOD</span><span class="o">=</span><span class="s">50</span>
+<span class="na">STOP_LOSS_PCT</span><span class="o">=</span><span class="s">3.09</span>
+<span class="na">TAKE_PROFIT_PCT</span><span class="o">=</span><span class="s">5.0</span>
+
+<span class="c1"># Trading Parameters</span>
+<span class="na">TRADE_AMOUNT_USD</span><span class="o">=</span><span class="s">100</span>
+</pre></div>
+</div>
+</section>
+<section id="first-run-paper-trading">
+<h2>First Run - Paper Trading<a class="headerlink" href="#first-run-paper-trading" title="Link to this heading"></a></h2>
+<p>Always test with paper trading first:</p>
+<ol class="arabic">
+<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">TRADE_MODE=paper</span></code> in <code class="docutils literal notranslate"><span class="pre">.config</span></code></p></li>
+<li><p>Run the trading bot:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>workon<span class="w"> </span>woox<span class="w">  </span><span class="c1"># Activate environment</span>
+python<span class="w"> </span>trade.py
+</pre></div>
+</div>
+</li>
+<li><p>Monitor the output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2025-11-23 10:30:00 - Trade - INFO - Trade class initialized for symbol: SPOT_BTC_USDT in PAPER mode
+💹 BTC/USDT: $37,250.50 | Entries: 45/1440 | Running...
+</pre></div>
+</div>
+</li>
+<li><p>Stop the bot with <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code></p></li>
+</ol>
+</section>
+<section id="verify-setup">
+<h2>Verify Setup<a class="headerlink" href="#verify-setup" title="Link to this heading"></a></h2>
+<p>Run verification tests to ensure everything works:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Verify signal generation and stop-loss logic</span>
+python<span class="w"> </span>verify_signals.py
+
+<span class="c1"># Test API connectivity</span>
+python<span class="w"> </span>test_api.py
+
+<span class="c1"># Test trading workflow</span>
+python<span class="w"> </span>test_trade_workflow.py
+</pre></div>
+</div>
+</section>
+<section id="view-account-summary">
+<h2>View Account Summary<a class="headerlink" href="#view-account-summary" title="Link to this heading"></a></h2>
+<p>Check your paper trading account:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>workon<span class="w"> </span>woox
+python<span class="w"> </span>account.py
+</pre></div>
+</div>
+<p>For live account (requires API credentials):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>account.py<span class="w"> </span>live
+</pre></div>
+</div>
+</section>
+<section id="portfolio-analysis">
+<h2>Portfolio Analysis<a class="headerlink" href="#portfolio-analysis" title="Link to this heading"></a></h2>
+<p>Use Jupyter notebook for detailed analysis:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>workon<span class="w"> </span>woox
+<span class="nb">cd</span><span class="w"> </span>portfolio_analysis
+jupyter<span class="w"> </span>notebook<span class="w"> </span>portfolio_monitor.ipynb
+</pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Read <a class="reference internal" href="configuration.html"><span class="doc">Configuration Guide</span></a> to understand all settings</p></li>
+<li><p>Learn about <a class="reference internal" href="strategies.html"><span class="doc">Trading Strategies</span></a> and how to create custom ones</p></li>
+<li><p>Review <a class="reference internal" href="api_reference.html"><span class="doc">API Reference</span></a> for detailed code documentation</p></li>
+<li><p>When ready, follow <a class="reference internal" href="deployment.html"><span class="doc">Deployment</span></a> for live trading</p></li>
+</ul>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><strong>Database not found</strong>:</dt><dd><p>Databases are created automatically on first run. If you see this error, ensure you have write permissions in the project directory.</p>
+</dd>
+<dt><strong>API authentication failed</strong>:</dt><dd><p>Verify your API credentials are correctly set in environment variables. Run <code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">$WOOX_API_KEY</span></code> to check.</p>
+</dd>
+<dt><strong>Module not found errors</strong>:</dt><dd><p>Ensure virtual environment is activated (<code class="docutils literal notranslate"><span class="pre">workon</span> <span class="pre">woox</span></code>) and all dependencies are installed.</p>
+</dd>
+<dt><strong>Connection timeout</strong>:</dt><dd><p>Check your internet connection and verify WOOX API is accessible at <a class="reference external" href="https://api.woox.io">https://api.woox.io</a></p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="WOOX Trading Bot Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, HoncyLee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
