@@ -1,0 +1,977 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deployment &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1d87fc8b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Testing" href="testing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            WOOX Trading Bot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#api-credentials-setup">API Credentials Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#first-run-paper-trading">First Run - Paper Trading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#verify-setup">Verify Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#view-account-summary">View Account Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#portfolio-analysis">Portfolio Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-mode">Trading Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#symbol-configuration">Symbol Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-selection">Strategy Selection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#entry-strategy">Entry Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#exit-strategy">Exit Strategy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-parameters">Strategy Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#risk-management">Risk Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#stop-loss">Stop Loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#take-profit">Take Profit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-parameters">Trading Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#trade-amount">Trade Amount</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#update-interval">Update Interval</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#logging-configuration">Logging Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#api-configuration">API Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#base-url">Base URL</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#example-configurations">Example Configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#conservative-recommended-for-beginners">Conservative (Recommended for Beginners)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#aggressive-higher-risk-reward">Aggressive (Higher Risk/Reward)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#scalping-very-active-trading">Scalping (Very Active Trading)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-validation">Configuration Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="strategies.html">Trading Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-architecture">Strategy Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#built-in-strategies">Built-in Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#exit-strategies">Exit Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#stop-loss-exit">Stop-Loss Exit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#take-profit-exit">Take-Profit Exit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#creating-custom-strategies">Creating Custom Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#basic-template">Basic Template</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#register-your-strategy">Register Your Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#use-in-configuration">Use in Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#advanced-using-orderbook-data">Advanced: Using Orderbook Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-selection-guide">Strategy Selection Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#choose-based-on-market-conditions">Choose Based on Market Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#choose-based-on-trading-style">Choose Based on Trading Style</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#backtesting-strategies">Backtesting Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-performance-metrics">Strategy Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#common-pitfalls">Common Pitfalls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#core-modules">Core Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-signal">signal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.signal"><code class="docutils literal notranslate"><span class="pre">signal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.getsignal"><code class="docutils literal notranslate"><span class="pre">getsignal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.pthread_sigmask"><code class="docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigpending"><code class="docutils literal notranslate"><span class="pre">sigpending()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigwait"><code class="docutils literal notranslate"><span class="pre">sigwait()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.valid_signals"><code class="docutils literal notranslate"><span class="pre">valid_signals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Handlers"><code class="docutils literal notranslate"><span class="pre">Handlers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.ItimerError"><code class="docutils literal notranslate"><span class="pre">ItimerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Sigmasks"><code class="docutils literal notranslate"><span class="pre">Sigmasks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Signals"><code class="docutils literal notranslate"><span class="pre">Signals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#basestrategy">BaseStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#movingaveragecrossover">MovingAverageCrossover</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#rsistrategy">RSIStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#bollingerbandsstrategy">BollingerBandsStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#strategy-registry">Strategy Registry</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-account">account</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account-class">Account Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-config_loader">config_loader</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.get_config_value"><code class="docutils literal notranslate"><span class="pre">get_config_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#configuration-functions">Configuration Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#utility-modules">Utility Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-createDuckDB">createDuckDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-balance_summary">balance_summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.get_current_price"><code class="docutils literal notranslate"><span class="pre">get_current_price()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_currency"><code class="docutils literal notranslate"><span class="pre">format_currency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_quantity"><code class="docutils literal notranslate"><span class="pre">format_quantity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.print_separator"><code class="docutils literal notranslate"><span class="pre">print_separator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_api_balance"><code class="docutils literal notranslate"><span class="pre">display_api_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_open_positions"><code class="docutils literal notranslate"><span class="pre">display_open_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_transaction_summary"><code class="docutils literal notranslate"><span class="pre">display_transaction_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_recent_trades"><code class="docutils literal notranslate"><span class="pre">display_recent_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#test-modules">Test Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-orderbook">test_orderbook</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_api">test_api</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_instruments"><code class="docutils literal notranslate"><span class="pre">test_instruments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#data-structures">Data Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#position-dictionary">Position Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade-data-dictionary">Trade Data Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#orderbook-dictionary">Orderbook Dictionary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#database-schema">Database Schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trades-table">trades Table</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#constants">Constants</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#default-configuration-values">Default Configuration Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#api-endpoints">API Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#exceptions-and-errors">Exceptions and Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#type-hints-reference">Type Hints Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-suite-overview">Test Suite Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-verification-recommended-first">Signal Verification (Recommended First)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#trading-workflow-test">Trading Workflow Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#strategy-tests">Strategy Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#orderbook-tests">Orderbook Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-connectivity-test">API Connectivity Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#running-all-tests">Running All Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-scenarios">Test Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-tests">Signal Generation Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#stop-loss-tests">Stop-Loss Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#take-profit-tests">Take-Profit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#position-holding-test">Position Holding Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-tests">Database Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#interpreting-test-results">Interpreting Test Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#success-indicators">Success Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#failure-indicators">Failure Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#warning-indicators">Warning Indicators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-output-analysis">Test Output Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#understanding-results">Understanding Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#troubleshooting-failed-tests">Troubleshooting Failed Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-issues">Signal Generation Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-issues">Database Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-issues">API Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#manual-testing">Manual Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#paper-trading-test">Paper Trading Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#portfolio-analysis-test">Portfolio Analysis Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#configuration-validation">Configuration Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pre-deployment-testing">Pre-Deployment Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#regular-testing">Regular Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#continuous-integration">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-coverage">Test Coverage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#current-test-coverage">Current Test Coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#areas-not-covered">Areas Not Covered</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#adding-new-tests">Adding New Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pre-deployment-checklist">Pre-Deployment Checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#infrastructure">Infrastructure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#monitoring">Monitoring</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#live-trading-setup">Live Trading Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-final-configuration">Step 1: Final Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-verify-api-credentials">Step 2: Verify API Credentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-database-preparation">Step 3: Database Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-initial-live-test">Step 4: Initial Live Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-full-deployment">Step 5: Full Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#production-deployment-options">Production Deployment Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#option-1-screen-tmux-simple">Option 1: Screen/Tmux (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#option-2-systemd-service-recommended">Option 2: Systemd Service (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#option-3-supervisor-alternative">Option 3: Supervisor (Alternative)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#option-4-docker-advanced">Option 4: Docker (Advanced)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring-and-alerting">Monitoring and Alerting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#log-monitoring">Log Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#email-alerts-simple">Email Alerts (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-monitoring">Performance Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scheduled-health-checks">Scheduled Health Checks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#backup-strategy">Backup Strategy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#database-backups">Database Backups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-backups">Configuration Backups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#disaster-recovery">Disaster Recovery</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bot-crashes">Bot Crashes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database-corruption">Database Corruption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lost-position">Lost Position</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#security-best-practices">Security Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-key-security">API Key Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#server-security">Server Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-security">Code Security</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#scaling-considerations">Scaling Considerations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-symbols">Multiple Symbols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multiple-strategies">Multiple Strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-tuning">Performance Tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting-production-issues">Troubleshooting Production Issues</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#high-cpu-usage">High CPU Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#memory-leaks">Memory Leaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-rate-limits">API Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WOOX Trading Bot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deployment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/deployment.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deployment">
+<h1>Deployment<a class="headerlink" href="#deployment" title="Link to this heading"></a></h1>
+<p>Guide for deploying the WOOX Trading Bot to production (live trading).</p>
+<section id="pre-deployment-checklist">
+<h2>Pre-Deployment Checklist<a class="headerlink" href="#pre-deployment-checklist" title="Link to this heading"></a></h2>
+<p>Before deploying to live trading, ensure:</p>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>☐ All test scripts pass successfully</p></li>
+<li><p>☐ Paper trading ran for 24+ hours without errors</p></li>
+<li><p>☐ Signal generation produces expected trades</p></li>
+<li><p>☐ Stop-loss triggers correctly</p></li>
+<li><p>☐ Take-profit triggers correctly</p></li>
+<li><p>☐ Database transactions record properly</p></li>
+<li><p>☐ Account summary displays correctly</p></li>
+</ul>
+</section>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>☐ API credentials verified and working</p></li>
+<li><p>☐ Configuration file reviewed and validated</p></li>
+<li><p>☐ Stop-loss and take-profit set appropriately</p></li>
+<li><p>☐ Trade amount set to small value ($10-50 for first trades)</p></li>
+<li><p>☐ Correct symbol selected (SPOT or PERP)</p></li>
+<li><p>☐ Strategy tested and understood</p></li>
+</ul>
+</section>
+<section id="infrastructure">
+<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>☐ Server/machine has stable internet connection</p></li>
+<li><p>☐ Sufficient disk space for database and logs</p></li>
+<li><p>☐ Process monitoring set up (systemd, supervisor, etc.)</p></li>
+<li><p>☐ Log rotation configured</p></li>
+<li><p>☐ Backup strategy in place</p></li>
+</ul>
+</section>
+<section id="monitoring">
+<h3>Monitoring<a class="headerlink" href="#monitoring" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>☐ Alert system configured (email/SMS)</p></li>
+<li><p>☐ Log monitoring enabled</p></li>
+<li><p>☐ Performance metrics tracking set up</p></li>
+<li><p>☐ Backup contact method for emergencies</p></li>
+</ul>
+</section>
+</section>
+<section id="live-trading-setup">
+<h2>Live Trading Setup<a class="headerlink" href="#live-trading-setup" title="Link to this heading"></a></h2>
+<section id="step-1-final-configuration">
+<h3>Step 1: Final Configuration<a class="headerlink" href="#step-1-final-configuration" title="Link to this heading"></a></h3>
+<p>Update <code class="docutils literal notranslate"><span class="pre">.config</span></code> for live trading:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># Switch to live mode</span>
+<span class="na">TRADE_MODE</span><span class="o">=</span><span class="s">live</span>
+
+<span class="c1"># Start with small amounts</span>
+<span class="na">TRADE_AMOUNT_USD</span><span class="o">=</span><span class="s">25</span>
+
+<span class="c1"># Conservative risk settings</span>
+<span class="na">STOP_LOSS_PCT</span><span class="o">=</span><span class="s">3.09</span>
+<span class="na">TAKE_PROFIT_PCT</span><span class="o">=</span><span class="s">5.0</span>
+
+<span class="c1"># Reasonable update interval</span>
+<span class="na">UPDATE_INTERVAL_SECONDS</span><span class="o">=</span><span class="s">60</span>
+</pre></div>
+</div>
+</section>
+<section id="step-2-verify-api-credentials">
+<h3>Step 2: Verify API Credentials<a class="headerlink" href="#step-2-verify-api-credentials" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test API access</span>
+workon<span class="w"> </span>woox
+python<span class="w"> </span>test_api.py
+
+<span class="c1"># Check balance</span>
+python<span class="w"> </span>account.py<span class="w"> </span>live
+</pre></div>
+</div>
+<p>Expected output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ACCOUNT SUMMARY - LIVE MODE
+============================
+
+📊 API ACCOUNT BALANCE:
+  USDT: 500.00000000
+  BTC: 0.00000000
+</pre></div>
+</div>
+</section>
+<section id="step-3-database-preparation">
+<h3>Step 3: Database Preparation<a class="headerlink" href="#step-3-database-preparation" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ensure live database exists (will be created automatically)</span>
+ls<span class="w"> </span>-lh<span class="w"> </span>live_transaction.db<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Will be created on first run&quot;</span>
+
+<span class="c1"># Backup paper trading data</span>
+cp<span class="w"> </span>paper_transaction.db<span class="w"> </span>paper_transaction_backup_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>.db
+</pre></div>
+</div>
+</section>
+<section id="step-4-initial-live-test">
+<h3>Step 4: Initial Live Test<a class="headerlink" href="#step-4-initial-live-test" title="Link to this heading"></a></h3>
+<p>Start with a short test run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>workon<span class="w"> </span>woox
+python<span class="w"> </span>trade.py
+</pre></div>
+</div>
+<p><strong>Monitor closely for 1-2 hours:</strong></p>
+<ul class="simple">
+<li><p>Watch console output for signals</p></li>
+<li><p>Check logs for any errors</p></li>
+<li><p>Verify transactions in database</p></li>
+<li><p>Monitor API balance changes</p></li>
+</ul>
+<p><strong>Stop test run:</strong></p>
+<p>Press <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> to gracefully stop the bot.</p>
+<p><strong>Review results:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>account.py<span class="w"> </span>live
+</pre></div>
+</div>
+</section>
+<section id="step-5-full-deployment">
+<h3>Step 5: Full Deployment<a class="headerlink" href="#step-5-full-deployment" title="Link to this heading"></a></h3>
+<p>After successful test:</p>
+<ol class="arabic simple">
+<li><p>Gradually increase trade amount</p></li>
+<li><p>Set up process monitoring</p></li>
+<li><p>Configure automated restarts</p></li>
+<li><p>Enable alerting</p></li>
+</ol>
+</section>
+</section>
+<section id="production-deployment-options">
+<h2>Production Deployment Options<a class="headerlink" href="#production-deployment-options" title="Link to this heading"></a></h2>
+<section id="option-1-screen-tmux-simple">
+<h3>Option 1: Screen/Tmux (Simple)<a class="headerlink" href="#option-1-screen-tmux-simple" title="Link to this heading"></a></h3>
+<p>For quick deployment on a server:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using screen</span>
+screen<span class="w"> </span>-S<span class="w"> </span>trading_bot
+workon<span class="w"> </span>woox
+python<span class="w"> </span>trade.py
+<span class="c1"># Detach: Ctrl+A, D</span>
+
+<span class="c1"># Reattach later</span>
+screen<span class="w"> </span>-r<span class="w"> </span>trading_bot
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Using tmux</span>
+tmux<span class="w"> </span>new<span class="w"> </span>-s<span class="w"> </span>trading_bot
+workon<span class="w"> </span>woox
+python<span class="w"> </span>trade.py
+<span class="c1"># Detach: Ctrl+B, D</span>
+
+<span class="c1"># Reattach later</span>
+tmux<span class="w"> </span>attach<span class="w"> </span>-t<span class="w"> </span>trading_bot
+</pre></div>
+</div>
+<p><strong>Pros</strong>: Simple, quick setup
+<strong>Cons</strong>: Doesn’t auto-restart on failure</p>
+</section>
+<section id="option-2-systemd-service-recommended">
+<h3>Option 2: Systemd Service (Recommended)<a class="headerlink" href="#option-2-systemd-service-recommended" title="Link to this heading"></a></h3>
+<p>Create systemd service for auto-restart:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create service file</span>
+sudo<span class="w"> </span>vim<span class="w"> </span>/etc/systemd/system/woox-trading.service
+</pre></div>
+</div>
+<p>Service configuration:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[Unit]</span>
+<span class="na">Description</span><span class="o">=</span><span class="s">WOOX Trading Bot</span>
+<span class="na">After</span><span class="o">=</span><span class="s">network.target</span>
+
+<span class="k">[Service]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
+<span class="na">User</span><span class="o">=</span><span class="s">youruser</span>
+<span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/Users/honcy/myproj/woox</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">&quot;WOOX_API_KEY=your_key&quot;</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">&quot;WOOX_API_SECRET=your_secret&quot;</span>
+<span class="na">Environment</span><span class="o">=</span><span class="s">&quot;PATH=/Users/honcy/.virtualenvs/woox/bin:/usr/local/bin:/usr/bin:/bin&quot;</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/Users/honcy/.virtualenvs/woox/bin/python trade.py</span>
+<span class="na">Restart</span><span class="o">=</span><span class="s">always</span>
+<span class="na">RestartSec</span><span class="o">=</span><span class="s">10</span>
+<span class="na">StandardOutput</span><span class="o">=</span><span class="s">append:/var/log/woox-trading/output.log</span>
+<span class="na">StandardError</span><span class="o">=</span><span class="s">append:/var/log/woox-trading/error.log</span>
+
+<span class="k">[Install]</span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</pre></div>
+</div>
+<p>Enable and start service:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create log directory</span>
+sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/var/log/woox-trading
+sudo<span class="w"> </span>chown<span class="w"> </span>youruser:youruser<span class="w"> </span>/var/log/woox-trading
+
+<span class="c1"># Enable service</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>woox-trading
+
+<span class="c1"># Start service</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>woox-trading
+
+<span class="c1"># Check status</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>woox-trading
+
+<span class="c1"># View logs</span>
+sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>woox-trading<span class="w"> </span>-f
+</pre></div>
+</div>
+<p><strong>Pros</strong>: Auto-restart, system integration, log management
+<strong>Cons</strong>: Requires root access</p>
+</section>
+<section id="option-3-supervisor-alternative">
+<h3>Option 3: Supervisor (Alternative)<a class="headerlink" href="#option-3-supervisor-alternative" title="Link to this heading"></a></h3>
+<p>Install supervisor:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>supervisor
+</pre></div>
+</div>
+<p>Create config:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># /etc/supervisor/conf.d/woox-trading.conf</span>
+<span class="k">[program:woox-trading]</span>
+<span class="na">command</span><span class="o">=</span><span class="s">/Users/honcy/.virtualenvs/woox/bin/python trade.py</span>
+<span class="na">directory</span><span class="o">=</span><span class="s">/Users/honcy/myproj/woox</span>
+<span class="na">user</span><span class="o">=</span><span class="s">youruser</span>
+<span class="na">autostart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">autorestart</span><span class="o">=</span><span class="s">true</span>
+<span class="na">stderr_logfile</span><span class="o">=</span><span class="s">/var/log/woox-trading/error.log</span>
+<span class="na">stdout_logfile</span><span class="o">=</span><span class="s">/var/log/woox-trading/output.log</span>
+<span class="na">environment=WOOX_API_KEY</span><span class="o">=</span><span class="s">&quot;your_key&quot;</span><span class="na">,WOOX_API_SECRET</span><span class="o">=</span><span class="s">&quot;your_secret&quot;</span>
+</pre></div>
+</div>
+<p>Start supervisor:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>supervisorctl<span class="w"> </span>reread
+supervisorctl<span class="w"> </span>update
+supervisorctl<span class="w"> </span>start<span class="w"> </span>woox-trading
+</pre></div>
+</div>
+</section>
+<section id="option-4-docker-advanced">
+<h3>Option 4: Docker (Advanced)<a class="headerlink" href="#option-4-docker-advanced" title="Link to this heading"></a></h3>
+<p>Create Dockerfile:</p>
+<div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.12-slim</span>
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+
+<span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>.
+
+<span class="k">ENV</span><span class="w"> </span><span class="nv">WOOX_API_KEY</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">WOOX_API_SECRET</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;trade.py&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Build and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build image</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>woox-trading-bot<span class="w"> </span>.
+
+<span class="c1"># Run container</span>
+docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>trading-bot<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">WOOX_API_KEY</span><span class="o">=</span><span class="s2">&quot;your_key&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-e<span class="w"> </span><span class="nv">WOOX_API_SECRET</span><span class="o">=</span><span class="s2">&quot;your_secret&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/live_transaction.db:/app/live_transaction.db<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/.config:/app/.config<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/trade.log:/app/trade.log<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>woox-trading-bot
+
+<span class="c1"># View logs</span>
+docker<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>trading-bot
+</pre></div>
+</div>
+</section>
+</section>
+<section id="monitoring-and-alerting">
+<h2>Monitoring and Alerting<a class="headerlink" href="#monitoring-and-alerting" title="Link to this heading"></a></h2>
+<section id="log-monitoring">
+<h3>Log Monitoring<a class="headerlink" href="#log-monitoring" title="Link to this heading"></a></h3>
+<p>Set up log rotation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># /etc/logrotate.d/woox-trading</span>
+/var/log/woox-trading/*.log<span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>daily
+<span class="w">    </span>rotate<span class="w"> </span><span class="m">30</span>
+<span class="w">    </span>compress
+<span class="w">    </span>delaycompress
+<span class="w">    </span>notifempty
+<span class="w">    </span>create<span class="w"> </span><span class="m">0644</span><span class="w"> </span>youruser<span class="w"> </span>youruser
+<span class="w">    </span>sharedscripts
+<span class="w">    </span>postrotate
+<span class="w">        </span>systemctl<span class="w"> </span>reload<span class="w"> </span>woox-trading<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+<span class="w">    </span>endscript
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Monitor for errors:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Watch for errors in real-time</span>
+tail<span class="w"> </span>-f<span class="w"> </span>trade.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>ERROR
+
+<span class="c1"># Get error summary</span>
+grep<span class="w"> </span>ERROR<span class="w"> </span>trade.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-20
+</pre></div>
+</div>
+</section>
+<section id="email-alerts-simple">
+<h3>Email Alerts (Simple)<a class="headerlink" href="#email-alerts-simple" title="Link to this heading"></a></h3>
+<p>Add to trade.py for critical alerts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">smtplib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">email.message</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmailMessage</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">send_alert</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Send email alert for critical issues.&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">()</span>
+    <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;Subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span>
+    <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;From&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;trading-bot@yourdomain.com&#39;</span>
+    <span class="n">msg</span><span class="p">[</span><span class="s1">&#39;To&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;your-email@example.com&#39;</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">set_content</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="s1">&#39;smtp.gmail.com&#39;</span><span class="p">,</span> <span class="mi">587</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+        <span class="n">server</span><span class="o">.</span><span class="n">starttls</span><span class="p">()</span>
+        <span class="n">server</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">&#39;your-email@gmail.com&#39;</span><span class="p">,</span> <span class="s1">&#39;app-password&#39;</span><span class="p">)</span>
+        <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<span class="c1"># Use in error handling</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Trading logic</span>
+    <span class="k">pass</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">send_alert</span><span class="p">(</span>
+        <span class="s1">&#39;Trading Bot Error&#39;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s1">&#39;Critical error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="performance-monitoring">
+<h3>Performance Monitoring<a class="headerlink" href="#performance-monitoring" title="Link to this heading"></a></h3>
+<p>Track key metrics:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add to trade.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_performance_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log performance metrics periodically.&quot;&quot;&quot;</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_account_summary</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Performance Metrics - &quot;</span>
+        <span class="s2">&quot;Total Trades: </span><span class="si">%d</span><span class="s2">, Win Rate: </span><span class="si">%.2f%%</span><span class="s2">, &quot;</span>
+        <span class="s2">&quot;Total P&amp;L: $</span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;total_trades&#39;</span><span class="p">],</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;win_rate&#39;</span><span class="p">],</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s1">&#39;total_pnl&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="scheduled-health-checks">
+<h3>Scheduled Health Checks<a class="headerlink" href="#scheduled-health-checks" title="Link to this heading"></a></h3>
+<p>Create health check script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1"># health_check.sh</span>
+
+<span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">&quot;/var/log/woox-trading/trade.log&quot;</span>
+
+<span class="c1"># Check if bot is running</span>
+<span class="k">if</span><span class="w"> </span>!<span class="w"> </span>pgrep<span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;python trade.py&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Trading bot not running!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mail<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;Bot Down Alert&quot;</span><span class="w"> </span>your-email@example.com
+<span class="k">fi</span>
+
+<span class="c1"># Check for recent activity (within last 5 minutes)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-f<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOG_FILE</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nv">RECENT</span><span class="o">=</span><span class="k">$(</span>find<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOG_FILE</span><span class="s2">&quot;</span><span class="w"> </span>-mmin<span class="w"> </span>-5<span class="k">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$RECENT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;No recent log activity!&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>mail<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;Bot Stalled Alert&quot;</span><span class="w"> </span>your-email@example.com
+<span class="w">    </span><span class="k">fi</span>
+<span class="k">fi</span>
+</pre></div>
+</div>
+<p>Add to crontab:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run health check every 5 minutes</span>
+*/5<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>/path/to/health_check.sh
+</pre></div>
+</div>
+</section>
+</section>
+<section id="backup-strategy">
+<h2>Backup Strategy<a class="headerlink" href="#backup-strategy" title="Link to this heading"></a></h2>
+<section id="database-backups">
+<h3>Database Backups<a class="headerlink" href="#database-backups" title="Link to this heading"></a></h3>
+<p>Automated daily backups:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="c1"># backup_database.sh</span>
+
+<span class="nv">BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;/path/to/backups&quot;</span>
+<span class="nv">DATE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span>
+
+<span class="c1"># Backup live database</span>
+cp<span class="w"> </span>live_transaction.db<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BACKUP_DIR</span><span class="s2">/live_transaction_</span><span class="nv">$DATE</span><span class="s2">.db&quot;</span>
+
+<span class="c1"># Keep only last 30 days</span>
+find<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BACKUP_DIR</span><span class="s2">&quot;</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.db&quot;</span><span class="w"> </span>-mtime<span class="w"> </span>+30<span class="w"> </span>-delete
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Backup completed: </span><span class="nv">$DATE</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>Add to crontab:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Daily backup at 2 AM</span>
+<span class="m">0</span><span class="w"> </span><span class="m">2</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>/path/to/backup_database.sh
+</pre></div>
+</div>
+</section>
+<section id="configuration-backups">
+<h3>Configuration Backups<a class="headerlink" href="#configuration-backups" title="Link to this heading"></a></h3>
+<p>Version control your configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>add<span class="w"> </span>.config
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Update trading configuration&quot;</span>
+git<span class="w"> </span>push
+</pre></div>
+</div>
+</section>
+</section>
+<section id="disaster-recovery">
+<h2>Disaster Recovery<a class="headerlink" href="#disaster-recovery" title="Link to this heading"></a></h2>
+<section id="bot-crashes">
+<h3>Bot Crashes<a class="headerlink" href="#bot-crashes" title="Link to this heading"></a></h3>
+<p>If using systemd, bot will auto-restart. Manual restart:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Systemd</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>woox-trading
+
+<span class="c1"># Screen</span>
+screen<span class="w"> </span>-r<span class="w"> </span>trading_bot
+workon<span class="w"> </span>woox
+python<span class="w"> </span>trade.py
+</pre></div>
+</div>
+</section>
+<section id="database-corruption">
+<h3>Database Corruption<a class="headerlink" href="#database-corruption" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Stop bot</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>woox-trading
+
+<span class="c1"># Restore from backup</span>
+cp<span class="w"> </span>/path/to/backup/live_transaction_YYYYMMDD.db<span class="w"> </span>live_transaction.db
+
+<span class="c1"># Restart bot</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>woox-trading
+</pre></div>
+</div>
+</section>
+<section id="lost-position">
+<h3>Lost Position<a class="headerlink" href="#lost-position" title="Link to this heading"></a></h3>
+<p>Check database for position state:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>workon<span class="w"> </span>woox
+python<span class="w"> </span>account.py<span class="w"> </span>live
+</pre></div>
+</div>
+<p>Manually close if needed using WOOX web interface.</p>
+</section>
+</section>
+<section id="security-best-practices">
+<h2>Security Best Practices<a class="headerlink" href="#security-best-practices" title="Link to this heading"></a></h2>
+<section id="api-key-security">
+<h3>API Key Security<a class="headerlink" href="#api-key-security" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Use API keys with minimum required permissions (trading only)</p></li>
+<li><p>Enable IP whitelist on WOOX for API keys</p></li>
+<li><p>Rotate API keys periodically (every 90 days)</p></li>
+<li><p>Never commit API keys to version control</p></li>
+<li><p>Use environment variables for credentials</p></li>
+</ul>
+</section>
+<section id="server-security">
+<h3>Server Security<a class="headerlink" href="#server-security" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Keep system updated: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">update</span> <span class="pre">&amp;&amp;</span> <span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">upgrade</span></code></p></li>
+<li><p>Enable firewall: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">ufw</span> <span class="pre">enable</span></code></p></li>
+<li><p>Use SSH keys instead of passwords</p></li>
+<li><p>Limit SSH access to specific IPs</p></li>
+<li><p>Regular security audits</p></li>
+</ul>
+</section>
+<section id="code-security">
+<h3>Code Security<a class="headerlink" href="#code-security" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Keep dependencies updated: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">list</span> <span class="pre">--outdated</span></code></p></li>
+<li><p>Review code changes before deployment</p></li>
+<li><p>Use separate environments for dev/prod</p></li>
+<li><p>Implement rate limiting for API calls</p></li>
+<li><p>Validate all user inputs</p></li>
+</ul>
+</section>
+</section>
+<section id="scaling-considerations">
+<h2>Scaling Considerations<a class="headerlink" href="#scaling-considerations" title="Link to this heading"></a></h2>
+<section id="multiple-symbols">
+<h3>Multiple Symbols<a class="headerlink" href="#multiple-symbols" title="Link to this heading"></a></h3>
+<p>For trading multiple pairs, run separate instances:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instance 1: BTC</span>
+<span class="nv">SYMBOL</span><span class="o">=</span>SPOT_BTC_USDT<span class="w"> </span>python<span class="w"> </span>trade.py
+
+<span class="c1"># Instance 2: ETH</span>
+<span class="nv">SYMBOL</span><span class="o">=</span>SPOT_ETH_USDT<span class="w"> </span>python<span class="w"> </span>trade.py
+</pre></div>
+</div>
+</section>
+<section id="multiple-strategies">
+<h3>Multiple Strategies<a class="headerlink" href="#multiple-strategies" title="Link to this heading"></a></h3>
+<p>Run parallel strategies with different configs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Conservative strategy</span>
+cp<span class="w"> </span>.config<span class="w"> </span>.config.conservative
+python<span class="w"> </span>trade.py<span class="w">  </span><span class="c1"># Uses .config.conservative</span>
+
+<span class="c1"># Aggressive strategy</span>
+cp<span class="w"> </span>.config<span class="w"> </span>.config.aggressive
+python<span class="w"> </span>trade.py<span class="w">  </span><span class="c1"># Uses .config.aggressive</span>
+</pre></div>
+</div>
+</section>
+<section id="performance-tuning">
+<h3>Performance Tuning<a class="headerlink" href="#performance-tuning" title="Link to this heading"></a></h3>
+<p>For high-frequency trading:</p>
+<ul class="simple">
+<li><p>Reduce UPDATE_INTERVAL_SECONDS</p></li>
+<li><p>Use PERP instead of SPOT (better liquidity)</p></li>
+<li><p>Optimize database writes (batch inserts)</p></li>
+<li><p>Monitor API rate limits</p></li>
+</ul>
+</section>
+</section>
+<section id="troubleshooting-production-issues">
+<h2>Troubleshooting Production Issues<a class="headerlink" href="#troubleshooting-production-issues" title="Link to this heading"></a></h2>
+<section id="high-cpu-usage">
+<h3>High CPU Usage<a class="headerlink" href="#high-cpu-usage" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Increase UPDATE_INTERVAL_SECONDS</p></li>
+<li><p>Check for infinite loops in logs</p></li>
+<li><p>Reduce orderbook depth (30 → 10 levels)</p></li>
+</ul>
+</section>
+<section id="memory-leaks">
+<h3>Memory Leaks<a class="headerlink" href="#memory-leaks" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Check deque size (should be limited to 1440)</p></li>
+<li><p>Monitor with: <code class="docutils literal notranslate"><span class="pre">ps</span> <span class="pre">aux</span> <span class="pre">|</span> <span class="pre">grep</span> <span class="pre">python</span></code></p></li>
+<li><p>Restart bot daily as workaround</p></li>
+</ul>
+</section>
+<section id="api-rate-limits">
+<h3>API Rate Limits<a class="headerlink" href="#api-rate-limits" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Increase delays between requests</p></li>
+<li><p>Cache orderbook data</p></li>
+<li><p>Use WebSocket for real-time data (future enhancement)</p></li>
+</ul>
+</section>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<p>After successful deployment:</p>
+<ol class="arabic simple">
+<li><p>Monitor performance for first week</p></li>
+<li><p>Review and adjust parameters based on results</p></li>
+<li><p>Gradually increase position sizes</p></li>
+<li><p>Set up advanced monitoring (Grafana, Prometheus)</p></li>
+<li><p>Implement additional strategies</p></li>
+<li><p>Consider portfolio diversification</p></li>
+</ol>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="configuration.html"><span class="doc">Configuration Guide</span></a> - Configuration options</p></li>
+<li><p><a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> - Testing before deployment</p></li>
+<li><p><a class="reference internal" href="api_reference.html"><span class="doc">API Reference</span></a> - Code documentation</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="testing.html" class="btn btn-neutral float-left" title="Testing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, HoncyLee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

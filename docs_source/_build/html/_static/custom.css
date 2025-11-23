@@ -1,0 +1,81 @@
+/* Custom CSS for WOOX Trading Bot documentation */
+
+/* Better code block styling */
+.highlight {
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+}
+
+/* Improve admonition styling */
+.admonition {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.admonition.warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.admonition.note {
+    background-color: #d1ecf1;
+    border-left: 4px solid #0dcaf0;
+}
+
+/* Better table styling */
+table.docutils {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+table.docutils th {
+    background-color: #2980B9;
+    color: white;
+    padding: 10px;
+}
+
+table.docutils td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+}
+
+table.docutils tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Improve code inline styling */
+code.docutils.literal {
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #e83e8c;
+    border: 1px solid #dee2e6;
+}
+
+/* Better heading spacing */
+h1, h2, h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+/* Improve navigation */
+.wy-nav-content {
+    max-width: 1200px;
+}
+
+/* Status indicators */
+.checkmark::before {
+    content: "✅ ";
+}
+
+.cross::before {
+    content: "❌ ";
+}
+
+.warning-icon::before {
+    content: "⚠️ ";
+}
