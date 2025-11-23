@@ -1,6 +1,6 @@
 # WOOX Trading Bot
 
-📚 **[Full Documentation](https://honcylee.github.io/AlgoTradeWooxAPI/index.html)** | [GitHub Repository](https://github.com/HoncyLee/AlgoTradeWooxAPI)
+📚 **[Full Documentation](https://honcylee.github.io/AlgoTradeWooxAPI/)** | [GitHub Repository](https://github.com/HoncyLee/AlgoTradeWooxAPI)
 
 A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market and executes automated trading strategies.
 
