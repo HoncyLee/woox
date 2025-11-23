@@ -14,6 +14,7 @@ project = 'WOOX Trading Bot'
 copyright = '2025, HoncyLee'
 author = 'HoncyLee'
 release = '1.0.0'
+master_doc = 'index'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
