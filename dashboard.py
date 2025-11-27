@@ -47,7 +47,11 @@ chart_data = {
     'volumes': deque(maxlen=500),
     'pnl': deque(maxlen=500),
     'bid_depth': deque(maxlen=500),
-    'ask_depth': deque(maxlen=500)
+    'ask_depth': deque(maxlen=500),
+    'spread': deque(maxlen=500),
+    'rsi': deque(maxlen=500),
+    'ma_short': deque(maxlen=500),
+    'ma_long': deque(maxlen=500)
 }
 
 # Custom CSS
@@ -290,6 +294,32 @@ app.layout = html.Div([
         
         html.Div([
             dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
+        ], style={'width': '50%', 'display': 'inline-block'}),
+    ], className='no-print'),
+    
+    # Technical Analysis Charts Row
+    html.Div([
+        html.Div([
+            dcc.Graph(id='rsi-chart', config={'displayModeBar': False}),
+        ], style={'width': '33%', 'display': 'inline-block'}),
+        
+        html.Div([
+            dcc.Graph(id='ma-chart', config={'displayModeBar': False}),
+        ], style={'width': '33%', 'display': 'inline-block'}),
+        
+        html.Div([
+            dcc.Graph(id='spread-chart', config={'displayModeBar': False}),
+        ], style={'width': '33%', 'display': 'inline-block'}),
+    ], className='no-print'),
+    
+    # Trade Analytics Row
+    html.Div([
+        html.Div([
+            dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
+        ], style={'width': '50%', 'display': 'inline-block'}),
+        
+        html.Div([
+            dcc.Graph(id='cumulative-return-chart', config={'displayModeBar': False}),
         ], style={'width': '50%', 'display': 'inline-block'}),
     ], className='no-print'),
     
@@ -751,6 +781,286 @@ def update_pnl_chart(n):
     )
     
     # Add zero line
+    fig.add_hline(y=0, line_dash="dash", line_color="#666666", line_width=1)
+    
+    return fig
+
+
+# Callback: Update RSI chart
+@app.callback(
+    Output('rsi-chart', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_rsi_chart(n):
+    global trader, chart_data
+    
+    fig = go.Figure()
+    
+    if trader and len(trader.trade_px_list) >= 14:
+        # Calculate RSI
+        prices = list(trader.trade_px_list)
+        period = 14
+        
+        if len(prices) >= period:
+            deltas = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+            gains = [d if d > 0 else 0 for d in deltas]
+            losses = [-d if d < 0 else 0 for d in deltas]
+            
+            avg_gain = sum(gains[-period:]) / period
+            avg_loss = sum(losses[-period:]) / period
+            
+            if avg_loss != 0:
+                rs = avg_gain / avg_loss
+                rsi = 100 - (100 / (1 + rs))
+            else:
+                rsi = 100
+            
+            chart_data['rsi'].append(rsi)
+            
+            if len(chart_data['timestamps']) > 0 and len(chart_data['rsi']) > 0:
+                # Trim to match timestamps
+                rsi_values = list(chart_data['rsi'])[-len(chart_data['timestamps']):]
+                
+                fig.add_trace(go.Scatter(
+                    x=list(chart_data['timestamps'])[-len(rsi_values):],
+                    y=rsi_values,
+                    mode='lines',
+                    name='RSI',
+                    line=dict(color='#2196F3', width=2)
+                ))
+                
+                # Add overbought/oversold lines
+                fig.add_hline(y=70, line_dash="dash", line_color="#ff1744", line_width=1, annotation_text="Overbought")
+                fig.add_hline(y=30, line_dash="dash", line_color="#00c853", line_width=1, annotation_text="Oversold")
+                fig.add_hline(y=50, line_dash="dot", line_color="#666666", line_width=1)
+    
+    fig.update_layout(
+        title='RSI Indicator (14)',
+        xaxis_title='Time',
+        yaxis_title='RSI',
+        template='plotly_dark',
+        paper_bgcolor='#1e2130',
+        plot_bgcolor='#1e2130',
+        height=300,
+        margin=dict(l=50, r=20, t=40, b=40),
+        hovermode='x unified',
+        yaxis=dict(range=[0, 100])
+    )
+    
+    return fig
+
+
+# Callback: Update Moving Averages chart
+@app.callback(
+    Output('ma-chart', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_ma_chart(n):
+    global trader, chart_data
+    
+    fig = go.Figure()
+    
+    if trader and len(trader.trade_px_list) >= 50:
+        prices = list(trader.trade_px_list)
+        
+        # Calculate MAs
+        if len(prices) >= 20:
+            ma_short = sum(prices[-20:]) / 20
+            chart_data['ma_short'].append(ma_short)
+        
+        if len(prices) >= 50:
+            ma_long = sum(prices[-50:]) / 50
+            chart_data['ma_long'].append(ma_long)
+        
+        if len(chart_data['timestamps']) > 0:
+            # Price line
+            fig.add_trace(go.Scatter(
+                x=list(chart_data['timestamps']),
+                y=list(chart_data['prices']),
+                mode='lines',
+                name='Price',
+                line=dict(color='#ffd600', width=2)
+            ))
+            
+            # MA20
+            if len(chart_data['ma_short']) > 0:
+                ma_short_values = list(chart_data['ma_short'])[-len(chart_data['timestamps']):]
+                fig.add_trace(go.Scatter(
+                    x=list(chart_data['timestamps'])[-len(ma_short_values):],
+                    y=ma_short_values,
+                    mode='lines',
+                    name='MA20',
+                    line=dict(color='#00c853', width=1.5, dash='dash')
+                ))
+            
+            # MA50
+            if len(chart_data['ma_long']) > 0:
+                ma_long_values = list(chart_data['ma_long'])[-len(chart_data['timestamps']):]
+                fig.add_trace(go.Scatter(
+                    x=list(chart_data['timestamps'])[-len(ma_long_values):],
+                    y=ma_long_values,
+                    mode='lines',
+                    name='MA50',
+                    line=dict(color='#ff1744', width=1.5, dash='dot')
+                ))
+    
+    fig.update_layout(
+        title='Moving Averages (MA20/MA50)',
+        xaxis_title='Time',
+        yaxis_title='Price (USD)',
+        template='plotly_dark',
+        paper_bgcolor='#1e2130',
+        plot_bgcolor='#1e2130',
+        height=300,
+        margin=dict(l=50, r=20, t=40, b=40),
+        hovermode='x unified',
+        legend=dict(x=0.01, y=0.99)
+    )
+    
+    return fig
+
+
+# Callback: Update Spread chart
+@app.callback(
+    Output('spread-chart', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_spread_chart(n):
+    global trader, chart_data
+    
+    fig = go.Figure()
+    
+    if trader and trader.orderbook:
+        # Calculate spread
+        bids = trader.orderbook.get('bids', [])
+        asks = trader.orderbook.get('asks', [])
+        
+        if bids and asks:
+            best_bid = bids[0]['price']
+            best_ask = asks[0]['price']
+            spread = best_ask - best_bid
+            spread_pct = (spread / best_bid) * 100
+            
+            chart_data['spread'].append(spread_pct)
+            
+            if len(chart_data['timestamps']) > 0 and len(chart_data['spread']) > 0:
+                spread_values = list(chart_data['spread'])[-len(chart_data['timestamps']):]
+                
+                fig.add_trace(go.Scatter(
+                    x=list(chart_data['timestamps'])[-len(spread_values):],
+                    y=spread_values,
+                    mode='lines',
+                    name='Spread %',
+                    line=dict(color='#9C27B0', width=2),
+                    fill='tozeroy',
+                    fillcolor='rgba(156, 39, 176, 0.1)'
+                ))
+    
+    fig.update_layout(
+        title='Bid-Ask Spread %',
+        xaxis_title='Time',
+        yaxis_title='Spread (%)',
+        template='plotly_dark',
+        paper_bgcolor='#1e2130',
+        plot_bgcolor='#1e2130',
+        height=300,
+        margin=dict(l=50, r=20, t=40, b=40),
+        hovermode='x unified'
+    )
+    
+    return fig
+
+
+# Callback: Update Trade Distribution chart
+@app.callback(
+    Output('trade-distribution-chart', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_trade_distribution_chart(n):
+    global performance_metrics
+    
+    fig = go.Figure()
+    
+    winning = performance_metrics['winning_trades']
+    losing = performance_metrics['losing_trades']
+    
+    if winning > 0 or losing > 0:
+        fig.add_trace(go.Pie(
+            labels=['Winning Trades', 'Losing Trades'],
+            values=[winning, losing],
+            marker=dict(colors=['#00c853', '#ff1744']),
+            hole=0.4,
+            textinfo='label+percent+value',
+            textfont=dict(size=14, color='white')
+        ))
+    
+    fig.update_layout(
+        title='Trade Distribution',
+        template='plotly_dark',
+        paper_bgcolor='#1e2130',
+        plot_bgcolor='#1e2130',
+        height=300,
+        margin=dict(l=20, r=20, t=40, b=20),
+        showlegend=True,
+        legend=dict(font=dict(color='white'))
+    )
+    
+    return fig
+
+
+# Callback: Update Cumulative Return chart
+@app.callback(
+    Output('cumulative-return-chart', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_cumulative_return_chart(n):
+    global trader, performance_metrics
+    
+    fig = go.Figure()
+    
+    if trader:
+        try:
+            account = Account(trade_mode=trader.trade_mode)
+            summary = account.get_transaction_summary()
+            
+            if summary:
+                # Get cumulative P&L over time (simplified)
+                cumulative_pnl = []
+                running_total = 0
+                
+                # This is a placeholder - you'd need actual trade history with timestamps
+                for i in range(min(len(chart_data['timestamps']), performance_metrics['total_trades'])):
+                    # Simplified: divide total P&L by number of trades
+                    running_total += performance_metrics['total_pnl'] / max(performance_metrics['total_trades'], 1)
+                    cumulative_pnl.append(running_total)
+                
+                if cumulative_pnl and len(chart_data['timestamps']) > 0:
+                    timestamps = list(chart_data['timestamps'])[-len(cumulative_pnl):]
+                    
+                    fig.add_trace(go.Scatter(
+                        x=timestamps,
+                        y=cumulative_pnl,
+                        mode='lines',
+                        name='Cumulative P&L',
+                        line=dict(color='#00e676', width=2),
+                        fill='tozeroy',
+                        fillcolor='rgba(0, 230, 118, 0.1)'
+                    ))
+        except Exception as e:
+            logger.error(f"Error calculating cumulative return: {e}")
+    
+    fig.update_layout(
+        title='Cumulative Return',
+        xaxis_title='Time',
+        yaxis_title='Total P&L (USD)',
+        template='plotly_dark',
+        paper_bgcolor='#1e2130',
+        plot_bgcolor='#1e2130',
+        height=300,
+        margin=dict(l=50, r=20, t=40, b=40),
+        hovermode='x unified'
+    )
+    
     fig.add_hline(y=0, line_dash="dash", line_color="#666666", line_width=1)
     
     return fig
