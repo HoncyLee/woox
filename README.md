@@ -24,6 +24,7 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Precision Management**: Proper number formatting for API requests using Decimal class
 - **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 - **📊 Interactive Dashboard**: Web-based real-time monitoring and control (Dash + Plotly)
+- **🖨️ Printable Reports**: Generate professional trading reports with white background for printing/archiving
 
 ## Requirements
 
@@ -366,6 +367,8 @@ Then open your browser to **http://127.0.0.1:8050**
 - 📊 Trading volume and market depth analysis
 - 📝 Activity log monitoring
 - ❌ Emergency position close button
+- 🖨️ **Print Report** - Generate printable trading reports with white background
+- 🌑 Dark theme with light text for comfortable monitoring
 
 See [DASHBOARD_README.md](DASHBOARD_README.md) for detailed documentation.
 

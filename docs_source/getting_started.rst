@@ -99,14 +99,36 @@ Always test with paper trading first:
 
 1. Ensure ``TRADE_MODE=paper`` in ``.config``
 
-2. Run the trading bot:
+2. **Option A: Interactive Dashboard (Recommended)**
+
+   Launch the web-based dashboard for real-time monitoring:
+
+   .. code-block:: bash
+
+      workon woox  # Activate environment
+      python dashboard.py
+
+   Then open your browser to ``http://127.0.0.1:8050``
+
+   Dashboard features:
+   
+   * Real-time price charts and orderbook visualization
+   * Start/Stop bot with one click
+   * Live P&L tracking and performance metrics
+   * Activity log monitoring
+   * Print report button for generating professional reports
+   * Dark theme with light text for comfortable monitoring
+
+3. **Option B: Command Line**
+
+   Run the trading bot directly:
 
    .. code-block:: bash
 
       workon woox  # Activate environment
       python trade.py
 
-3. Monitor the output:
+   Monitor the output:
 
    .. code-block:: text
 

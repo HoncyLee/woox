@@ -8,6 +8,7 @@ Welcome to the WOOX Trading Bot documentation! This bot automates cryptocurrency
    :caption: Contents:
 
    getting_started
+   dashboard
    configuration
    strategies
    error_handling
@@ -36,6 +37,8 @@ Features
 * **Production-Grade Error Handling**: Complete error code mapping with automatic retry logic
 * **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 * **Precision Management**: Proper decimal handling prevents floating-point errors
+* **Interactive Dashboard**: Web-based real-time monitoring with Dash and Plotly
+* **Printable Reports**: Generate professional trading reports with white background
 * **Paper Trading**: Test strategies without risking real money
 * **Transaction Database**: Complete trade history in DuckDB
 * **Portfolio Analysis**: Jupyter notebook for performance tracking
@@ -59,7 +62,14 @@ Quick Start
 
 3. Configure trading parameters in ``.config`` file
 
-4. Start paper trading:
+4. Start the interactive dashboard (recommended):
+
+   .. code-block:: bash
+
+      python dashboard.py
+      # Then open http://127.0.0.1:8050 in your browser
+
+   Or start paper trading directly:
 
    .. code-block:: bash
 
