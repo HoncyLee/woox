@@ -161,3 +161,29 @@
 2025-11-23 14:10:07,589 - Trade - INFO - Transaction recorded - Type: BUY, Quantity: 0.001053, Price: 95000.00, Proceeds: -100.00
 2025-11-23 14:10:07,589 - Trade - INFO - Position opened successfully: {'side': 'long', 'quantity': 0.0010526315789473684, 'entry_price': 95000.0, 'open_time': 1763878207.3550751}
 2025-11-23 14:10:07,589 - Trade - ERROR - Error determining stop trade: MovingAverageCrossover.generate_exit_signal() takes 3 positional arguments but 4 were given
+2025-11-27 11:10:24,087 - Trade - INFO - Strategies loaded - Entry: ma_crossover, Exit: ma_crossover
+2025-11-27 11:10:24,102 - Trade - INFO - Database initialized successfully
+2025-11-27 11:10:24,102 - Trade - INFO - Trade class initialized for symbol: PERP_BTC_USDT in LIVE mode
+2025-11-27 11:10:24,102 - root - INFO - Trading bot started in LIVE MODE - Real orders will be placed!
+2025-11-27 11:10:24,102 - Trade - INFO - Starting trading bot...
+2025-11-27 11:10:24,429 - Trade - INFO - Trade update - Price: 91461.0, Volume: 0.064, Bid: 91462.0, Ask: 91463.0
+2025-11-27 11:10:24,429 - Trade - INFO - Trade price list updated - Total entries: 1, Latest price: 91461.0
+2025-11-27 11:10:24,529 - Trade - INFO - No position currently held
+2025-11-27 11:10:24,531 - Trade - ERROR - Error determining open trade: MovingAverageCrossover.generate_entry_signal() takes 2 positional arguments but 3 were given
+2025-11-27 11:10:29,439 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91486.0, Ask: 91487.0
+2025-11-27 11:10:29,440 - Trade - INFO - Trade price list updated - Total entries: 2, Latest price: 91474.0
+2025-11-27 11:10:34,518 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91495.0, Ask: 91496.0
+2025-11-27 11:10:34,518 - Trade - INFO - Trade price list updated - Total entries: 3, Latest price: 91474.0
+2025-11-27 11:10:39,499 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91495.0, Ask: 91496.0
+2025-11-27 11:10:39,499 - Trade - INFO - Trade price list updated - Total entries: 4, Latest price: 91474.0
+2025-11-27 11:10:44,577 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91495.0, Ask: 91496.0
+2025-11-27 11:10:44,577 - Trade - INFO - Trade price list updated - Total entries: 5, Latest price: 91474.0
+2025-11-27 11:10:49,666 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91495.0, Ask: 91496.0
+2025-11-27 11:10:49,667 - Trade - INFO - Trade price list updated - Total entries: 6, Latest price: 91474.0
+2025-11-27 11:10:54,761 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91495.0, Ask: 91496.0
+2025-11-27 11:10:54,762 - Trade - INFO - Trade price list updated - Total entries: 7, Latest price: 91474.0
+2025-11-27 11:10:59,774 - Trade - INFO - Trade update - Price: 91474.0, Volume: 0.317, Bid: 91487.0, Ask: 91488.0
+2025-11-27 11:10:59,774 - Trade - INFO - Trade price list updated - Total entries: 8, Latest price: 91474.0
+2025-11-27 11:11:03,314 - Trade - INFO - Trading bot stopped by user
+2025-11-27 11:11:03,316 - Trade - INFO - Database connection closed
+2025-11-27 11:11:03,317 - Trade - INFO - Trading bot shutdown complete
