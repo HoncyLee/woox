@@ -23,6 +23,7 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Production-Ready Error Handling**: Complete error code mapping with automatic retry logic
 - **Precision Management**: Proper number formatting for API requests using Decimal class
 - **Order Validation**: Pre-flight validation against symbol's price/quantity filters
+- **📊 Interactive Dashboard**: Web-based real-time monitoring and control (Dash + Plotly)
 
 ## Requirements
 
@@ -345,6 +346,30 @@ TAKE_PROFIT_PCT=3.0    # Take profit at 3% gain
 4. Set your strategy name in `.config`
 
 ## Usage
+
+### 📊 Interactive Dashboard (Recommended)
+
+Launch the web-based dashboard for real-time monitoring and control:
+
+```bash
+./start_dashboard.sh
+# or
+python dashboard.py
+```
+
+Then open your browser to **http://127.0.0.1:8050**
+
+**Dashboard Features:**
+- 🎮 Start/Stop bot with one click
+- 📈 Real-time price charts and orderbook visualization
+- 💰 Live P&L tracking and performance metrics
+- 📊 Trading volume and market depth analysis
+- 📝 Activity log monitoring
+- ❌ Emergency position close button
+
+See [DASHBOARD_README.md](DASHBOARD_README.md) for detailed documentation.
+
+---
 
 ### Paper Trading Mode (Simulation - Default)
 
