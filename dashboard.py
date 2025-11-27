@@ -130,9 +130,57 @@ app.index_string = '''
                 color: #1a1a1a;
                 font-weight: bold;
             }
+            .print-btn {
+                background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+                color: white;
+            }
             .control-button:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            }
+            @media print {
+                body {
+                    background-color: white !important;
+                    color: black !important;
+                }
+                .no-print {
+                    display: none !important;
+                }
+                .print-only {
+                    display: block !important;
+                }
+                .header {
+                    background: white !important;
+                    color: black !important;
+                    border: 2px solid #667eea;
+                }
+                .metric-card {
+                    background-color: white !important;
+                    color: black !important;
+                    border: 1px solid #ddd;
+                    page-break-inside: avoid;
+                }
+                .metric-value {
+                    color: black !important;
+                }
+                .metric-label {
+                    color: #555 !important;
+                }
+                h1, h2, h3, h4, h5, h6 {
+                    color: black !important;
+                }
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+                table td, table th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    color: black !important;
+                }
+                table th {
+                    background-color: #f0f0f0 !important;
+                }
             }
             .status-indicator {
                 display: inline-block;
@@ -146,6 +194,9 @@ app.index_string = '''
             @keyframes pulse {
                 0%, 100% { opacity: 1; }
                 50% { opacity: 0.5; }
+            }
+            .print-only {
+                display: none;
             }
         </style>
     </head>
@@ -177,9 +228,10 @@ app.layout = html.Div([
             html.Button("▶ Start Bot", id='start-btn', n_clicks=0, className='control-button start-btn'),
             html.Button("⏸ Stop Bot", id='stop-btn', n_clicks=0, className='control-button stop-btn'),
             html.Button("❌ Close Position", id='close-btn', n_clicks=0, className='control-button close-btn'),
+            html.Button("🖨️ Print Report", id='print-btn', n_clicks=0, className='control-button print-btn'),
             html.Div(id='control-feedback', style={'color': '#ffffff', 'marginTop': '10px', 'fontSize': '14px'})
         ]),
-    ], style={'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px', 'marginBottom': '20px'}),
+    ], style={'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px', 'marginBottom': '20px'}, className='no-print'),
     
     # Metrics Row
     html.Div([
@@ -228,7 +280,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Graph(id='orderbook-chart', config={'displayModeBar': False}),
         ], style={'width': '33%', 'display': 'inline-block', 'verticalAlign': 'top'}),
-    ]),
+    ], className='no-print'),
     
     # Secondary Charts Row
     html.Div([
@@ -239,7 +291,7 @@ app.layout = html.Div([
         html.Div([
             dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
         ], style={'width': '50%', 'display': 'inline-block'}),
-    ]),
+    ], className='no-print'),
     
     # Performance Metrics and Logs
     html.Div([
@@ -259,6 +311,23 @@ app.layout = html.Div([
                   'padding': '20px', 'borderRadius': '10px', 'verticalAlign': 'top'}),
     ]),
     
+    # Detailed Report Section (visible only when printing)
+    html.Div([
+        html.Div([
+            html.H2("📊 WOOX Trading Bot - Detailed Report", 
+                    style={'textAlign': 'center', 'marginBottom': '20px', 'color': '#667eea', 'borderBottom': '3px solid #667eea', 'paddingBottom': '10px'}),
+            html.P(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 
+                   style={'textAlign': 'center', 'color': '#666', 'fontSize': '14px', 'marginBottom': '30px'}),
+            
+            # Trading Records Section
+            html.Div(id='print-trading-records'),
+            
+            # Account Summary Section
+            html.Div(id='print-account-summary'),
+            
+        ], style={'backgroundColor': 'white', 'padding': '40px', 'maxWidth': '1200px', 'margin': '0 auto'})
+    ], style={'display': 'none'}, className='print-only'),
+    
     # Auto-refresh interval
     dcc.Interval(id='interval-component', interval=1000, n_intervals=0),  # Update every second
     
@@ -275,9 +344,10 @@ app.layout = html.Div([
     Input('start-btn', 'n_clicks'),
     Input('stop-btn', 'n_clicks'),
     Input('close-btn', 'n_clicks'),
+    Input('print-btn', 'n_clicks'),
     prevent_initial_call=True
 )
-def control_bot(start_clicks, stop_clicks, close_clicks):
+def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
     global trader, trader_thread, is_running
     
     ctx = callback_context
@@ -316,6 +386,13 @@ def control_bot(start_clicks, stop_clicks, close_clicks):
                     return "❌ Failed to close position", {'color': '#ff1744'}
             else:
                 return "⚠️ No open position", {'color': '#ffd600'}
+        
+        elif button_id == 'print-btn':
+            # Trigger browser print dialog using JavaScript
+            return html.Div([
+                "📄 Preparing report... Please use Ctrl+P (Cmd+P on Mac) or browser print to print the report.",
+                dcc.Store(id='trigger-print', data={'print': True})
+            ]), {'color': '#2196F3'}
     
     except Exception as e:
         logger.error(f"Control error: {str(e)}")
@@ -747,6 +824,134 @@ def update_activity_log(n):
         return html.Div("No log file found", style={'color': '#888888', 'fontSize': '14px'})
     except Exception as e:
         return html.Div(f"Error reading logs: {str(e)}", style={'color': '#ff5252', 'fontSize': '14px'})
+
+
+# Callback: Update print report - Trading Records
+@app.callback(
+    Output('print-trading-records', 'children'),
+    Input('interval-component', 'n_intervals')
+)
+def update_print_trading_records(n):
+    global trader, chart_data
+    
+    try:
+        # Collect trading data
+        rows = []
+        
+        # Add current position if exists
+        if trader and trader.current_position:
+            pos = trader.current_position
+            rows.append(html.Tr([
+                html.Td("CURRENT", style={'fontWeight': 'bold', 'color': '#2196F3'}),
+                html.Td(pos['side'].upper()),
+                html.Td(f"{pos['quantity']:.6f}"),
+                html.Td(f"${pos['entry_price']:.2f}"),
+                html.Td(f"${trader.current_price:.2f}" if trader.current_price else "N/A"),
+                html.Td("OPEN", style={'color': '#00c853', 'fontWeight': 'bold'}),
+            ]))
+        
+        # Add price history data
+        if len(chart_data['timestamps']) > 0:
+            for i, (ts, price, vol) in enumerate(zip(
+                list(chart_data['timestamps'])[-50:], 
+                list(chart_data['prices'])[-50:],
+                list(chart_data['volumes'])[-50:]
+            )):
+                if i % 5 == 0:  # Sample every 5th entry to avoid too much data
+                    rows.append(html.Tr([
+                        html.Td(ts.strftime('%H:%M:%S')),
+                        html.Td("MONITOR"),
+                        html.Td("N/A"),
+                        html.Td("N/A"),
+                        html.Td(f"${price:.2f}"),
+                        html.Td(f"{vol:.2f}"),
+                    ]))
+        
+        if not rows:
+            rows.append(html.Tr([
+                html.Td("No trading data available", colSpan=6, style={'textAlign': 'center', 'color': '#666'})
+            ]))
+        
+        return html.Div([
+            html.H3("Trading Records", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
+            html.Table([
+                html.Thead(html.Tr([
+                    html.Th("Time", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                    html.Th("Side", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                    html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                    html.Th("Entry Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                    html.Th("Current Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                    html.Th("Status/Volume", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                ])),
+                html.Tbody(rows)
+            ], style={'width': '100%', 'borderCollapse': 'collapse', 'marginBottom': '30px', 'border': '1px solid #ddd'})
+        ])
+        
+    except Exception as e:
+        logger.error(f"Error generating print trading records: {str(e)}")
+        return html.Div(f"Error: {str(e)}", style={'color': 'red'})
+
+
+# Callback: Update print report - Account Summary
+@app.callback(
+    Output('print-account-summary', 'children'),
+    Input('interval-component', 'n_intervals')
+)
+def update_print_account_summary(n):
+    global trader, performance_metrics
+    
+    try:
+        summary_items = []
+        
+        # Performance metrics
+        metrics_data = [
+            ("Total Trades", str(performance_metrics['total_trades'])),
+            ("Winning Trades", str(performance_metrics['winning_trades'])),
+            ("Losing Trades", str(performance_metrics['losing_trades'])),
+            ("Win Rate", f"{performance_metrics['win_rate']:.1f}%"),
+            ("Total P&L", f"${performance_metrics['total_pnl']:.2f}"),
+            ("Sharpe Ratio", f"{performance_metrics['sharpe_ratio']:.2f}"),
+        ]
+        
+        # Current bot status
+        if trader:
+            summary_items.append(html.Div([
+                html.H4("Current Status", style={'color': '#333', 'marginTop': '0'}),
+                html.Table([
+                    html.Tr([
+                        html.Td("Bot Status:", style={'fontWeight': 'bold', 'padding': '8px', 'width': '200px'}),
+                        html.Td("Running" if is_running else "Stopped", style={'padding': '8px'})
+                    ]),
+                    html.Tr([
+                        html.Td("Current Price:", style={'fontWeight': 'bold', 'padding': '8px'}),
+                        html.Td(f"${trader.current_price:.2f}" if trader.current_price else "N/A", style={'padding': '8px'})
+                    ]),
+                    html.Tr([
+                        html.Td("Data Points:", style={'fontWeight': 'bold', 'padding': '8px'}),
+                        html.Td(f"{len(trader.trade_px_list)}/1440", style={'padding': '8px'})
+                    ]),
+                ], style={'width': '100%', 'border': '1px solid #ddd', 'marginBottom': '20px'})
+            ]))
+        
+        # Performance summary
+        summary_items.append(html.Div([
+            html.H4("Performance Summary", style={'color': '#333'}),
+            html.Table([
+                html.Tr([
+                    html.Td(label + ":", style={'fontWeight': 'bold', 'padding': '8px', 'width': '200px', 'borderBottom': '1px solid #ddd'}),
+                    html.Td(value, style={'padding': '8px', 'borderBottom': '1px solid #ddd'})
+                ]) for label, value in metrics_data
+            ], style={'width': '100%', 'border': '1px solid #ddd'})
+        ]))
+        
+        return html.Div([
+            html.H3("Account Summary", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
+            html.Div(summary_items)
+        ])
+        
+    except Exception as e:
+        logger.error(f"Error generating print account summary: {str(e)}")
+        return html.Div(f"Error: {str(e)}", style={'color': 'red'})
 
 
 if __name__ == '__main__':
