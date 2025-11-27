@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Testing" href="testing.html" />
-    <link rel="prev" title="Trading Strategies" href="strategies.html" /> 
+    <link rel="prev" title="Error Handling &amp; Best Practices" href="error_handling.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -132,6 +132,39 @@
 <li class="toctree-l2"><a class="reference internal" href="strategies.html#see-also">See Also</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="error_handling.html">Error Handling &amp; Best Practices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#error-code-reference">Error Code Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#standard-api-errors-1000-to-1103">Standard API Errors (-1000 to -1103)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#order-service-errors-317xxx">Order Service Errors (317xxx)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#basic-error-handling">Basic Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#specific-exception-handling">Specific Exception Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#retry-logic">Retry Logic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#automatic-retry-with-exponential-backoff">Automatic Retry with Exponential Backoff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#retryable-errors">Retryable Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#always-use-error-handling">1. Always Use Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#use-centralized-request-method">2. Use Centralized Request Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#validate-before-sending">3. Validate Before Sending</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#use-proper-number-formatting">4. Use Proper Number Formatting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#track-client-order-ids">5. Track Client Order IDs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#log-errors-appropriately">6. Log Errors Appropriately</a></li>
+<li class="toctree-l3"><a class="reference internal" href="error_handling.html#respect-rate-limits">7. Respect Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#testing-error-handling">Testing Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#monitoring-and-alerting">Monitoring and Alerting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error_handling.html#see-also">See Also</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#core-modules">Core Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#trade">trade</a><ul>
@@ -170,6 +203,35 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#error-handling">Error Handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-woox_errors">woox_errors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.WooxError"><code class="docutils literal notranslate"><span class="pre">WooxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.WooxAuthenticationError"><code class="docutils literal notranslate"><span class="pre">WooxAuthenticationError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.WooxRateLimitError"><code class="docutils literal notranslate"><span class="pre">WooxRateLimitError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.WooxInvalidParameterError"><code class="docutils literal notranslate"><span class="pre">WooxInvalidParameterError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.WooxResourceNotFoundError"><code class="docutils literal notranslate"><span class="pre">WooxResourceNotFoundError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.WooxServerError"><code class="docutils literal notranslate"><span class="pre">WooxServerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.get_error_info"><code class="docutils literal notranslate"><span class="pre">get_error_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.handle_api_error"><code class="docutils literal notranslate"><span class="pre">handle_api_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.is_retryable_error"><code class="docutils literal notranslate"><span class="pre">is_retryable_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.get_retry_delay"><code class="docutils literal notranslate"><span class="pre">get_retry_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#woox_errors.ErrorFormatter"><code class="docutils literal notranslate"><span class="pre">ErrorFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#exception-classes">Exception Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error-handling-functions">Error Handling Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#error-formatter">Error Formatter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#order-management">Order Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-order_helper">order_helper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#order_helper.OrderHelper"><code class="docutils literal notranslate"><span class="pre">OrderHelper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#order_helper.format_order_for_display"><code class="docutils literal notranslate"><span class="pre">format_order_for_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#orderhelper-class">OrderHelper Class</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#utility-modules">Utility Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-createDuckDB">createDuckDB</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-balance_summary">balance_summary</a><ul>
@@ -200,6 +262,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#examples-best-practices">examples_best_practices</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#decorators">Decorators</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cron">cron</a></li>
 </ul>
@@ -219,7 +285,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#api-endpoints">API Endpoints</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#exceptions-and-errors">Exceptions and Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exceptions-and-errors">Exceptions and Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#woox-api-exceptions">WOOX API Exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#order-service-errors-317xxx">Order Service Errors (317xxx)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#retry-logic">Retry Logic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#common-python-exceptions">Common Python Exceptions</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#type-hints-reference">Type Hints Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
@@ -967,6 +1039,834 @@ Reads settings from .config file in the project root.</p>
 </section>
 </section>
 </section>
+<section id="error-handling">
+<h2>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h2>
+<section id="module-woox_errors">
+<span id="woox-errors"></span><h3>woox_errors<a class="headerlink" href="#module-woox_errors" title="Link to this heading"></a></h3>
+<p>WOOX API Error Codes and Exception Handling.
+Based on official WOOX API documentation.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="woox_errors.WooxError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Base exception for WOOX API errors.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="woox_errors.WooxError.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxError.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="woox_errors.WooxAuthenticationError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxAuthenticationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxAuthenticationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxAuthenticationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Authentication-related errors.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="woox_errors.WooxRateLimitError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxRateLimitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxRateLimitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxRateLimitError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Rate limit exceeded.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="woox_errors.WooxInvalidParameterError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxInvalidParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxInvalidParameterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxInvalidParameterError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Invalid parameter in request.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="woox_errors.WooxResourceNotFoundError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxResourceNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxResourceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxResourceNotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Requested resource not found.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="woox_errors.WooxServerError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxServerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxServerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxServerError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Internal server error.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="woox_errors.get_error_info">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">get_error_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#get_error_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.get_error_info" title="Link to this definition"></a></dt>
+<dd><p>Get error information by error code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>code</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Error code from API response</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with error details</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="woox_errors.handle_api_error">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">handle_api_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#handle_api_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.handle_api_error" title="Link to this definition"></a></dt>
+<dd><p>Handle API error response and raise appropriate exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – JSON response from API</p></li>
+<li><p><strong>logger</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a>]</span>) – Optional logger instance</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Appropriate WooxError subclass based on error code</strong> – </p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="woox_errors.is_retryable_error">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">is_retryable_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#is_retryable_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.is_retryable_error" title="Link to this definition"></a></dt>
+<dd><p>Check if an error is retryable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>code</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Error code</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if error is retryable (rate limit, network, server errors)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="woox_errors.get_retry_delay">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">get_retry_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#get_retry_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.get_retry_delay" title="Link to this definition"></a></dt>
+<dd><p>Get suggested retry delay in seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Error code</p></li>
+<li><p><strong>attempt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Current retry attempt number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Delay in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="woox_errors.ErrorFormatter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">ErrorFormatter</span></span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.ErrorFormatter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Format error messages for logging and user display.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="woox_errors.ErrorFormatter.format_error">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.ErrorFormatter.format_error" title="Link to this definition"></a></dt>
+<dd><p>Format error for logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Formatted error string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="woox_errors.ErrorFormatter.format_user_message">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_user_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_user_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.ErrorFormatter.format_user_message" title="Link to this definition"></a></dt>
+<dd><p>Format user-friendly error message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>User-friendly error message</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="exception-classes">
+<h4>Exception Classes<a class="headerlink" href="#exception-classes" title="Link to this heading"></a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="id10">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Base exception for WOOX API errors.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="id12">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxAuthenticationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxAuthenticationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Authentication-related errors.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="id13">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxRateLimitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxRateLimitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Rate limit exceeded.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="id14">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxInvalidParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxInvalidParameterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Invalid parameter in request.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="id15">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxResourceNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxResourceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Requested resource not found.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="id16">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxServerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxServerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<p>Internal server error.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+</section>
+<section id="error-handling-functions">
+<h4>Error Handling Functions<a class="headerlink" href="#error-handling-functions" title="Link to this heading"></a></h4>
+<dl class="py function">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">handle_api_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#handle_api_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<dd><p>Handle API error response and raise appropriate exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – JSON response from API</p></li>
+<li><p><strong>logger</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a>]</span>) – Optional logger instance</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Appropriate WooxError subclass based on error code</strong> – </p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id18">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">is_retryable_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#is_retryable_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
+<dd><p>Check if an error is retryable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>code</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Error code</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if error is retryable (rate limit, network, server errors)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="id19">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">get_retry_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#get_retry_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id19" title="Link to this definition"></a></dt>
+<dd><p>Get suggested retry delay in seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>code</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Error code</p></li>
+<li><p><strong>attempt</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Current retry attempt number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Delay in seconds</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="error-formatter">
+<h4>Error Formatter<a class="headerlink" href="#error-formatter" title="Link to this heading"></a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="id20">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">ErrorFormatter</span></span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Format error messages for logging and user display.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="id21">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
+<dd><p>Format error for logging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Formatted error string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id22">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_user_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_user_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
+<dd><p>Format user-friendly error message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>User-friendly error message</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+<section id="order-management">
+<h2>Order Management<a class="headerlink" href="#order-management" title="Link to this heading"></a></h2>
+<section id="module-order_helper">
+<span id="order-helper"></span><h3>order_helper<a class="headerlink" href="#module-order_helper" title="Link to this heading"></a></h3>
+<p>WOOX API Helper utilities for order placement and management.
+Implements best practices for precision, order tracking, and parameter validation.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="order_helper.OrderHelper">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">order_helper.</span></span><span class="sig-name descname"><span class="pre">OrderHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Helper class for creating properly formatted orders.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.generate_client_order_id">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_client_order_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.generate_client_order_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.generate_client_order_id" title="Link to this definition"></a></dt>
+<dd><p>Generate unique client_order_id.
+Uses last 12 digits of current timestamp in milliseconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Integer client_order_id (0 to 9223372036854775807)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.format_price">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_price</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_price"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.format_price" title="Link to this definition"></a></dt>
+<dd><p>Format price as string with proper precision.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Price as float</p></li>
+<li><p><strong>precision</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of decimal places (default 8)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Price as string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.format_quantity">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_quantity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_quantity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.format_quantity" title="Link to this definition"></a></dt>
+<dd><p>Format quantity as string with proper precision.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Quantity as float</p></li>
+<li><p><strong>precision</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of decimal places (default 8)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Quantity as string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.validate_price_filters">
+<span class="sig-name descname"><span class="pre">validate_price_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_price_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.validate_price_filters" title="Link to this definition"></a></dt>
+<dd><p>Validate price against symbol’s price filters.</p>
+<p>Price filter requirements:
+- price &gt;= quote_min
+- price &lt;= quote_max
+- (price - quote_min) % quote_tick == 0
+- For BUY: price &lt;= asks[0].price * (1 + price_range)
+- For SELL: price &gt;= bids[0].price * (1 - price_range)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>symbol_info</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Symbol information from /v1/public/info/{symbol}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.validate_quantity_filters">
+<span class="sig-name descname"><span class="pre">validate_quantity_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_quantity_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.validate_quantity_filters" title="Link to this definition"></a></dt>
+<dd><p>Validate quantity against symbol’s size filters.</p>
+<p>Size filter requirements:
+- base_min &lt;= quantity &lt;= base_max
+- (quantity - base_min) % base_tick == 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>symbol_info</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Symbol information from /v1/public/info/{symbol}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.validate_min_notional">
+<span class="sig-name descname"><span class="pre">validate_min_notional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_min_notional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.validate_min_notional" title="Link to this definition"></a></dt>
+<dd><p>Validate that price * quantity meets minimum notional requirement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>symbol_info</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Symbol information from /v1/public/info/{symbol}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.create_limit_order">
+<span class="sig-name descname"><span class="pre">create_limit_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_limit_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.create_limit_order" title="Link to this definition"></a></dt>
+<dd><p>Create a properly formatted limit order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Trading pair (e.g., ‘SPOT_BTC_USDT’)</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘BUY’ or ‘SELL’</p></li>
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>**kwargs</strong> – Additional order parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Order data dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.create_market_order">
+<span class="sig-name descname"><span class="pre">create_market_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_market_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.create_market_order" title="Link to this definition"></a></dt>
+<dd><p>Create a properly formatted market order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Trading pair (e.g., ‘SPOT_BTC_USDT’)</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘BUY’ or ‘SELL’</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Order quantity (base currency)</p></li>
+<li><p><strong>amount</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Order amount (quote currency) - alternative to quantity</p></li>
+<li><p><strong>**kwargs</strong> – Additional order parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Order data dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.create_post_only_order">
+<span class="sig-name descname"><span class="pre">create_post_only_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_post_only_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.create_post_only_order" title="Link to this definition"></a></dt>
+<dd><p>Create a POST_ONLY order (maker-only).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Trading pair</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘BUY’ or ‘SELL’</p></li>
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Order data dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="order_helper.OrderHelper.log_order_details">
+<span class="sig-name descname"><span class="pre">log_order_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.log_order_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.OrderHelper.log_order_details" title="Link to this definition"></a></dt>
+<dd><p>Log order details for debugging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>order_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Order data dictionary</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order_helper.format_order_for_display">
+<span class="sig-prename descclassname"><span class="pre">order_helper.</span></span><span class="sig-name descname"><span class="pre">format_order_for_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#format_order_for_display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order_helper.format_order_for_display" title="Link to this definition"></a></dt>
+<dd><p>Format order data for user-friendly display.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>order</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Order data from API response</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Formatted string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="orderhelper-class">
+<h4>OrderHelper Class<a class="headerlink" href="#orderhelper-class" title="Link to this heading"></a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="id23">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">order_helper.</span></span><span class="sig-name descname"><span class="pre">OrderHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id23" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Helper class for creating properly formatted orders.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id24">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id25">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_client_order_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.generate_client_order_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
+<dd><p>Generate unique client_order_id.
+Uses last 12 digits of current timestamp in milliseconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Integer client_order_id (0 to 9223372036854775807)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id26">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_price</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_price"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
+<dd><p>Format price as string with proper precision.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Price as float</p></li>
+<li><p><strong>precision</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of decimal places (default 8)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Price as string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id27">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_quantity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_quantity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
+<dd><p>Format quantity as string with proper precision.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Quantity as float</p></li>
+<li><p><strong>precision</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of decimal places (default 8)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Quantity as string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id28">
+<span class="sig-name descname"><span class="pre">validate_price_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_price_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id28" title="Link to this definition"></a></dt>
+<dd><p>Validate price against symbol’s price filters.</p>
+<p>Price filter requirements:
+- price &gt;= quote_min
+- price &lt;= quote_max
+- (price - quote_min) % quote_tick == 0
+- For BUY: price &lt;= asks[0].price * (1 + price_range)
+- For SELL: price &gt;= bids[0].price * (1 - price_range)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>symbol_info</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Symbol information from /v1/public/info/{symbol}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id29">
+<span class="sig-name descname"><span class="pre">validate_quantity_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_quantity_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id29" title="Link to this definition"></a></dt>
+<dd><p>Validate quantity against symbol’s size filters.</p>
+<p>Size filter requirements:
+- base_min &lt;= quantity &lt;= base_max
+- (quantity - base_min) % base_tick == 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>symbol_info</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Symbol information from /v1/public/info/{symbol}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id30">
+<span class="sig-name descname"><span class="pre">validate_min_notional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_min_notional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id30" title="Link to this definition"></a></dt>
+<dd><p>Validate that price * quantity meets minimum notional requirement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>symbol_info</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Symbol information from /v1/public/info/{symbol}</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if valid, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id31">
+<span class="sig-name descname"><span class="pre">create_limit_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_limit_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id31" title="Link to this definition"></a></dt>
+<dd><p>Create a properly formatted limit order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Trading pair (e.g., ‘SPOT_BTC_USDT’)</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘BUY’ or ‘SELL’</p></li>
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>**kwargs</strong> – Additional order parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Order data dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id32">
+<span class="sig-name descname"><span class="pre">create_market_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_market_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id32" title="Link to this definition"></a></dt>
+<dd><p>Create a properly formatted market order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Trading pair (e.g., ‘SPOT_BTC_USDT’)</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘BUY’ or ‘SELL’</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Order quantity (base currency)</p></li>
+<li><p><strong>amount</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Order amount (quote currency) - alternative to quantity</p></li>
+<li><p><strong>**kwargs</strong> – Additional order parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Order data dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id33">
+<span class="sig-name descname"><span class="pre">create_post_only_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_post_only_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id33" title="Link to this definition"></a></dt>
+<dd><p>Create a POST_ONLY order (maker-only).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Trading pair</p></li>
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘BUY’ or ‘SELL’</p></li>
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order price</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Order quantity</p></li>
+<li><p><strong>**kwargs</strong> – Additional parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Order data dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id34">
+<span class="sig-name descname"><span class="pre">log_order_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.log_order_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id34" title="Link to this definition"></a></dt>
+<dd><p>Log order details for debugging.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>order_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Order data dictionary</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
 <section id="utility-modules">
 <h2>Utility Modules<a class="headerlink" href="#utility-modules" title="Link to this heading"></a></h2>
 <section id="module-createDuckDB">
@@ -1107,6 +2007,12 @@ This script tests the public API endpoints without requiring authentication.</p>
 
 </section>
 </section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
+<section id="examples-best-practices">
+<h3>examples_best_practices<a class="headerlink" href="#examples-best-practices" title="Link to this heading"></a></h3>
+</section>
+</section>
 <section id="decorators">
 <h2>Decorators<a class="headerlink" href="#decorators" title="Link to this heading"></a></h2>
 <section id="cron">
@@ -1229,25 +2135,96 @@ This script tests the public API endpoints without requiring authentication.</p>
 </section>
 <section id="api-endpoints">
 <h3>API Endpoints<a class="headerlink" href="#api-endpoints" title="Link to this heading"></a></h3>
-<p>WOOX API v3 endpoints used:</p>
+<p>WOOX API endpoints used (V1 for trading, V3 for account):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">BASE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.woox.io&#39;</span>
 
-<span class="c1"># Public endpoints (no auth)</span>
-<span class="n">GET</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">orderbook</span>       <span class="c1"># Get orderbook data</span>
-<span class="n">GET</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">marketTrades</span>    <span class="c1"># Get recent trades</span>
+<span class="c1"># Public endpoints (V1 - no auth required)</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">orderbook</span><span class="o">/</span><span class="p">{</span><span class="n">symbol</span><span class="p">}</span>  <span class="c1"># Get orderbook data (max_level=100)</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">market_trades</span>       <span class="c1"># Get recent trades</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">info</span><span class="o">/</span><span class="p">{</span><span class="n">symbol</span><span class="p">}</span>       <span class="c1"># Get symbol configuration</span>
 
-<span class="c1"># Authenticated endpoints</span>
-<span class="n">GET</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">asset</span><span class="o">/</span><span class="n">balances</span>          <span class="c1"># Get account balance</span>
-<span class="n">GET</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">trade</span><span class="o">/</span><span class="n">orders</span>            <span class="c1"># Get open orders</span>
-<span class="n">POST</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">trade</span><span class="o">/</span><span class="n">order</span>            <span class="c1"># Place new order</span>
-<span class="n">DELETE</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">trade</span><span class="o">/</span><span class="n">order</span>          <span class="c1"># Cancel order</span>
+<span class="c1"># Order endpoints (V1 - authenticated)</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">orders</span>                      <span class="c1"># Get open orders</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">order</span>                      <span class="c1"># Place new order</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">order</span><span class="o">/</span><span class="p">{</span><span class="n">order_id</span><span class="p">}</span>         <span class="c1"># Cancel order</span>
+
+<span class="c1"># Account endpoints (V3 - authenticated)</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">balances</span>                    <span class="c1"># Get account balance</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">accountinfo</span>                 <span class="c1"># Get account information</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">v3</span><span class="o">/</span><span class="n">algo</span><span class="o">/</span><span class="n">order</span>                 <span class="c1"># Place algo order</span>
 </pre></div>
 </div>
+<p>For official documentation, see: <a class="reference external" href="https://docs.woox.io/">https://docs.woox.io/</a></p>
 </section>
 </section>
 <section id="exceptions-and-errors">
 <h2>Exceptions and Errors<a class="headerlink" href="#exceptions-and-errors" title="Link to this heading"></a></h2>
-<p>Common exceptions you may encounter:</p>
+<section id="woox-api-exceptions">
+<h3>WOOX API Exceptions<a class="headerlink" href="#woox-api-exceptions" title="Link to this heading"></a></h3>
+<p>Custom exception hierarchy for WOOX API errors:</p>
+<dl>
+<dt><strong>WooxError</strong> (Base Exception)</dt><dd><p>Base exception for all WOOX API errors:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">except</span> <span class="n">WooxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>WooxAuthenticationError</strong></dt><dd><p>Authentication failed (error codes: -1000, -1002):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WooxAuthenticationError</span><span class="p">:</span> <span class="n">Invalid</span> <span class="n">API</span> <span class="n">key</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>WooxRateLimitError</strong></dt><dd><p>Rate limit exceeded (error code: -1003):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WooxRateLimitError</span><span class="p">:</span> <span class="n">Too</span> <span class="n">many</span> <span class="n">requests</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>WooxInvalidParameterError</strong></dt><dd><p>Invalid parameters (error codes: -1004 to -1010):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WooxInvalidParameterError</span><span class="p">:</span> <span class="n">Invalid</span> <span class="n">symbol</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>WooxResourceNotFoundError</strong></dt><dd><p>Resource not found (error code: -1011):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WooxResourceNotFoundError</span><span class="p">:</span> <span class="n">Order</span> <span class="ow">not</span> <span class="n">found</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>WooxServerError</strong></dt><dd><p>Server error (error codes: -1012, -1099 to -1103):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">WooxServerError</span><span class="p">:</span> <span class="n">Internal</span> <span class="n">server</span> <span class="n">error</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</section>
+<section id="order-service-errors-317xxx">
+<h3>Order Service Errors (317xxx)<a class="headerlink" href="#order-service-errors-317xxx" title="Link to this heading"></a></h3>
+<p>Specific order-related errors:</p>
+<ul class="simple">
+<li><p><strong>317136</strong>: Repeated client_order_id</p></li>
+<li><p><strong>317137</strong>: Invalid client_order_id format</p></li>
+<li><p><strong>317138</strong>: clientOrderID exceeds maximum length</p></li>
+<li><p><strong>317139</strong>: Invalid algo_type</p></li>
+<li><p><strong>317143</strong>: Invalid order_quantity</p></li>
+<li><p><strong>317201</strong>: Insufficient balance</p></li>
+<li><p><strong>317202</strong>: Quantity below minimum</p></li>
+</ul>
+<p>See <code class="docutils literal notranslate"><span class="pre">woox_errors.py</span></code> for complete error code mapping.</p>
+</section>
+<section id="retry-logic">
+<h3>Retry Logic<a class="headerlink" href="#retry-logic" title="Link to this heading"></a></h3>
+<p>Automatic retry with exponential backoff:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rate limit errors (exponential backoff)</span>
+<span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">attempt</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>  <span class="c1"># Max 60 seconds</span>
+
+<span class="c1"># Server errors (linear backoff)</span>
+<span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">attempt</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>   <span class="c1"># Max 30 seconds</span>
+
+<span class="c1"># Max retries: 3 attempts</span>
+</pre></div>
+</div>
+</section>
+<section id="common-python-exceptions">
+<h3>Common Python Exceptions<a class="headerlink" href="#common-python-exceptions" title="Link to this heading"></a></h3>
 <dl>
 <dt><strong>ValueError</strong></dt><dd><p>Raised for invalid configuration or parameters:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">ValueError</span><span class="p">:</span> <span class="n">Unknown</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">invalid_strategy</span>
@@ -1270,6 +2247,7 @@ This script tests the public API endpoints without requiring authentication.</p>
 </div>
 </dd>
 </dl>
+</section>
 </section>
 <section id="type-hints-reference">
 <h2>Type Hints Reference<a class="headerlink" href="#type-hints-reference" title="Link to this heading"></a></h2>
@@ -1336,7 +2314,7 @@ This script tests the public API endpoints without requiring authentication.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="strategies.html" class="btn btn-neutral float-left" title="Trading Strategies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="error_handling.html" class="btn btn-neutral float-left" title="Error Handling &amp; Best Practices" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="testing.html" class="btn btn-neutral float-right" title="Testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

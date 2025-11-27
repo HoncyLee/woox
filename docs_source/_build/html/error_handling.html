@@ -1,0 +1,1012 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error Handling &amp; Best Practices &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=1d87fc8b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api_reference.html" />
+    <link rel="prev" title="Trading Strategies" href="strategies.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            WOOX Trading Bot
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#api-credentials-setup">API Credentials Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#first-run-paper-trading">First Run - Paper Trading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#verify-setup">Verify Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#view-account-summary">View Account Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#portfolio-analysis">Portfolio Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-file">Configuration File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-mode">Trading Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#symbol-configuration">Symbol Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-selection">Strategy Selection</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#entry-strategy">Entry Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#exit-strategy">Exit Strategy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#strategy-parameters">Strategy Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#risk-management">Risk Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#stop-loss">Stop Loss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#take-profit">Take Profit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#trading-parameters">Trading Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#trade-amount">Trade Amount</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#update-interval">Update Interval</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#logging-configuration">Logging Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#api-configuration">API Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#base-url">Base URL</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#example-configurations">Example Configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#conservative-recommended-for-beginners">Conservative (Recommended for Beginners)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#aggressive-higher-risk-reward">Aggressive (Higher Risk/Reward)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="configuration.html#scalping-very-active-trading">Scalping (Very Active Trading)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#configuration-validation">Configuration Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="strategies.html">Trading Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-architecture">Strategy Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#built-in-strategies">Built-in Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#moving-average-crossover">Moving Average Crossover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#rsi-strategy">RSI Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#bollinger-bands">Bollinger Bands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#exit-strategies">Exit Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#stop-loss-exit">Stop-Loss Exit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#take-profit-exit">Take-Profit Exit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#creating-custom-strategies">Creating Custom Strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#basic-template">Basic Template</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#register-your-strategy">Register Your Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#use-in-configuration">Use in Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#advanced-using-orderbook-data">Advanced: Using Orderbook Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-selection-guide">Strategy Selection Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#choose-based-on-market-conditions">Choose Based on Market Conditions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="strategies.html#choose-based-on-trading-style">Choose Based on Trading Style</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#backtesting-strategies">Backtesting Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#strategy-performance-metrics">Strategy Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#best-practices">Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#common-pitfalls">Common Pitfalls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="strategies.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Error Handling &amp; Best Practices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#error-code-reference">Error Code Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#standard-api-errors-1000-to-1103">Standard API Errors (-1000 to -1103)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#order-service-errors-317xxx">Order Service Errors (317xxx)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-error-handling">Basic Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#specific-exception-handling">Specific Exception Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#retry-logic">Retry Logic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#automatic-retry-with-exponential-backoff">Automatic Retry with Exponential Backoff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#retryable-errors">Retryable Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#always-use-error-handling">1. Always Use Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-centralized-request-method">2. Use Centralized Request Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validate-before-sending">3. Validate Before Sending</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-proper-number-formatting">4. Use Proper Number Formatting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#track-client-order-ids">5. Track Client Order IDs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#log-errors-appropriately">6. Log Errors Appropriately</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#respect-rate-limits">7. Respect Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-error-handling">Testing Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring-and-alerting">Monitoring and Alerting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#core-modules">Core Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-signal">signal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.signal"><code class="docutils literal notranslate"><span class="pre">signal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.getsignal"><code class="docutils literal notranslate"><span class="pre">getsignal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.pthread_sigmask"><code class="docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigpending"><code class="docutils literal notranslate"><span class="pre">sigpending()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigwait"><code class="docutils literal notranslate"><span class="pre">sigwait()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.valid_signals"><code class="docutils literal notranslate"><span class="pre">valid_signals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Handlers"><code class="docutils literal notranslate"><span class="pre">Handlers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.ItimerError"><code class="docutils literal notranslate"><span class="pre">ItimerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Sigmasks"><code class="docutils literal notranslate"><span class="pre">Sigmasks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Signals"><code class="docutils literal notranslate"><span class="pre">Signals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#basestrategy">BaseStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#movingaveragecrossover">MovingAverageCrossover</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#rsistrategy">RSIStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#bollingerbandsstrategy">BollingerBandsStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#strategy-registry">Strategy Registry</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-account">account</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#account-class">Account Class</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-config_loader">config_loader</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#config_loader.get_config_value"><code class="docutils literal notranslate"><span class="pre">get_config_value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#configuration-functions">Configuration Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#error-handling">Error Handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-woox_errors">woox_errors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.WooxError"><code class="docutils literal notranslate"><span class="pre">WooxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.WooxAuthenticationError"><code class="docutils literal notranslate"><span class="pre">WooxAuthenticationError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.WooxRateLimitError"><code class="docutils literal notranslate"><span class="pre">WooxRateLimitError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.WooxInvalidParameterError"><code class="docutils literal notranslate"><span class="pre">WooxInvalidParameterError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.WooxResourceNotFoundError"><code class="docutils literal notranslate"><span class="pre">WooxResourceNotFoundError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.WooxServerError"><code class="docutils literal notranslate"><span class="pre">WooxServerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.get_error_info"><code class="docutils literal notranslate"><span class="pre">get_error_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.handle_api_error"><code class="docutils literal notranslate"><span class="pre">handle_api_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.is_retryable_error"><code class="docutils literal notranslate"><span class="pre">is_retryable_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.get_retry_delay"><code class="docutils literal notranslate"><span class="pre">get_retry_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#woox_errors.ErrorFormatter"><code class="docutils literal notranslate"><span class="pre">ErrorFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#exception-classes">Exception Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#error-handling-functions">Error Handling Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#error-formatter">Error Formatter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#order-management">Order Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-order_helper">order_helper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#order_helper.OrderHelper"><code class="docutils literal notranslate"><span class="pre">OrderHelper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#order_helper.format_order_for_display"><code class="docutils literal notranslate"><span class="pre">format_order_for_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#orderhelper-class">OrderHelper Class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#utility-modules">Utility Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-createDuckDB">createDuckDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-balance_summary">balance_summary</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.get_current_price"><code class="docutils literal notranslate"><span class="pre">get_current_price()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_currency"><code class="docutils literal notranslate"><span class="pre">format_currency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.format_quantity"><code class="docutils literal notranslate"><span class="pre">format_quantity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.print_separator"><code class="docutils literal notranslate"><span class="pre">print_separator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_api_balance"><code class="docutils literal notranslate"><span class="pre">display_api_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_open_positions"><code class="docutils literal notranslate"><span class="pre">display_open_positions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_transaction_summary"><code class="docutils literal notranslate"><span class="pre">display_transaction_summary()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.display_recent_trades"><code class="docutils literal notranslate"><span class="pre">display_recent_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#balance_summary.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#test-modules">Test Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-orderbook">test_orderbook</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_api">test_api</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_instruments"><code class="docutils literal notranslate"><span class="pre">test_instruments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#examples-best-practices">examples_best_practices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#data-structures">Data Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#position-dictionary">Position Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade-data-dictionary">Trade Data Dictionary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#orderbook-dictionary">Orderbook Dictionary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#database-schema">Database Schema</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trades-table">trades Table</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#constants">Constants</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#default-configuration-values">Default Configuration Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#api-endpoints">API Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#exceptions-and-errors">Exceptions and Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#woox-api-exceptions">WOOX API Exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#order-service-errors-317xxx">Order Service Errors (317xxx)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#retry-logic">Retry Logic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#common-python-exceptions">Common Python Exceptions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#type-hints-reference">Type Hints Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#logging">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-suite-overview">Test Suite Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-verification-recommended-first">Signal Verification (Recommended First)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#trading-workflow-test">Trading Workflow Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#strategy-tests">Strategy Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#orderbook-tests">Orderbook Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-connectivity-test">API Connectivity Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#running-all-tests">Running All Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-scenarios">Test Scenarios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-tests">Signal Generation Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#stop-loss-tests">Stop-Loss Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#take-profit-tests">Take-Profit Tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#position-holding-test">Position Holding Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-tests">Database Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#interpreting-test-results">Interpreting Test Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#success-indicators">Success Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#failure-indicators">Failure Indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#warning-indicators">Warning Indicators</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-output-analysis">Test Output Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#understanding-results">Understanding Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#troubleshooting-failed-tests">Troubleshooting Failed Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#signal-generation-issues">Signal Generation Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#database-issues">Database Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#api-issues">API Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#manual-testing">Manual Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#paper-trading-test">Paper Trading Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#portfolio-analysis-test">Portfolio Analysis Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#configuration-validation">Configuration Validation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#pre-deployment-testing">Pre-Deployment Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#regular-testing">Regular Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#continuous-integration">Continuous Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#test-coverage">Test Coverage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#current-test-coverage">Current Test Coverage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html#areas-not-covered">Areas Not Covered</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#adding-new-tests">Adding New Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#see-also">See Also</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#pre-deployment-checklist">Pre-Deployment Checklist</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#testing">Testing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#infrastructure">Infrastructure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#monitoring">Monitoring</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#live-trading-setup">Live Trading Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-1-final-configuration">Step 1: Final Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-2-verify-api-credentials">Step 2: Verify API Credentials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-3-database-preparation">Step 3: Database Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-4-initial-live-test">Step 4: Initial Live Test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#step-5-full-deployment">Step 5: Full Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#production-deployment-options">Production Deployment Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-1-screen-tmux-simple">Option 1: Screen/Tmux (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-2-systemd-service-recommended">Option 2: Systemd Service (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-3-supervisor-alternative">Option 3: Supervisor (Alternative)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#option-4-docker-advanced">Option 4: Docker (Advanced)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#monitoring-and-alerting">Monitoring and Alerting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#log-monitoring">Log Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#email-alerts-simple">Email Alerts (Simple)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#performance-monitoring">Performance Monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#scheduled-health-checks">Scheduled Health Checks</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#backup-strategy">Backup Strategy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#database-backups">Database Backups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#configuration-backups">Configuration Backups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#disaster-recovery">Disaster Recovery</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#bot-crashes">Bot Crashes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#database-corruption">Database Corruption</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#lost-position">Lost Position</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#security-best-practices">Security Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#api-key-security">API Key Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#server-security">Server Security</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#code-security">Code Security</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#scaling-considerations">Scaling Considerations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#multiple-symbols">Multiple Symbols</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#multiple-strategies">Multiple Strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#performance-tuning">Performance Tuning</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#troubleshooting-production-issues">Troubleshooting Production Issues</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#high-cpu-usage">High CPU Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#memory-leaks">Memory Leaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="deployment.html#api-rate-limits">API Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#next-steps">Next Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html#see-also">See Also</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">WOOX Trading Bot</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Error Handling &amp; Best Practices</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/error_handling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="error-handling-best-practices">
+<h1>Error Handling &amp; Best Practices<a class="headerlink" href="#error-handling-best-practices" title="Link to this heading"></a></h1>
+<p>This page documents the production-grade error handling system and best practices for using the WOOX API.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>The bot includes comprehensive error handling following WOOX official documentation standards:</p>
+<ul class="simple">
+<li><p><strong>40+ Error Codes Mapped</strong>: Complete coverage of WOOX API errors</p></li>
+<li><p><strong>Exception Hierarchy</strong>: Specialized exceptions for different error types</p></li>
+<li><p><strong>Automatic Retry Logic</strong>: Exponential backoff for rate limits</p></li>
+<li><p><strong>Error Formatting</strong>: User-friendly messages and detailed logging</p></li>
+</ul>
+</section>
+<section id="error-code-reference">
+<h2>Error Code Reference<a class="headerlink" href="#error-code-reference" title="Link to this heading"></a></h2>
+<section id="standard-api-errors-1000-to-1103">
+<h3>Standard API Errors (-1000 to -1103)<a class="headerlink" href="#standard-api-errors-1000-to-1103" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 50.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Error Code</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Exception Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-1000</p></td>
+<td><p>Invalid signature</p></td>
+<td><p>WooxAuthenticationError</p></td>
+</tr>
+<tr class="row-odd"><td><p>-1001</p></td>
+<td><p>Invalid timestamp</p></td>
+<td><p>WooxAuthenticationError</p></td>
+</tr>
+<tr class="row-even"><td><p>-1002</p></td>
+<td><p>Invalid API key</p></td>
+<td><p>WooxAuthenticationError</p></td>
+</tr>
+<tr class="row-odd"><td><p>-1003</p></td>
+<td><p>Too many requests (rate limit)</p></td>
+<td><p>WooxRateLimitError</p></td>
+</tr>
+<tr class="row-even"><td><p>-1004</p></td>
+<td><p>Missing required parameter</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-odd"><td><p>-1005</p></td>
+<td><p>Invalid parameter value</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-even"><td><p>-1006</p></td>
+<td><p>Invalid symbol</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-odd"><td><p>-1007</p></td>
+<td><p>Invalid order type</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-even"><td><p>-1008</p></td>
+<td><p>Invalid side</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-odd"><td><p>-1009</p></td>
+<td><p>Invalid quantity</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-even"><td><p>-1010</p></td>
+<td><p>Invalid price</p></td>
+<td><p>WooxInvalidParameterError</p></td>
+</tr>
+<tr class="row-odd"><td><p>-1011</p></td>
+<td><p>Resource not found</p></td>
+<td><p>WooxResourceNotFoundError</p></td>
+</tr>
+<tr class="row-even"><td><p>-1012</p></td>
+<td><p>Service unavailable</p></td>
+<td><p>WooxServerError</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="order-service-errors-317xxx">
+<h3>Order Service Errors (317xxx)<a class="headerlink" href="#order-service-errors-317xxx" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 50.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Error Code</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Common Cause</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>317136</p></td>
+<td><p>Repeated client_order_id</p></td>
+<td><p>Duplicate order ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>317137</p></td>
+<td><p>Invalid client_order_id format</p></td>
+<td><p>Wrong format (must be int64)</p></td>
+</tr>
+<tr class="row-even"><td><p>317143</p></td>
+<td><p>Invalid order_quantity</p></td>
+<td><p>Quantity below minimum</p></td>
+</tr>
+<tr class="row-odd"><td><p>317144</p></td>
+<td><p>Invalid order_price</p></td>
+<td><p>Price below minimum</p></td>
+</tr>
+<tr class="row-even"><td><p>317145</p></td>
+<td><p>Invalid notional value</p></td>
+<td><p>Price × Quantity too small</p></td>
+</tr>
+<tr class="row-odd"><td><p>317201</p></td>
+<td><p>Insufficient balance</p></td>
+<td><p>Not enough funds</p></td>
+</tr>
+<tr class="row-even"><td><p>317202</p></td>
+<td><p>Quantity below minimum</p></td>
+<td><p>Check symbol’s base_min</p></td>
+</tr>
+<tr class="row-odd"><td><p>317203</p></td>
+<td><p>Quantity above maximum</p></td>
+<td><p>Check symbol’s base_max</p></td>
+</tr>
+<tr class="row-even"><td><p>317204</p></td>
+<td><p>Price below minimum</p></td>
+<td><p>Check symbol’s quote_min</p></td>
+</tr>
+<tr class="row-odd"><td><p>317205</p></td>
+<td><p>Price above maximum</p></td>
+<td><p>Check symbol’s quote_max</p></td>
+</tr>
+</tbody>
+</table>
+<p>For complete error code list, see <code class="docutils literal notranslate"><span class="pre">woox_errors.ERROR_CODES</span></code> and <code class="docutils literal notranslate"><span class="pre">woox_errors.ORDER_ERROR_CODES</span></code>.</p>
+</section>
+</section>
+<section id="exception-hierarchy">
+<h2>Exception Hierarchy<a class="headerlink" href="#exception-hierarchy" title="Link to this heading"></a></h2>
+<p>All WOOX API errors inherit from <code class="docutils literal notranslate"><span class="pre">WooxError</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>WooxError (base)
+├── WooxAuthenticationError
+│   └── Invalid API key, signature, or timestamp
+├── WooxRateLimitError
+│   └── Too many requests (-1003)
+├── WooxInvalidParameterError
+│   └── Invalid parameters (-1004 to -1010)
+├── WooxResourceNotFoundError
+│   └── Order or resource not found (-1011)
+└── WooxServerError
+    └── Server errors (-1012, -1099 to -1103)
+</pre></div>
+</div>
+</section>
+<section id="usage-examples">
+<h2>Usage Examples<a class="headerlink" href="#usage-examples" title="Link to this heading"></a></h2>
+<section id="basic-error-handling">
+<h3>Basic Error Handling<a class="headerlink" href="#basic-error-handling" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">woox_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">WooxError</span><span class="p">,</span> <span class="n">handle_api_error</span><span class="p">,</span> <span class="n">ErrorFormatter</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">handle_api_error</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="k">except</span> <span class="n">WooxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Log the error</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="c1"># Show user-friendly message</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="specific-exception-handling">
+<h3>Specific Exception Handling<a class="headerlink" href="#specific-exception-handling" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">woox_errors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">WooxAuthenticationError</span><span class="p">,</span>
+    <span class="n">WooxRateLimitError</span><span class="p">,</span>
+    <span class="n">WooxInvalidParameterError</span><span class="p">,</span>
+    <span class="n">WooxServerError</span>
+<span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Place order</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">place_order</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="n">WooxAuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Authentication failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="c1"># Check API key and secret</span>
+
+<span class="k">except</span> <span class="n">WooxRateLimitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Rate limited: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="c1"># Reduce request frequency</span>
+
+<span class="k">except</span> <span class="n">WooxInvalidParameterError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid parameters: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="c1"># Validate order parameters</span>
+
+<span class="k">except</span> <span class="n">WooxServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Server error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="c1"># Retry later</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="retry-logic">
+<h2>Retry Logic<a class="headerlink" href="#retry-logic" title="Link to this heading"></a></h2>
+<section id="automatic-retry-with-exponential-backoff">
+<h3>Automatic Retry with Exponential Backoff<a class="headerlink" href="#automatic-retry-with-exponential-backoff" title="Link to this heading"></a></h3>
+<p>The bot automatically retries certain errors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">woox_errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_retryable_error</span><span class="p">,</span> <span class="n">get_retry_delay</span>
+
+<span class="n">max_retries</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">while</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">make_request</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="n">error_code</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_retryable_error</span><span class="p">(</span><span class="n">error_code</span><span class="p">):</span>
+            <span class="n">handle_api_error</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="n">delay</span> <span class="o">=</span> <span class="n">get_retry_delay</span><span class="p">(</span><span class="n">error_code</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retrying in </span><span class="si">{</span><span class="n">delay</span><span class="si">}</span><span class="s2">s (attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+        <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</section>
+<section id="retryable-errors">
+<h3>Retryable Errors<a class="headerlink" href="#retryable-errors" title="Link to this heading"></a></h3>
+<p>The following errors trigger automatic retry:</p>
+<ul class="simple">
+<li><p><strong>-1000</strong>: Invalid signature (may be timing issue)</p></li>
+<li><p><strong>-1003</strong>: Rate limit exceeded</p></li>
+<li><p><strong>-1011</strong>: Resource not found (may be propagation delay)</p></li>
+<li><p><strong>-1012</strong>: Service unavailable</p></li>
+</ul>
+<p>Retry delays:</p>
+<ul class="simple">
+<li><p><strong>Rate limits (-1003)</strong>: Exponential backoff (2^attempt, max 60s)</p></li>
+<li><p><strong>Server errors (-1012)</strong>: Linear backoff (attempt × 5, max 30s)</p></li>
+<li><p><strong>Other retryable</strong>: Linear backoff (attempt × 2, max 10s)</p></li>
+</ul>
+</section>
+</section>
+<section id="best-practices">
+<h2>Best Practices<a class="headerlink" href="#best-practices" title="Link to this heading"></a></h2>
+<section id="always-use-error-handling">
+<h3>1. Always Use Error Handling<a class="headerlink" href="#always-use-error-handling" title="Link to this heading"></a></h3>
+<p>Never make API calls without proper error handling:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ❌ BAD - No error handling</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="c1"># ✅ GOOD - Proper error handling</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">handle_api_error</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">WooxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">raise</span>
+</pre></div>
+</div>
+</section>
+<section id="use-centralized-request-method">
+<h3>2. Use Centralized Request Method<a class="headerlink" href="#use-centralized-request-method" title="Link to this heading"></a></h3>
+<p>Create a reusable request method with error handling:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_make_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make API request with error handling and retry logic.&quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_headers</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+            <span class="n">error_code</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_retryable_error</span><span class="p">(</span><span class="n">error_code</span><span class="p">):</span>
+                <span class="n">handle_api_error</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">delay</span> <span class="o">=</span> <span class="n">get_retry_delay</span><span class="p">(</span><span class="n">error_code</span><span class="p">,</span> <span class="n">attempt</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retry in </span><span class="si">{</span><span class="n">delay</span><span class="si">}</span><span class="s2">s (attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">handle_api_error</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Request failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;=</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span>
+</pre></div>
+</div>
+</section>
+<section id="validate-before-sending">
+<h3>3. Validate Before Sending<a class="headerlink" href="#validate-before-sending" title="Link to this heading"></a></h3>
+<p>Use OrderHelper to validate orders before submission:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">order_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderHelper</span>
+
+<span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+
+<span class="c1"># Get symbol info (cache this in production)</span>
+<span class="n">symbol_info</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;quote_min&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;quote_max&#39;</span><span class="p">:</span> <span class="mi">100000</span><span class="p">,</span>
+    <span class="s1">&#39;quote_tick&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="s1">&#39;base_min&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span>
+    <span class="s1">&#39;base_max&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="s1">&#39;base_tick&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span>
+    <span class="s1">&#39;min_notional&#39;</span><span class="p">:</span> <span class="mi">10</span>
+<span class="p">}</span>
+
+<span class="c1"># Validate before placing order</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_price_filters</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid price&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_quantity_filters</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid quantity&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_min_notional</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">):</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Notional value too small&quot;</span><span class="p">)</span>
+    <span class="k">return</span>
+</pre></div>
+</div>
+</section>
+<section id="use-proper-number-formatting">
+<h3>4. Use Proper Number Formatting<a class="headerlink" href="#use-proper-number-formatting" title="Link to this heading"></a></h3>
+<p>Always format numbers as strings for API requests:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">order_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderHelper</span>
+
+<span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+
+<span class="c1"># ❌ BAD - Float precision issues</span>
+<span class="n">order_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;order_price&quot;</span><span class="p">:</span> <span class="mf">50123.456789</span><span class="p">,</span>  <span class="c1"># May lose precision</span>
+    <span class="s2">&quot;order_quantity&quot;</span><span class="p">:</span> <span class="mf">0.001234567890</span>
+<span class="p">}</span>
+
+<span class="c1"># ✅ GOOD - String with proper precision</span>
+<span class="n">order_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;order_price&quot;</span><span class="p">:</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">format_price</span><span class="p">(</span><span class="mf">50123.456789</span><span class="p">),</span>
+    <span class="s2">&quot;order_quantity&quot;</span><span class="p">:</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">format_quantity</span><span class="p">(</span><span class="mf">0.001234567890</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1"># Result: {&quot;order_price&quot;: &quot;50123.45678901&quot;, &quot;order_quantity&quot;: &quot;0.00123456&quot;}</span>
+</pre></div>
+</div>
+</section>
+<section id="track-client-order-ids">
+<h3>5. Track Client Order IDs<a class="headerlink" href="#track-client-order-ids" title="Link to this heading"></a></h3>
+<p>Use unique client order IDs for tracking:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">order_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderHelper</span>
+
+<span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+
+<span class="n">order_data</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">create_limit_order</span><span class="p">(</span>
+    <span class="n">symbol</span><span class="o">=</span><span class="s2">&quot;SPOT_BTC_USDT&quot;</span><span class="p">,</span>
+    <span class="n">side</span><span class="o">=</span><span class="s2">&quot;BUY&quot;</span><span class="p">,</span>
+    <span class="n">price</span><span class="o">=</span><span class="mf">50000.00</span><span class="p">,</span>
+    <span class="n">quantity</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">order_tag</span><span class="o">=</span><span class="s2">&quot;algo_bot&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># order_data includes unique client_order_id</span>
+<span class="c1"># Store in database for reconciliation</span>
+<span class="n">client_order_id</span> <span class="o">=</span> <span class="n">order_data</span><span class="p">[</span><span class="s1">&#39;client_order_id&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="log-errors-appropriately">
+<h3>6. Log Errors Appropriately<a class="headerlink" href="#log-errors-appropriately" title="Link to this heading"></a></h3>
+<p>Use different log levels for different scenarios:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">place_order</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="n">WooxRateLimitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Warning for rate limits (expected in high-frequency)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Rate limited: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+<span class="k">except</span> <span class="n">WooxInvalidParameterError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Error for validation issues (should be prevented)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid parameters: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+<span class="k">except</span> <span class="n">WooxServerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Error for server issues (needs attention)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Server error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+<span class="k">except</span> <span class="n">WooxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Catch-all for other errors</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="respect-rate-limits">
+<h3>7. Respect Rate Limits<a class="headerlink" href="#respect-rate-limits" title="Link to this heading"></a></h3>
+<p>Implement rate limiting to prevent -1003 errors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimiter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_requests</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">time_window</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_requests</span> <span class="o">=</span> <span class="n">max_requests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_window</span> <span class="o">=</span> <span class="n">time_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="c1"># Remove old requests</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_window</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+        <span class="c1"># Check if limit reached</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_requests</span><span class="p">:</span>
+            <span class="n">wait_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_window</span> <span class="o">-</span> <span class="n">now</span>
+            <span class="k">if</span> <span class="n">wait_time</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="testing-error-handling">
+<h2>Testing Error Handling<a class="headerlink" href="#testing-error-handling" title="Link to this heading"></a></h2>
+<p>Test different error scenarios:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test authentication error</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_invalid_signature</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">trader</span> <span class="o">=</span> <span class="n">Trade</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;invalid&quot;</span><span class="p">,</span> <span class="n">api_secret</span><span class="o">=</span><span class="s2">&quot;invalid&quot;</span><span class="p">)</span>
+        <span class="n">trader</span><span class="o">.</span><span class="n">get_balance</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">WooxAuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Caught authentication error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Test rate limit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_rate_limit</span><span class="p">():</span>
+    <span class="n">trader</span> <span class="o">=</span> <span class="n">Trade</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>  <span class="c1"># Trigger rate limit</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trader</span><span class="o">.</span><span class="n">trade_update</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">WooxRateLimitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Caught rate limit at request </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+<span class="c1"># Test invalid parameters</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_invalid_parameters</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">create_limit_order</span><span class="p">(</span>
+            <span class="n">symbol</span><span class="o">=</span><span class="s2">&quot;INVALID_SYMBOL&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="s2">&quot;INVALID&quot;</span><span class="p">,</span>
+            <span class="n">price</span><span class="o">=-</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">quantity</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">WooxInvalidParameterError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Caught invalid parameters: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="monitoring-and-alerting">
+<h2>Monitoring and Alerting<a class="headerlink" href="#monitoring-and-alerting" title="Link to this heading"></a></h2>
+<p>Set up monitoring for production:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logging.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RotatingFileHandler</span>
+
+<span class="c1"># Setup error logging</span>
+<span class="n">error_handler</span> <span class="o">=</span> <span class="n">RotatingFileHandler</span><span class="p">(</span>
+    <span class="s1">&#39;errors.log&#39;</span><span class="p">,</span>
+    <span class="n">maxBytes</span><span class="o">=</span><span class="mi">10485760</span><span class="p">,</span>  <span class="c1"># 10MB</span>
+    <span class="n">backupCount</span><span class="o">=</span><span class="mi">5</span>
+<span class="p">)</span>
+<span class="n">error_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+<span class="n">error_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+    <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+<span class="p">)</span>
+<span class="n">error_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">error_formatter</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">error_handler</span><span class="p">)</span>
+
+<span class="c1"># Track error counts</span>
+<span class="n">error_counts</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">log_error_with_tracking</span><span class="p">(</span><span class="n">error_code</span><span class="p">,</span> <span class="n">error_message</span><span class="p">):</span>
+    <span class="n">error_counts</span><span class="p">[</span><span class="n">error_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">error_code</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error </span><span class="si">{</span><span class="n">error_code</span><span class="si">}</span><span class="s2"> (count: </span><span class="si">{</span><span class="n">error_counts</span><span class="p">[</span><span class="n">error_code</span><span class="p">]</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Alert on threshold</span>
+    <span class="k">if</span> <span class="n">error_counts</span><span class="p">[</span><span class="n">error_code</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">send_alert</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;High error count for </span><span class="si">{</span><span class="n">error_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="api_reference.html"><span class="doc">API Reference</span></a> - Complete API documentation</p></li>
+<li><p><a class="reference internal" href="testing.html"><span class="doc">Testing</span></a> - Testing guide</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">woox_errors.py</span></code> - Error handling implementation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">order_helper.py</span></code> - Order validation and formatting</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">examples_best_practices.py</span></code> - Usage examples</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WOOX_BEST_PRACTICES_CHECKLIST.md</span></code> - Implementation checklist</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="strategies.html" class="btn btn-neutral float-left" title="Trading Strategies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_reference.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, HoncyLee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

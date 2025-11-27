@@ -10,6 +10,7 @@ Welcome to the WOOX Trading Bot documentation! This bot automates cryptocurrency
    getting_started
    configuration
    strategies
+   error_handling
    api_reference
    testing
    deployment
@@ -29,12 +30,16 @@ The WOOX Trading Bot is a Python-based automated trading system that:
 Features
 --------
 
-* **Real-time Market Data**: Fetches latest price, volume, and orderbook data
+* **Real-time Market Data**: Fetches latest price, volume, and orderbook data using WOOX V1/V3 APIs
 * **Multiple Strategies**: Choose from MA Crossover, RSI, or Bollinger Bands
 * **Risk Management**: Built-in stop-loss and take-profit mechanisms
+* **Production-Grade Error Handling**: Complete error code mapping with automatic retry logic
+* **Order Validation**: Pre-flight validation against symbol's price/quantity filters
+* **Precision Management**: Proper decimal handling prevents floating-point errors
 * **Paper Trading**: Test strategies without risking real money
 * **Transaction Database**: Complete trade history in DuckDB
 * **Portfolio Analysis**: Jupyter notebook for performance tracking
+* **Client Order ID Tracking**: Unique IDs for order tracking and reconciliation
 
 Quick Start
 -----------

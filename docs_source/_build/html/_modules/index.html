@@ -129,6 +129,39 @@
 <li class="toctree-l2"><a class="reference internal" href="../strategies.html#see-also">See Also</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../error_handling.html">Error Handling &amp; Best Practices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#error-code-reference">Error Code Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#standard-api-errors-1000-to-1103">Standard API Errors (-1000 to -1103)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#order-service-errors-317xxx">Order Service Errors (317xxx)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#exception-hierarchy">Exception Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#usage-examples">Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#basic-error-handling">Basic Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#specific-exception-handling">Specific Exception Handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#retry-logic">Retry Logic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#automatic-retry-with-exponential-backoff">Automatic Retry with Exponential Backoff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#retryable-errors">Retryable Errors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#best-practices">Best Practices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#always-use-error-handling">1. Always Use Error Handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#use-centralized-request-method">2. Use Centralized Request Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#validate-before-sending">3. Validate Before Sending</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#use-proper-number-formatting">4. Use Proper Number Formatting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#track-client-order-ids">5. Track Client Order IDs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#log-errors-appropriately">6. Log Errors Appropriately</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../error_handling.html#respect-rate-limits">7. Respect Rate Limits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#testing-error-handling">Testing Error Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#monitoring-and-alerting">Monitoring and Alerting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../error_handling.html#see-also">See Also</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../api_reference.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#core-modules">Core Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#trade">trade</a><ul>
@@ -167,6 +200,35 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#error-handling">Error Handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-woox_errors">woox_errors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.WooxError"><code class="docutils literal notranslate"><span class="pre">WooxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.WooxAuthenticationError"><code class="docutils literal notranslate"><span class="pre">WooxAuthenticationError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.WooxRateLimitError"><code class="docutils literal notranslate"><span class="pre">WooxRateLimitError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.WooxInvalidParameterError"><code class="docutils literal notranslate"><span class="pre">WooxInvalidParameterError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.WooxResourceNotFoundError"><code class="docutils literal notranslate"><span class="pre">WooxResourceNotFoundError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.WooxServerError"><code class="docutils literal notranslate"><span class="pre">WooxServerError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.get_error_info"><code class="docutils literal notranslate"><span class="pre">get_error_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.handle_api_error"><code class="docutils literal notranslate"><span class="pre">handle_api_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.is_retryable_error"><code class="docutils literal notranslate"><span class="pre">is_retryable_error()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.get_retry_delay"><code class="docutils literal notranslate"><span class="pre">get_retry_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#woox_errors.ErrorFormatter"><code class="docutils literal notranslate"><span class="pre">ErrorFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#exception-classes">Exception Classes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#error-handling-functions">Error Handling Functions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#error-formatter">Error Formatter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#order-management">Order Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-order_helper">order_helper</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#order_helper.OrderHelper"><code class="docutils literal notranslate"><span class="pre">OrderHelper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#order_helper.format_order_for_display"><code class="docutils literal notranslate"><span class="pre">format_order_for_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#orderhelper-class">OrderHelper Class</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#utility-modules">Utility Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-createDuckDB">createDuckDB</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-balance_summary">balance_summary</a><ul>
@@ -197,6 +259,10 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#examples-best-practices">examples_best_practices</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#decorators">Decorators</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#cron">cron</a></li>
 </ul>
@@ -216,7 +282,13 @@
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#api-endpoints">API Endpoints</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#exceptions-and-errors">Exceptions and Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference.html#exceptions-and-errors">Exceptions and Errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#woox-api-exceptions">WOOX API Exceptions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#order-service-errors-317xxx">Order Service Errors (317xxx)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#retry-logic">Retry Logic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#common-python-exceptions">Common Python Exceptions</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#type-hints-reference">Type Hints Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#logging">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#see-also">See Also</a></li>
@@ -370,8 +442,10 @@
 <ul><li><a href="account.html">account</a></li>
 <li><a href="balance_summary.html">balance_summary</a></li>
 <li><a href="config_loader.html">config_loader</a></li>
+<li><a href="order_helper.html">order_helper</a></li>
 <li><a href="signal.html">signal</a></li>
 <li><a href="test_api.html">test_api</a></li>
+<li><a href="woox_errors.html">woox_errors</a></li>
 </ul>
 
            </div>

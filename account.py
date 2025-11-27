@@ -9,6 +9,11 @@ import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from config_loader import CONFIG
+from woox_errors import (
+    handle_api_error,
+    WooxError,
+    ErrorFormatter
+)
 
 # Configure logging
 logging.basicConfig(
@@ -65,8 +70,12 @@ class Account:
         headers = {
             'x-api-key': self.api_key,
             'x-api-signature': signature,
-            'x-api-timestamp': str(timestamp)
+            'x-api-timestamp': str(timestamp),
+            'Cache-Control': 'no-cache'
         }
+        
+        if method in ['POST', 'PUT', 'DELETE']:
+            headers['Content-Type'] = 'application/json'
         
         return headers
     
@@ -82,7 +91,7 @@ class Account:
             return None
         
         try:
-            request_path = "/v3/asset/balances"
+            request_path = "/v3/balances"
             headers = self._get_auth_headers('GET', request_path)
             
             response = requests.get(
@@ -91,14 +100,19 @@ class Account:
                 timeout=10
             )
             
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('success'):
-                    return data.get('data', {})
+            response_data = response.json()
             
-            self.logger.error("Failed to fetch balance: %s", response.json())
+            # Handle API errors
+            handle_api_error(response_data, self.logger)
+            
+            if response_data.get('success'):
+                return response_data.get('data', {})
+            
             return None
             
+        except WooxError as e:
+            self.logger.error("WOOX API error: %s", ErrorFormatter.format_user_message(e))
+            return None
         except Exception as e:
             self.logger.error("Error fetching API balance: %s", str(e))
             return None

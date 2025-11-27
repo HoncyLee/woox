@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>test_api &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+  <title>woox_errors &mdash; WOOX Trading Bot 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1d87fc8b" />
@@ -430,7 +430,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
-      <li class="breadcrumb-item active">test_api</li>
+      <li class="breadcrumb-item active">woox_errors</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -439,154 +439,350 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for test_api</h1><div class="highlight"><pre>
-<span></span><span class="ch">#!/usr/bin/env python3</span>
+  <h1>Source code for woox_errors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">WOOX API Error Codes and Exception Handling.</span>
+<span class="sd">Based on official WOOX API documentation.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Simple test script to verify WOOX API connectivity and data retrieval.</span>
-<span class="sd">This script tests the public API endpoints without requiring authentication.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
-<span class="n">BASE_URL</span> <span class="o">=</span> <span class="s1">&#39;https://api.woox.io&#39;</span>
-<span class="n">SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;PERP_BTC_USDT&#39;</span>
+<div class="viewcode-block" id="WooxError">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WooxError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for WOOX API errors.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="WooxError.__init__">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">details</span> <span class="o">=</span> <span class="n">details</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="test_orderbook">
-<a class="viewcode-back" href="../api_reference.html#test_api.test_orderbook">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_orderbook</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test orderbook endpoint&quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Testing orderbook endpoint...&quot;</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/v3/public/orderbook&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">SYMBOL</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="WooxAuthenticationError">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxAuthenticationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WooxAuthenticationError</span><span class="p">(</span><span class="n">WooxError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Authentication-related errors.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="WooxRateLimitError">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxRateLimitError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WooxRateLimitError</span><span class="p">(</span><span class="n">WooxError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rate limit exceeded.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="WooxInvalidParameterError">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxInvalidParameterError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WooxInvalidParameterError</span><span class="p">(</span><span class="n">WooxError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Invalid parameter in request.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="WooxResourceNotFoundError">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxResourceNotFoundError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WooxResourceNotFoundError</span><span class="p">(</span><span class="n">WooxError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Requested resource not found.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="WooxServerError">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.WooxServerError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WooxServerError</span><span class="p">(</span><span class="n">WooxError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal server error.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<span class="c1"># WOOX API Error Code Mappings</span>
+<span class="n">ERROR_CODES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># General Errors</span>
+    <span class="o">-</span><span class="mi">1000</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;An unknown error occurred while processing the request&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxServerError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1001</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;INVALID_SIGNATURE&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The api key or secret is in wrong format&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">401</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxAuthenticationError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1002</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;UNAUTHORIZED&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;API key or secret is invalid, insufficient permissions or expired/revoked&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">401</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxAuthenticationError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1003</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;TOO_MANY_REQUEST&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Rate limit exceeded&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">429</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxRateLimitError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1004</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;UNKNOWN_PARAM&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;An unknown parameter was sent&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxInvalidParameterError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1005</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;INVALID_PARAM&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Some parameters are in the wrong format for API&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxInvalidParameterError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1006</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RESOURCE_NOT_FOUND&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The data is not found in the server&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxResourceNotFoundError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1007</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;DUPLICATE_REQUEST&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The data already exists or your request is duplicated&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">409</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1008</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;QUANTITY_TOO_HIGH&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The quantity of settlement is higher than you can request&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxInvalidParameterError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1009</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;CAN_NOT_WITHDRAWAL&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Cannot request withdrawal settlement, need to deposit other arrears first&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1011</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RPC_NOT_CONNECT&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Cannot place/cancel orders due to internal network error&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxServerError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1012</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RPC_REJECT&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Request rejected by internal module (liquidation or other internal errors)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxServerError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1101</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;RISK_TOO_HIGH&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Risk exposure too high (order too big or leverage too low)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxError</span>
+    <span class="p">},</span>
+    <span class="o">-</span><span class="mi">1103</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;INVALID_PRICE_QUOTE_MIN&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The order does not meet the price filter requirement&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxInvalidParameterError</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="c1"># Order Service Specific Error Codes (commonly encountered)</span>
+<span class="n">ORDER_ERROR_CODES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">317136</span><span class="p">:</span> <span class="s1">&#39;Edit tpsl quantity is not allowed for quantity bracket&#39;</span><span class="p">,</span>
+    <span class="mi">317137</span><span class="p">:</span> <span class="s1">&#39;Edit quantity should edit both legs&#39;</span><span class="p">,</span>
+    <span class="mi">317138</span><span class="p">:</span> <span class="s1">&#39;Edit quantity should be same for both legs&#39;</span><span class="p">,</span>
+    <span class="mi">317139</span><span class="p">:</span> <span class="s1">&#39;Trigger price of 1st leg should not be empty for STOP_BRACKET&#39;</span><span class="p">,</span>
+    <span class="mi">317140</span><span class="p">:</span> <span class="s1">&#39;The quantity of a quantity TP/SL order should not be empty&#39;</span><span class="p">,</span>
+    <span class="mi">317144</span><span class="p">:</span> <span class="s1">&#39;IndexPrice is not supported for non spot symbol&#39;</span><span class="p">,</span>
+    <span class="mi">317157</span><span class="p">:</span> <span class="s1">&#39;Trading with this pair is temporarily suspended&#39;</span><span class="p">,</span>
+    <span class="mi">317159</span><span class="p">:</span> <span class="s1">&#39;This pair is currently not supported&#39;</span><span class="p">,</span>
+    <span class="mi">317160</span><span class="p">:</span> <span class="s1">&#39;The order id and symbol are not matched&#39;</span><span class="p">,</span>
+    <span class="mi">317161</span><span class="p">:</span> <span class="s1">&#39;The order is completed&#39;</span><span class="p">,</span>
+    <span class="mi">317162</span><span class="p">:</span> <span class="s1">&#39;The params should not be null or 0&#39;</span><span class="p">,</span>
+    <span class="mi">317163</span><span class="p">:</span> <span class="s1">&#39;Cannot edit TP/SL quantity under bracket order&#39;</span><span class="p">,</span>
+    <span class="mi">317164</span><span class="p">:</span> <span class="s1">&#39;Invalid client order id&#39;</span><span class="p">,</span>
+    <span class="mi">317165</span><span class="p">:</span> <span class="s1">&#39;Invalid order id list&#39;</span><span class="p">,</span>
+    <span class="mi">317166</span><span class="p">:</span> <span class="s1">&#39;Invalid client order id list&#39;</span><span class="p">,</span>
+    <span class="mi">317167</span><span class="p">:</span> <span class="s1">&#39;Unsupported algo type&#39;</span><span class="p">,</span>
+    <span class="mi">317168</span><span class="p">:</span> <span class="s1">&#39;Order failed due to internal service error&#39;</span><span class="p">,</span>
+    <span class="mi">317170</span><span class="p">:</span> <span class="s1">&#39;The order quantity must bigger than the executed quantity&#39;</span><span class="p">,</span>
+    <span class="mi">317172</span><span class="p">:</span> <span class="s1">&#39;The userId should not be null or 0&#39;</span><span class="p">,</span>
+    <span class="mi">317173</span><span class="p">:</span> <span class="s1">&#39;The orderId should not be null or 0&#39;</span><span class="p">,</span>
+    <span class="mi">317174</span><span class="p">:</span> <span class="s1">&#39;The order is processing&#39;</span><span class="p">,</span>
+    <span class="mi">317176</span><span class="p">:</span> <span class="s1">&#39;The trigger after should from 0 to maxTriggerAfter&#39;</span><span class="p">,</span>
+    <span class="mi">317177</span><span class="p">:</span> <span class="s1">&#39;Order has terminated&#39;</span><span class="p">,</span>
+    <span class="mi">317178</span><span class="p">:</span> <span class="s1">&#39;The receive window is invalid&#39;</span><span class="p">,</span>
+    <span class="mi">317179</span><span class="p">:</span> <span class="s1">&#39;Request has failed as the receive window is exceeded&#39;</span><span class="p">,</span>
+    <span class="mi">317184</span><span class="p">:</span> <span class="s1">&#39;The order cannot be found, or it is already completed&#39;</span><span class="p">,</span>
+    <span class="mi">317206</span><span class="p">:</span> <span class="s1">&#39;Spot trading is disabled while futures credits are active&#39;</span><span class="p">,</span>
+    <span class="mi">317207</span><span class="p">:</span> <span class="s1">&#39;Ensure sufficient USDT to cover futures credits&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_error_info">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.get_error_info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_error_info</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get error information by error code.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        code: Error code from API response</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary with error details</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">ERROR_CODES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ERROR_CODES</span><span class="p">[</span><span class="n">code</span><span class="p">]</span>
+    
+    <span class="c1"># Check order service errors</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">ORDER_ERROR_CODES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;ORDER_ERROR_</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">ORDER_ERROR_CODES</span><span class="p">[</span><span class="n">code</span><span class="p">],</span>
+            <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+            <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxInvalidParameterError</span>
+        <span class="p">}</span>
+    
+    <span class="c1"># Unknown error code</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;UNKNOWN_ERROR&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;Unknown error code: </span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;http_code&#39;</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="n">WooxError</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="handle_api_error">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.handle_api_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_api_error</span><span class="p">(</span><span class="n">response_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handle API error response and raise appropriate exception.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        response_data: JSON response from API</span>
+<span class="sd">        logger: Optional logger instance</span>
+<span class="sd">        </span>
+<span class="sd">    Raises:</span>
+<span class="sd">        Appropriate WooxError subclass based on error code</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;Unknown error&#39;</span><span class="p">)</span>
         
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">):</span>
-            <span class="n">orderbook</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="n">asks</span> <span class="o">=</span> <span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asks&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="n">bids</span> <span class="o">=</span> <span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bids&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Orderbook retrieved successfully&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Best Ask: </span><span class="si">{</span><span class="n">asks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">asks</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;N/A&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Best Bid: </span><span class="si">{</span><span class="n">bids</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">bids</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;N/A&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Failed: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="test_market_trades">
-<a class="viewcode-back" href="../api_reference.html#test_api.test_market_trades">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_market_trades</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test market trades endpoint&quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Testing market trades endpoint...&quot;</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/v3/public/marketTrades&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">SYMBOL</span><span class="p">,</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">error_info</span> <span class="o">=</span> <span class="n">get_error_info</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">exception_class</span> <span class="o">=</span> <span class="n">error_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exception&#39;</span><span class="p">,</span> <span class="n">WooxError</span><span class="p">)</span>
         
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">):</span>
-            <span class="n">trades_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="n">trades</span> <span class="o">=</span> <span class="n">trades_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rows&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Market trades retrieved successfully&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">trades</span><span class="p">:</span>
-                <span class="n">latest</span> <span class="o">=</span> <span class="n">trades</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Latest Price: </span><span class="si">{</span><span class="n">latest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;executedPrice&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Latest Volume: </span><span class="si">{</span><span class="n">latest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;executedQuantity&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Side: </span><span class="si">{</span><span class="n">latest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;side&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Number of trades: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">trades</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Failed: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-
-<div class="viewcode-block" id="test_instruments">
-<a class="viewcode-back" href="../api_reference.html#test_api.test_instruments">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_instruments</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test instruments/symbol info endpoint&quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Testing instruments endpoint...&quot;</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/v3/public/instruments&quot;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;WOOX API Error - Code: </span><span class="si">%d</span><span class="s2">, Name: </span><span class="si">%s</span><span class="s2">, Message: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">code</span><span class="p">,</span> <span class="n">error_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">message</span>
+            <span class="p">)</span>
         
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">):</span>
-            <span class="n">instruments_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">{})</span>
-            <span class="n">instruments</span> <span class="o">=</span> <span class="n">instruments_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rows&#39;</span><span class="p">,</span> <span class="p">[])</span>
-            
-            <span class="c1"># Find BTC_USDT spot</span>
-            <span class="n">btc_usdt</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="n">instruments</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symbol&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">SYMBOL</span><span class="p">:</span>
-                    <span class="n">btc_usdt</span> <span class="o">=</span> <span class="n">inst</span>
-                    <span class="k">break</span>
-            
-            <span class="k">if</span> <span class="n">btc_usdt</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Instrument info retrieved successfully&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Symbol: </span><span class="si">{</span><span class="n">btc_usdt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;symbol&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Base: </span><span class="si">{</span><span class="n">btc_usdt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;baseTick&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Quote: </span><span class="si">{</span><span class="n">btc_usdt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;quoteTick&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">True</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ </span><span class="si">{</span><span class="n">SYMBOL</span><span class="si">}</span><span class="s2"> not found in instruments&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Failed: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">raise</span> <span class="n">exception_class</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">response_data</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="main">
-<a class="viewcode-back" href="../api_reference.html#test_api.main">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run all tests&quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WOOX API Connection Test&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Base URL: </span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing Symbol: </span><span class="si">{</span><span class="n">SYMBOL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    
-    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;Orderbook&quot;</span><span class="p">,</span> <span class="n">test_orderbook</span><span class="p">()))</span>
-    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;Market Trades&quot;</span><span class="p">,</span> <span class="n">test_market_trades</span><span class="p">()))</span>
-    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;Instruments&quot;</span><span class="p">,</span> <span class="n">test_instruments</span><span class="p">()))</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test Results Summary&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    
-    <span class="k">for</span> <span class="n">test_name</span><span class="p">,</span> <span class="n">passed</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;✓ PASS&quot;</span> <span class="k">if</span> <span class="n">passed</span> <span class="k">else</span> <span class="s2">&quot;✗ FAIL&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">test_name</span><span class="si">:</span><span class="s2">20</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-    
-    <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
-    <span class="n">passed</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">p</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total: </span><span class="si">{</span><span class="n">passed</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> tests passed&quot;</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">passed</span> <span class="o">==</span> <span class="n">total</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✓ All tests passed! API connection is working.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;You can now run the trading bot with: python trade.py&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="is_retryable_error">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.is_retryable_error">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_retryable_error</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if an error is retryable.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        code: Error code</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        True if error is retryable (rate limit, network, server errors)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">retryable_codes</span> <span class="o">=</span> <span class="p">{</span><span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="o">-</span><span class="mi">1003</span><span class="p">,</span> <span class="o">-</span><span class="mi">1011</span><span class="p">,</span> <span class="o">-</span><span class="mi">1012</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">retryable_codes</span></div>
+
+
+
+<div class="viewcode-block" id="get_retry_delay">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.get_retry_delay">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_retry_delay</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">attempt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get suggested retry delay in seconds.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        code: Error code</span>
+<span class="sd">        attempt: Current retry attempt number</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Delay in seconds</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1003</span><span class="p">:</span>  <span class="c1"># Rate limit</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">attempt</span><span class="p">)</span>  <span class="c1"># Exponential backoff, max 60s</span>
+    <span class="k">elif</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">{</span><span class="o">-</span><span class="mi">1011</span><span class="p">,</span> <span class="o">-</span><span class="mi">1012</span><span class="p">}:</span>  <span class="c1"># Server errors</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>  <span class="c1"># Linear backoff, max 10s</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✗ Some tests failed. Please check your internet connection&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;or verify the API endpoints are accessible.&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="mf">1.0</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ErrorFormatter">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.ErrorFormatter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorFormatter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format error messages for logging and user display.&quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="ErrorFormatter.format_error">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.ErrorFormatter.format_error">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="n">WooxError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Format error for logging.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: WooxError instance</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Formatted error string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error_info</span> <span class="o">=</span> <span class="n">get_error_info</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;WOOX API Error</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;  Code: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;  Type: </span><span class="si">{</span><span class="n">error_info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;  HTTP: </span><span class="si">{</span><span class="n">error_info</span><span class="p">[</span><span class="s1">&#39;http_code&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;  Message: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;  Description: </span><span class="si">{</span><span class="n">error_info</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="ErrorFormatter.format_user_message">
+<a class="viewcode-back" href="../api_reference.html#woox_errors.ErrorFormatter.format_user_message">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_user_message</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="n">WooxError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Format user-friendly error message.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            error: WooxError instance</span>
+<span class="sd">            </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            User-friendly error message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">WooxAuthenticationError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Authentication failed. Please check your API credentials.&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">WooxRateLimitError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Rate limit exceeded. Please wait before retrying.&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">WooxInvalidParameterError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Invalid request: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">WooxResourceNotFoundError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Resource not found: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span></div>
+</div>
+
 </pre></div>
 
            </div>

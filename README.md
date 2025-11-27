@@ -6,7 +6,7 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 
 ## Features
 
-- **Real-time Market Data**: Fetches latest BTC_USDT price, volume, bid, and ask using WOOX V3 API
+- **Real-time Market Data**: Fetches latest BTC_USDT price, volume, bid, and ask using WOOX V1 API
 - **Deep Orderbook Data**: Collects up to 100 bid/ask levels with quantities, depth metrics, and imbalance analysis
 - **Historical Data Tracking**: Monitors and records up to 1440 minutes (24 hours) of price and orderbook data
 - **Multiple Trading Strategies**: Choose from MA Crossover, RSI, or Bollinger Bands strategies (extensible)
@@ -20,6 +20,9 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Customizable Execution Frequency**: Control method execution with @cron decorator (milliseconds, seconds, minutes)
 - **Live Price Display**: Real-time BTC price updates every 5 seconds
 - **Comprehensive Logging**: All actions logged to file and console
+- **Production-Ready Error Handling**: Complete error code mapping with automatic retry logic
+- **Precision Management**: Proper number formatting for API requests using Decimal class
+- **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 
 ## Requirements
 
@@ -27,24 +30,121 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 pip install -r requirements.txt
 ```
 
+## New Modules
+
+The bot now includes production-ready modules following WOOX best practices:
+
+### Error Handling (`woox_errors.py`)
+
+Comprehensive error handling system:
+
+- **40+ Error Codes Mapped**: All WOOX API errors (-1000 to -1103, 317xxx order errors)
+- **Exception Hierarchy**: Specialized exceptions for different error types
+- **Automatic Retry Logic**: Exponential backoff for rate limits (2^attempt, max 60s)
+- **Error Formatting**: User-friendly messages and detailed logging
+
+```python
+from woox_errors import WooxError, WooxRateLimitError, handle_api_error, ErrorFormatter
+
+try:
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code != 200:
+        handle_api_error(response)
+except WooxRateLimitError as e:
+    logger.warning("Rate limited: %s", ErrorFormatter.format_user_message(e))
+except WooxError as e:
+    logger.error("API error: %s", ErrorFormatter.format_error(e))
+```
+
+### Order Helper (`order_helper.py`)
+
+Proper order formatting with precision and validation:
+
+- **Client Order ID Generation**: Unique tracking IDs for each order
+- **Precision Formatting**: Convert floats to strings with proper decimal precision
+- **Filter Validation**: Validate against symbol's price/quantity filters
+- **Order Creation**: Create properly formatted LIMIT, MARKET, and POST_ONLY orders
+
+```python
+from order_helper import OrderHelper
+
+order_helper = OrderHelper(logger)
+
+# Create limit order with proper formatting
+order_data = order_helper.create_limit_order(
+    symbol="SPOT_BTC_USDT",
+    side="BUY",
+    price=50000.00,
+    quantity=0.001,
+    order_tag="algo_bot"
+)
+# Returns: {"symbol": "SPOT_BTC_USDT", "order_price": "50000.00", ...}
+
+# Validate before placing order
+if order_helper.validate_price_filters(price, symbol_info):
+    # Place order
+```
+
+### Best Practices Checklist
+
+See `WOOX_BEST_PRACTICES_CHECKLIST.md` for:
+
+- ✅ Completed improvements (error handling, API endpoints, precision)
+- 🔄 In-progress items (rate limiting, WebSocket integration)
+- ⏳ Pending improvements (testing, monitoring, optimization)
+- Priority rankings and verification commands
+
+### Examples
+
+See `examples_best_practices.py` for complete usage examples:
+
+```bash
+python examples_best_practices.py
+```
+
+Demonstrates:
+- Safe order placement with error handling
+- Market and POST_ONLY orders
+- Account balance fetching
+- Order parameter validation
+- Automatic retry on rate limits
+- Proper precision formatting
+
 ## API Documentation
 
-This bot uses WOOX V3 REST API:
+This bot uses WOOX REST API with proper version handling:
 
 - Base URL: `https://api.woox.io`
-- Documentation: https://developer.woox.io/api-reference/introduction
+- Official Documentation: https://docs.woox.io/
 
 ### Endpoints Used
 
-- **Public Market Data** (no authentication required):
+- **Public Market Data** (V1 - no authentication required):
 
-  - `GET /v3/public/orderbook` - Get orderbook for bid/ask prices (supports maxLevel=100 for deep data)
-  - `GET /v3/public/marketTrades` - Get recent market trades
+  - `GET /v1/public/orderbook/{symbol}` - Get orderbook for bid/ask prices (supports max_level=100 for deep data)
+  - `GET /v1/public/market_trades` - Get recent market trades
+  - `GET /v1/public/info/{symbol}` - Get symbol configuration and trading rules
 
-- **Authenticated Trading** (requires API key):
-  - `GET /v3/trade/orders` - Get open orders
-  - `POST /v3/trade/order` - Place a new order
-  - `DELETE /v3/trade/order` - Cancel an order
+- **Authenticated Trading** (V1 - requires API key):
+  - `GET /v1/orders` - Get open orders
+  - `POST /v1/order` - Place a new order
+  - `DELETE /v1/order/{order_id}` - Cancel an order
+
+- **Account Management** (V3 - requires API key):
+  - `GET /v3/balances` - Get account balances
+  - `GET /v3/accountinfo` - Get account information
+  - `POST /v3/algo/order` - Place algo orders
+
+### Error Handling
+
+The bot includes comprehensive error handling:
+
+- **Error Code Mapping**: All WOOX API error codes (-1000 to -1103, 317xxx) mapped to specific exceptions
+- **Automatic Retry**: Exponential backoff for rate limits, linear retry for server errors
+- **Exception Hierarchy**: `WooxError`, `WooxAuthenticationError`, `WooxRateLimitError`, `WooxInvalidParameterError`, `WooxResourceNotFoundError`, `WooxServerError`
+- **Error Formatting**: User-friendly error messages and detailed logging
+
+See `woox_errors.py` for complete error handling implementation.
 
 ## Orderbook Data Collection
 
@@ -513,6 +613,20 @@ python test_api.py
 
 Tests basic WOOX API connectivity and authentication.
 
+### Run Best Practices Examples
+
+```bash
+python examples_best_practices.py
+```
+
+Demonstrates:
+- Proper error handling with retry logic
+- Order placement with precision formatting
+- Order validation against symbol filters
+- Account balance fetching with error handling
+- Automatic retry on rate limits
+- Market and POST_ONLY order creation
+
 ## Example Output
 
 ```
@@ -533,10 +647,14 @@ Tests basic WOOX API connectivity and authentication.
 - **Trade mode validation**: Only places real orders when explicitly in 'live' mode
 - **Position validation**: Checks for existing position before opening new one
 - **Graceful shutdown**: Closes positions and database connections cleanly
-- **Error handling**: Comprehensive try-catch blocks with detailed logging
+- **Production-grade error handling**: Complete error code mapping with automatic retry
+- **Exponential backoff**: Automatic retry with increasing delays for rate limits
+- **Precision management**: Proper decimal handling prevents floating-point errors
+- **Order validation**: Pre-flight checks against symbol's trading rules
 - **API timeout**: All requests timeout after 10 seconds
 - **PERP support**: Both long and short positions for perpetual futures
 - **SPOT restrictions**: Only long positions for spot trading (validation built-in)
+- **Client order ID tracking**: Unique IDs for order tracking and reconciliation
 
 ## Notes
 

@@ -104,6 +104,88 @@ Configuration Functions
 
 .. autofunction:: config_loader.get_config_value
 
+Error Handling
+--------------
+
+woox_errors
+~~~~~~~~~~~
+
+.. automodule:: woox_errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Exception Classes
+^^^^^^^^^^^^^^^^^
+
+.. autoclass:: woox_errors.WooxError
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
+.. autoclass:: woox_errors.WooxAuthenticationError
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: woox_errors.WooxRateLimitError
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: woox_errors.WooxInvalidParameterError
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: woox_errors.WooxResourceNotFoundError
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: woox_errors.WooxServerError
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Error Handling Functions
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: woox_errors.handle_api_error
+
+.. autofunction:: woox_errors.is_retryable_error
+
+.. autofunction:: woox_errors.get_retry_delay
+
+Error Formatter
+^^^^^^^^^^^^^^^
+
+.. autoclass:: woox_errors.ErrorFormatter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Order Management
+----------------
+
+order_helper
+~~~~~~~~~~~~
+
+.. automodule:: order_helper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+OrderHelper Class
+^^^^^^^^^^^^^^^^^
+
+.. autoclass:: order_helper.OrderHelper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
 Utility Modules
 ---------------
 
@@ -160,6 +242,25 @@ test_api
 .. automodule:: test_api
    :members:
    :undoc-members:
+
+Examples
+--------
+
+examples_best_practices
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: examples_best_practices
+   :members:
+   :undoc-members:
+
+   Comprehensive examples demonstrating WOOX API best practices:
+
+   - Safe order placement with error handling
+   - Market and POST_ONLY order creation
+   - Account balance fetching with retry logic
+   - Order parameter validation
+   - Automatic retry on rate limits
+   - Proper precision formatting
 
 Decorators
 ----------
@@ -308,26 +409,100 @@ Default Configuration Values
 API Endpoints
 ~~~~~~~~~~~~~
 
-WOOX API v3 endpoints used:
+WOOX API endpoints used (V1 for trading, V3 for account):
 
 .. code-block:: python
 
    BASE_URL = 'https://api.woox.io'
 
-   # Public endpoints (no auth)
-   GET /v3/public/orderbook       # Get orderbook data
-   GET /v3/public/marketTrades    # Get recent trades
+   # Public endpoints (V1 - no auth required)
+   GET /v1/public/orderbook/{symbol}  # Get orderbook data (max_level=100)
+   GET /v1/public/market_trades       # Get recent trades
+   GET /v1/public/info/{symbol}       # Get symbol configuration
 
-   # Authenticated endpoints
-   GET /v3/asset/balances          # Get account balance
-   GET /v3/trade/orders            # Get open orders
-   POST /v3/trade/order            # Place new order
-   DELETE /v3/trade/order          # Cancel order
+   # Order endpoints (V1 - authenticated)
+   GET /v1/orders                      # Get open orders
+   POST /v1/order                      # Place new order
+   DELETE /v1/order/{order_id}         # Cancel order
+
+   # Account endpoints (V3 - authenticated)
+   GET /v3/balances                    # Get account balance
+   GET /v3/accountinfo                 # Get account information
+   POST /v3/algo/order                 # Place algo order
+
+For official documentation, see: https://docs.woox.io/
 
 Exceptions and Errors
 ---------------------
 
-Common exceptions you may encounter:
+WOOX API Exceptions
+~~~~~~~~~~~~~~~~~~~
+
+Custom exception hierarchy for WOOX API errors:
+
+**WooxError** (Base Exception)
+   Base exception for all WOOX API errors::
+
+      except WooxError as e:
+          logger.error(ErrorFormatter.format_error(e))
+
+**WooxAuthenticationError**
+   Authentication failed (error codes: -1000, -1002)::
+
+      WooxAuthenticationError: Invalid API key
+
+**WooxRateLimitError**
+   Rate limit exceeded (error code: -1003)::
+
+      WooxRateLimitError: Too many requests
+
+**WooxInvalidParameterError**
+   Invalid parameters (error codes: -1004 to -1010)::
+
+      WooxInvalidParameterError: Invalid symbol
+
+**WooxResourceNotFoundError**
+   Resource not found (error code: -1011)::
+
+      WooxResourceNotFoundError: Order not found
+
+**WooxServerError**
+   Server error (error codes: -1012, -1099 to -1103)::
+
+      WooxServerError: Internal server error
+
+Order Service Errors (317xxx)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Specific order-related errors:
+
+* **317136**: Repeated client_order_id
+* **317137**: Invalid client_order_id format
+* **317138**: clientOrderID exceeds maximum length
+* **317139**: Invalid algo_type
+* **317143**: Invalid order_quantity
+* **317201**: Insufficient balance
+* **317202**: Quantity below minimum
+
+See ``woox_errors.py`` for complete error code mapping.
+
+Retry Logic
+~~~~~~~~~~~
+
+Automatic retry with exponential backoff:
+
+.. code-block:: python
+
+   # Rate limit errors (exponential backoff)
+   delay = min(2 ** attempt, 60)  # Max 60 seconds
+
+   # Server errors (linear backoff)
+   delay = min(attempt * 5, 30)   # Max 30 seconds
+
+   # Max retries: 3 attempts
+
+Common Python Exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 **ValueError**
    Raised for invalid configuration or parameters::

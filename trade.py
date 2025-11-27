@@ -9,8 +9,18 @@ from typing import Optional, Dict, Any, Callable
 import json
 import functools
 import duckdb
+from decimal import Decimal
 from config_loader import CONFIG, get_config_value
 from signal import get_strategy
+from woox_errors import (
+    handle_api_error,
+    is_retryable_error,
+    get_retry_delay,
+    WooxError,
+    WooxRateLimitError,
+    WooxAuthenticationError,
+    ErrorFormatter
+)
 
 
 def cron(freq: str = 's', period: float = 1):
@@ -261,13 +271,85 @@ class Trade:
         headers = {
             'x-api-key': self.api_key,
             'x-api-signature': signature,
-            'x-api-timestamp': str(timestamp)
+            'x-api-timestamp': str(timestamp),
+            'Cache-Control': 'no-cache'
         }
         
-        if method in ['POST', 'PUT']:
+        if method in ['POST', 'PUT', 'DELETE']:
             headers['Content-Type'] = 'application/json'
             
         return headers
+    
+    def _make_request(self, method: str, endpoint: str, params: Optional[Dict] = None, 
+                      data: Optional[Dict] = None, authenticated: bool = False,
+                      max_retries: int = 3) -> Dict[str, Any]:
+        """
+        Make API request with error handling and retry logic.
+        
+        Args:
+            method: HTTP method (GET, POST, PUT, DELETE)
+            endpoint: API endpoint path
+            params: Query parameters
+            data: Request body data
+            authenticated: Whether to include auth headers
+            max_retries: Maximum number of retry attempts
+            
+        Returns:
+            JSON response data
+            
+        Raises:
+            WooxError: On API errors
+        """
+        url = f"{self.base_url}{endpoint}"
+        
+        for attempt in range(max_retries):
+            try:
+                # Prepare headers
+                if authenticated:
+                    body = json.dumps(data) if data else ""
+                    headers = self._get_auth_headers(method, endpoint, body)
+                else:
+                    headers = {}
+                
+                # Make request
+                if method == 'GET':
+                    response = requests.get(url, params=params, headers=headers, timeout=10)
+                elif method == 'POST':
+                    response = requests.post(url, json=data, headers=headers, timeout=10)
+                elif method == 'PUT':
+                    response = requests.put(url, json=data, headers=headers, timeout=10)
+                elif method == 'DELETE':
+                    response = requests.delete(url, params=params, headers=headers, timeout=10)
+                else:
+                    raise ValueError(f"Unsupported HTTP method: {method}")
+                
+                # Parse response
+                response_data = response.json()
+                
+                # Handle API errors
+                handle_api_error(response_data, self.logger)
+                
+                return response_data
+                
+            except WooxRateLimitError as e:
+                if attempt < max_retries - 1:
+                    delay = get_retry_delay(e.code, attempt)
+                    self.logger.warning(
+                        "Rate limit hit, retrying in %.1fs (attempt %d/%d)",
+                        delay, attempt + 1, max_retries
+                    )
+                    time.sleep(delay)
+                else:
+                    raise
+            except (WooxAuthenticationError, requests.RequestException) as e:
+                if attempt < max_retries - 1 and is_retryable_error(getattr(e, 'code', -1000)):
+                    delay = get_retry_delay(getattr(e, 'code', -1000), attempt)
+                    self.logger.warning("Request failed, retrying in %.1fs", delay)
+                    time.sleep(delay)
+                else:
+                    raise
+        
+        raise WooxError(-1000, "Max retries exceeded")
     
     def trade_update(self) -> Dict[str, Any]:
         """
@@ -278,29 +360,26 @@ class Trade:
             Dictionary containing price, volume, bid, ask, and orderbook data
         """
         try:
-            # Get orderbook with up to 30 levels (V3 API)
-            orderbook_url = f"{self.base_url}/v3/public/orderbook"
-            orderbook_response = requests.get(
-                orderbook_url,
-                params={"symbol": self.symbol, "maxLevel": 30},
-                timeout=10
+            # Get orderbook with up to 30 levels (V1 API - Public)
+            orderbook_data = self._make_request(
+                'GET',
+                f"/v1/public/orderbook/{self.symbol}",
+                params={"max_level": 30},
+                authenticated=False
             )
-            orderbook_data = orderbook_response.json()
             
-            # Get market trades for price and volume (V3 API)
-            trades_url = f"{self.base_url}/v3/public/marketTrades"
-            trades_response = requests.get(
-                trades_url, 
+            # Get market trades for price and volume (V1 API - Public)
+            trades_data = self._make_request(
+                'GET',
+                "/v1/public/market_trades",
                 params={"symbol": self.symbol, "limit": 1},
-                timeout=10
+                authenticated=False
             )
-            trades_data = trades_response.json()
             
             # Process orderbook data
-            if orderbook_response.status_code == 200 and orderbook_data.get('success'):
-                data = orderbook_data.get('data', {})
-                asks = data.get('asks', [])
-                bids = data.get('bids', [])
+            if orderbook_data.get('success'):
+                asks = orderbook_data.get('asks', [])
+                bids = orderbook_data.get('bids', [])
                 
                 # Store best bid/ask
                 self.current_ask = float(asks[0]['price']) if asks else None
@@ -330,13 +409,12 @@ class Trade:
                         self.orderbook['spread'], len(self.orderbook['bids']), len(self.orderbook['asks'])
                     )
             
-            if trades_response.status_code == 200 and trades_data.get('success'):
-                data = trades_data.get('data', {})
-                recent_trades = data.get('rows', [])
+            if trades_data.get('success'):
+                recent_trades = trades_data.get('rows', [])
                 if recent_trades:
                     latest_trade = recent_trades[0]
-                    self.current_price = float(latest_trade.get('executedPrice', 0))
-                    self.current_volume = float(latest_trade.get('executedQuantity', 0))
+                    self.current_price = float(latest_trade.get('executed_price', 0))
+                    self.current_volume = float(latest_trade.get('executed_quantity', 0))
             
             # Fallback to mid-price if no recent trades
             if not self.current_price and self.orderbook.get('mid_price'):
