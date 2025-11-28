@@ -53,7 +53,7 @@ Five metric cards display live information:
 Interactive Charts
 ~~~~~~~~~~~~~~~~~~
 
-The dashboard includes six interactive charts:
+The dashboard includes eleven interactive charts for comprehensive analysis:
 
 1. **Price Chart**: 
    
@@ -77,6 +77,32 @@ The dashboard includes six interactive charts:
    * Profit/loss tracking
    * Cumulative and per-trade view
    * Color-coded positive/negative
+
+5. **RSI Chart**:
+
+   * Relative Strength Index (14-period)
+   * Overbought (70) and Oversold (30) threshold lines
+   * Momentum tracking
+
+6. **Moving Averages Chart**:
+
+   * SMA 20 (Fast) and SMA 50 (Slow) lines
+   * Trend identification and crossover signals
+
+7. **Spread Chart**:
+
+   * Bid-Ask spread percentage over time
+   * Liquidity monitoring
+
+8. **Trade Distribution**:
+
+   * Pie chart visualization
+   * Win vs. Loss ratio breakdown
+
+9. **Cumulative Return**:
+
+   * Area chart showing total portfolio growth
+   * Long-term performance tracking
 
 Performance Metrics
 ~~~~~~~~~~~~~~~~~~~

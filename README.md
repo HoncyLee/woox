@@ -24,7 +24,15 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Precision Management**: Proper number formatting for API requests using Decimal class
 - **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 - **📊 Interactive Dashboard**: Web-based real-time monitoring and control (Dash + Plotly)
-- **🖨️ Printable Reports**: Generate professional trading reports with white background for printing/archiving
+- **Print Report**: Generate a white-background report for printing or PDF export.
+- **Technical Analysis**:
+  - **RSI (Relative Strength Index)**: 14-period momentum indicator.
+  - **Moving Averages**: SMA 20 (Fast) and SMA 50 (Slow) crossover analysis.
+  - **Bid-Ask Spread**: Real-time spread percentage monitoring.
+- **Trade Analytics**:
+  - **Trade Distribution**: Pie chart showing Win vs. Loss ratio.
+  - **Cumulative Return**: Area chart tracking total portfolio growth over time.
+- **Interactive Charts**: Real-time price, orderbook depth, volume, and P&L tracking.
 
 ## Requirements
 
