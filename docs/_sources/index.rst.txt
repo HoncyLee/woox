@@ -32,8 +32,9 @@ Features
 --------
 
 * **Real-time Market Data**: Fetches latest price, volume, and orderbook data using WOOX V1/V3 APIs
-* **Multiple Strategies**: Choose from MA Crossover, RSI, or Bollinger Bands
+* **Multiple Strategies**: Choose from MA Crossover, RSI, or Bollinger Bands with configurable timeframes
 * **Risk Management**: Built-in stop-loss and take-profit mechanisms
+* **Advanced P&L Tracking**: Total P&L includes both realized and unrealized gains/losses
 * **Production-Grade Error Handling**: Complete error code mapping with automatic retry logic
 * **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 * **Precision Management**: Proper decimal handling prevents floating-point errors

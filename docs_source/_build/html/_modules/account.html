@@ -210,7 +210,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_reference.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#core-modules">Core Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#trade">trade</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trade.cron"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trade.Trade"><code class="docutils literal notranslate"><span class="pre">Trade</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trade-class">Trade Class</a></li>
 </ul>
 </li>
@@ -292,10 +294,27 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#test-modules">Test Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#test-signals">test_signals</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#test-orderbook">test_orderbook</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-test_trade_workflow">test_trade_workflow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.print_section"><code class="docutils literal notranslate"><span class="pre">print_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.check_database_transactions"><code class="docutils literal notranslate"><span class="pre">check_database_transactions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.test_position_lifecycle"><code class="docutils literal notranslate"><span class="pre">test_position_lifecycle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.test_database_integrity"><code class="docutils literal notranslate"><span class="pre">test_database_integrity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.test_stop_loss_scenario"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_trade_workflow.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-test_signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-test_orderbook">test_orderbook</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_orderbook.test_orderbook_collection"><code class="docutils literal notranslate"><span class="pre">test_orderbook_collection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-verify_signals">verify_signals</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#verify_signals.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#verify_signals.test_stop_loss_logic"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_logic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#verify_signals.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-test_api">test_api</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
@@ -306,11 +325,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#examples">Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#examples-best-practices">examples_best_practices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-examples_best_practices">examples_best_practices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_safe_order_placement"><code class="docutils literal notranslate"><span class="pre">example_safe_order_placement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_market_order"><code class="docutils literal notranslate"><span class="pre">example_market_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_post_only_order"><code class="docutils literal notranslate"><span class="pre">example_post_only_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_account_balance"><code class="docutils literal notranslate"><span class="pre">example_account_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_order_validation"><code class="docutils literal notranslate"><span class="pre">example_order_validation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_retry_on_rate_limit"><code class="docutils literal notranslate"><span class="pre">example_retry_on_rate_limit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.example_precision_formatting"><code class="docutils literal notranslate"><span class="pre">example_precision_formatting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#examples_best_practices.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#decorators">Decorators</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#cron">cron</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#cron">cron</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#id51"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#data-structures">Data Structures</a><ul>
@@ -534,13 +566,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_KEY&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_SECRET&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;BASE_URL&#39;</span><span class="p">,</span> <span class="s1">&#39;https://api.woox.io&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_lock</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="c1"># Connect to appropriate database</span>
+        <span class="c1"># Use read_only=False to match Trade&#39;s connection config and avoid conflicts</span>
+        <span class="c1"># Create a new connection for thread safety</span>
         <span class="n">db_file</span> <span class="o">=</span> <span class="s1">&#39;live_transaction.db&#39;</span> <span class="k">if</span> <span class="n">trade_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span> <span class="k">else</span> <span class="s1">&#39;paper_transaction.db&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span> <span class="o">=</span> <span class="n">duckdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span> <span class="o">=</span> <span class="n">duckdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Account initialized in </span><span class="si">%s</span><span class="s2"> mode&quot;</span><span class="p">,</span> <span class="n">trade_mode</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_generate_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">request_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate HMAC SHA256 signature for API authentication.&quot;&quot;&quot;</span>
@@ -612,45 +653,126 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error fetching API balance: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
+
+<div class="viewcode-block" id="Account.get_account_info">
+<a class="viewcode-back" href="../api_reference.html#account.Account.get_account_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_account_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get account information from WOOX API (V3).</span>
+<span class="sd">        Includes total collateral, leverage, etc.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with account info or None if error</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;API credentials not available&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">request_path</span> <span class="o">=</span> <span class="s2">&quot;/v3/accountinfo&quot;</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_headers</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="n">request_path</span><span class="p">)</span>
+            
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}{</span><span class="n">request_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span>
+            <span class="p">)</span>
+            
+            <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">handle_api_error</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">response_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            
+            <span class="k">return</span> <span class="kc">None</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error fetching account info: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
     
 <div class="viewcode-block" id="Account.get_transaction_summary">
 <a class="viewcode-back" href="../api_reference.html#account.Account.get_transaction_summary">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_transaction_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_transaction_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get transaction summary from database.</span>
 <span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            current_price: Current market price (optional) to calculate unrealized P&amp;L</span>
+<span class="sd">            </span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary with transaction statistics</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Total transactions</span>
-            <span class="n">total_trades</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="n">count_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                SELECT COUNT(*) as count FROM trades</span>
-<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">count_row</span> <span class="o">=</span> <span class="n">count_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">total_trades</span> <span class="o">=</span> <span class="n">count_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">count_row</span> <span class="k">else</span> <span class="mi">0</span>
             
             <span class="c1"># Total buy and sell volumes</span>
-            <span class="n">buy_summary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="n">buy_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                SELECT </span>
 <span class="s2">                    COUNT(*) as count,</span>
 <span class="s2">                    SUM(quantity) as total_quantity,</span>
 <span class="s2">                    SUM(proceeds) as total_proceeds</span>
 <span class="s2">                FROM trades </span>
 <span class="s2">                WHERE trade_type = &#39;BUY&#39;</span>
-<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">buy_summary</span> <span class="o">=</span> <span class="n">buy_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
             
-            <span class="n">sell_summary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="n">sell_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                SELECT </span>
 <span class="s2">                    COUNT(*) as count,</span>
 <span class="s2">                    SUM(ABS(quantity)) as total_quantity,</span>
 <span class="s2">                    SUM(proceeds) as total_proceeds</span>
 <span class="s2">                FROM trades </span>
 <span class="s2">                WHERE trade_type = &#39;SELL&#39;</span>
-<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">sell_summary</span> <span class="o">=</span> <span class="n">sell_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
             
-            <span class="c1"># Net P&amp;L from closed positions (paired trades)</span>
-            <span class="n">net_pnl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="c1"># Net P&amp;L (Cash Flow)</span>
+            <span class="n">pnl_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                SELECT SUM(proceeds) as net_pnl FROM trades</span>
-<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.0</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">pnl_row</span> <span class="o">=</span> <span class="n">pnl_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">cash_pnl</span> <span class="o">=</span> <span class="n">pnl_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">pnl_row</span> <span class="ow">and</span> <span class="n">pnl_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="c1"># Net Quantity (Current Position)</span>
+            <span class="n">qty_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT SUM(quantity) as net_qty FROM trades</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">qty_row</span> <span class="o">=</span> <span class="n">qty_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">net_quantity</span> <span class="o">=</span> <span class="n">qty_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">qty_row</span> <span class="ow">and</span> <span class="n">qty_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="c1"># Calculate Total P&amp;L (Realized + Unrealized)</span>
+            <span class="n">total_pnl</span> <span class="o">=</span> <span class="n">cash_pnl</span>
+            <span class="n">unrealized_pnl</span> <span class="o">=</span> <span class="mf">0.0</span>
+            
+            <span class="k">if</span> <span class="n">current_price</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">net_quantity</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Total Equity Change = Cash Change + Current Position Value</span>
+                <span class="n">total_pnl</span> <span class="o">=</span> <span class="n">cash_pnl</span> <span class="o">+</span> <span class="p">(</span><span class="n">net_quantity</span> <span class="o">*</span> <span class="n">current_price</span><span class="p">)</span>
+                <span class="n">unrealized_pnl</span> <span class="o">=</span> <span class="n">total_pnl</span> <span class="o">-</span> <span class="n">cash_pnl</span> <span class="c1"># This is approximate if we don&#39;t track realized separately</span>
+                
+                <span class="c1"># Better approximation for Unrealized:</span>
+                <span class="c1"># If we assume cash_pnl includes the cost of the open position (negative proceeds),</span>
+                <span class="c1"># then adding current value gives the total result.</span>
+                <span class="c1"># So total_pnl is the correct &quot;Account P&amp;L&quot;.</span>
+            
+            <span class="c1"># Winning trades (TAKE_PROFIT)</span>
+            <span class="n">win_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT COUNT(*) FROM trades WHERE signal = &#39;TAKE_PROFIT&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">win_row</span> <span class="o">=</span> <span class="n">win_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">winning_trades</span> <span class="o">=</span> <span class="n">win_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">win_row</span> <span class="k">else</span> <span class="mi">0</span>
+            
+            <span class="c1"># Losing trades (STOP_LOSS)</span>
+            <span class="n">loss_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT COUNT(*) FROM trades WHERE signal = &#39;STOP_LOSS&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">loss_row</span> <span class="o">=</span> <span class="n">loss_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">losing_trades</span> <span class="o">=</span> <span class="n">loss_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">loss_row</span> <span class="k">else</span> <span class="mi">0</span>
             
             <span class="c1"># Recent trades</span>
             <span class="n">recent_trades</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
@@ -659,15 +781,29 @@
 <span class="s2">                LIMIT 10</span>
 <span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
             
+            <span class="c1"># Handle potential None results from empty tables</span>
+            <span class="n">buy_count</span> <span class="o">=</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">buy_summary</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">buy_qty</span> <span class="o">=</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">buy_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">buy_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">buy_proc</span> <span class="o">=</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">buy_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">buy_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="n">sell_count</span> <span class="o">=</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">sell_summary</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">sell_qty</span> <span class="o">=</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">sell_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sell_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">sell_proc</span> <span class="o">=</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">sell_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sell_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
             <span class="k">return</span> <span class="p">{</span>
                 <span class="s1">&#39;total_trades&#39;</span><span class="p">:</span> <span class="n">total_trades</span><span class="p">,</span>
-                <span class="s1">&#39;buy_count&#39;</span><span class="p">:</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s1">&#39;buy_quantity&#39;</span><span class="p">:</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
-                <span class="s1">&#39;buy_proceeds&#39;</span><span class="p">:</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
-                <span class="s1">&#39;sell_count&#39;</span><span class="p">:</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="s1">&#39;sell_quantity&#39;</span><span class="p">:</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
-                <span class="s1">&#39;sell_proceeds&#39;</span><span class="p">:</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
-                <span class="s1">&#39;net_pnl&#39;</span><span class="p">:</span> <span class="n">net_pnl</span><span class="p">,</span>
+                <span class="s1">&#39;buy_count&#39;</span><span class="p">:</span> <span class="n">buy_count</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;buy_quantity&#39;</span><span class="p">:</span> <span class="n">buy_qty</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;buy_proceeds&#39;</span><span class="p">:</span> <span class="n">buy_proc</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;sell_count&#39;</span><span class="p">:</span> <span class="n">sell_count</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;sell_quantity&#39;</span><span class="p">:</span> <span class="n">sell_qty</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;sell_proceeds&#39;</span><span class="p">:</span> <span class="n">sell_proc</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;net_pnl&#39;</span><span class="p">:</span> <span class="n">total_pnl</span><span class="p">,</span> <span class="c1"># Return Total P&amp;L as the main P&amp;L metric</span>
+                <span class="s1">&#39;cash_pnl&#39;</span><span class="p">:</span> <span class="n">cash_pnl</span><span class="p">,</span> <span class="c1"># Raw cash flow</span>
+                <span class="s1">&#39;unrealized_pnl&#39;</span><span class="p">:</span> <span class="n">unrealized_pnl</span><span class="p">,</span>
+                <span class="s1">&#39;net_quantity&#39;</span><span class="p">:</span> <span class="n">net_quantity</span><span class="p">,</span>
+                <span class="s1">&#39;winning_trades&#39;</span><span class="p">:</span> <span class="n">winning_trades</span><span class="p">,</span>
+                <span class="s1">&#39;losing_trades&#39;</span><span class="p">:</span> <span class="n">losing_trades</span><span class="p">,</span>
                 <span class="s1">&#39;recent_trades&#39;</span><span class="p">:</span> <span class="n">recent_trades</span>
             <span class="p">}</span>
             

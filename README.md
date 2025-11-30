@@ -16,23 +16,26 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Position Management**: Tracks open positions and manages entries/exits (long and short for PERP)
 - **Paper/Live Trading**: Switch between simulation (paper) and real (live) trading modes
 - **Transaction Database**: Records all trades in DuckDB (separate databases for paper/live)
-- **Account Management**: View balances, P&L, and transaction history
+- **Account Management**: View balances, P&L (realized + unrealized), and transaction history
+- **Advanced P&L Tracking**: Total P&L = Realized Cash Flow + (Net Position × Current Price)
 - **Customizable Execution Frequency**: Control method execution with @cron decorator (milliseconds, seconds, minutes)
 - **Live Price Display**: Real-time BTC price updates every 5 seconds
 - **Comprehensive Logging**: All actions logged to file and console
+- **Dynamic Database Selection**: Automatically uses correct DB file based on TRADE_MODE config
 - **Production-Ready Error Handling**: Complete error code mapping with automatic retry logic
 - **Precision Management**: Proper number formatting for API requests using Decimal class
 - **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 - **📊 Interactive Dashboard**: Web-based real-time monitoring and control (Dash + Plotly)
 - **Print Report**: Generate a white-background report for printing or PDF export.
 - **Technical Analysis**:
-  - **RSI (Relative Strength Index)**: 14-period momentum indicator.
-  - **Moving Averages**: SMA 20 (Fast) and SMA 50 (Slow) crossover analysis.
+  - **RSI (Relative Strength Index)**: Configurable period momentum indicator with timeframe resampling.
+  - **Moving Averages**: Configurable periods with threshold-based crossover and timeframe resampling.
   - **Bid-Ask Spread**: Real-time spread percentage monitoring.
 - **Trade Analytics**:
-  - **Trade Distribution**: Pie chart showing Win vs. Loss ratio.
+  - **Trade Distribution**: Pie chart showing Win vs. Loss ratio (based on TAKE_PROFIT/STOP_LOSS signals).
   - **Cumulative Return**: Area chart tracking total portfolio growth over time.
-- **Interactive Charts**: Real-time price, orderbook depth, volume, and P&L tracking.
+  - **Unrealized P&L**: Real-time floating profit/loss on open positions.
+- **Interactive Charts**: Real-time price, orderbook depth, volume, and P&L tracking with accurate unrealized gains.
 
 ## Requirements
 
@@ -278,14 +281,18 @@ SYMBOL=SPOT_BTC_USDT  # For spot trading (long only)
 **PERP advantages:**
 
 - Can profit from both rising (long) and falling (short) markets
+- MA strategy generates both LONG and SHORT signals for perpetual futures
 - Typically higher liquidity and tighter spreads
 - Better for strategy testing with orderbook depth
+- System automatically enforces PERP_ prefix when TRADE_TYPE=future
 
 **SPOT advantages:**
 
 - No funding fees
 - Direct ownership of assets
 - Simpler for buy-and-hold strategies
+- Long positions only (short signals are blocked with warning)
+- System automatically enforces SPOT_ prefix when TRADE_TYPE=spot
 
 ## Database Setup
 

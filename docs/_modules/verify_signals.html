@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+  <title>verify_signals &mdash; WOOX Trading Bot 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1d87fc8b" />
@@ -507,7 +507,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Overview: module code</li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">verify_signals</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -516,20 +517,210 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="account.html">account</a></li>
-<li><a href="balance_summary.html">balance_summary</a></li>
-<li><a href="config_loader.html">config_loader</a></li>
-<li><a href="examples_best_practices.html">examples_best_practices</a></li>
-<li><a href="order_helper.html">order_helper</a></li>
-<li><a href="signal.html">signal</a></li>
-<li><a href="test_api.html">test_api</a></li>
-<li><a href="test_orderbook.html">test_orderbook</a></li>
-<li><a href="test_trade_workflow.html">test_trade_workflow</a></li>
-<li><a href="trade.html">trade</a></li>
-<li><a href="verify_signals.html">verify_signals</a></li>
-<li><a href="woox_errors.html">woox_errors</a></li>
-</ul>
+  <h1>Source code for verify_signals</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Simple verification script to test signal generation and stop-loss logic independently.</span>
+<span class="sd">This helps verify the core logic works before testing the full workflow.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">config_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trading_signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">MovingAverageCrossover</span>
+
+<div class="viewcode-block" id="test_signal_generation">
+<a class="viewcode-back" href="../api_reference.html#verify_signals.test_signal_generation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_signal_generation</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test MA crossover signal generation with clear patterns.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TEST 1: Signal Generation Verification&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">MovingAverageCrossover</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">)</span>
+    
+    <span class="c1"># Test 1: Strong Bullish Crossover (should generate LONG signal)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Test 1a: Strong Bullish Crossover&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">price_data</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="mi">95000</span>
+    
+    <span class="c1"># Create 50 declining prices, then 15 strongly rising prices</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">65</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="n">price</span> <span class="o">=</span> <span class="n">base</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>  <span class="c1"># Declining</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">price</span> <span class="o">=</span> <span class="n">base</span> <span class="o">-</span> <span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> <span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="mi">50</span><span class="p">)</span> <span class="o">*</span> <span class="mi">200</span><span class="p">)</span>  <span class="c1"># Strong rise</span>
+        
+        <span class="n">price_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="n">price</span><span class="p">,</span>
+            <span class="s1">&#39;volume&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">i</span>
+        <span class="p">})</span>
+    
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_entry_signal</span><span class="p">(</span><span class="n">price_data</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate and display MAs</span>
+    <span class="n">prices</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">price_data</span><span class="p">]</span>
+    <span class="n">short_period</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SHORT_MA_PERIOD&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+    <span class="n">long_period</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LONG_MA_PERIOD&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+    
+    <span class="n">short_ma</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="n">short_period</span><span class="p">:])</span> <span class="o">/</span> <span class="n">short_period</span>
+    <span class="n">long_ma</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="n">long_period</span><span class="p">:])</span> <span class="o">/</span> <span class="n">long_period</span>
+    <span class="n">prev_short_ma</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="n">short_period</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">short_period</span>
+    <span class="n">prev_long_ma</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="n">long_period</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">long_period</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Price range: $</span><span class="si">{</span><span class="n">prices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> → $</span><span class="si">{</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Previous Short MA (</span><span class="si">{</span><span class="n">short_period</span><span class="si">}</span><span class="s2">): $</span><span class="si">{</span><span class="n">prev_short_ma</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Previous Long MA (</span><span class="si">{</span><span class="n">long_period</span><span class="si">}</span><span class="s2">): $</span><span class="si">{</span><span class="n">prev_long_ma</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Short MA (</span><span class="si">{</span><span class="n">short_period</span><span class="si">}</span><span class="s2">): $</span><span class="si">{</span><span class="n">short_ma</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Long MA (</span><span class="si">{</span><span class="n">long_period</span><span class="si">}</span><span class="s2">): $</span><span class="si">{</span><span class="n">long_ma</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Crossover: </span><span class="si">{</span><span class="s1">&#39;YES&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">prev_short_ma</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">prev_long_ma</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">short_ma</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">long_ma</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;NO&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Signal Generated: </span><span class="si">{</span><span class="n">signal</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected: long&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="s1">&#39;✅ PASS&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">&#39;long&#39;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌ FAIL&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Test 2: No Crossover (should generate NO signal)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Test 1b: No Crossover (Stable Prices)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">price_data</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">60</span><span class="p">):</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="mi">95000</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># Small variations</span>
+        <span class="n">price_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="n">price</span><span class="p">,</span> <span class="s1">&#39;volume&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;timestamp&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">})</span>
+    
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_entry_signal</span><span class="p">(</span><span class="n">price_data</span><span class="p">)</span>
+    
+    <span class="n">prices</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">price_data</span><span class="p">]</span>
+    <span class="n">short_ma</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="n">short_period</span><span class="p">:])</span> <span class="o">/</span> <span class="n">short_period</span>
+    <span class="n">long_ma</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">prices</span><span class="p">[</span><span class="o">-</span><span class="n">long_period</span><span class="p">:])</span> <span class="o">/</span> <span class="n">long_period</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Short MA: $</span><span class="si">{</span><span class="n">short_ma</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Long MA: $</span><span class="si">{</span><span class="n">long_ma</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Difference: $</span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">short_ma</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">long_ma</span><span class="p">)</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Signal Generated: </span><span class="si">{</span><span class="n">signal</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected: None&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="s1">&#39;✅ PASS&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌ FAIL&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+
+<div class="viewcode-block" id="test_stop_loss_logic">
+<a class="viewcode-back" href="../api_reference.html#verify_signals.test_stop_loss_logic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_stop_loss_logic</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test stop-loss and take-profit logic.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TEST 2: Stop-Loss &amp; Take-Profit Logic Verification&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">MovingAverageCrossover</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">)</span>
+    
+    <span class="n">stop_loss_pct</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;STOP_LOSS_PCT&#39;</span><span class="p">,</span> <span class="mf">3.09</span><span class="p">))</span>
+    <span class="n">take_profit_pct</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TAKE_PROFIT_PCT&#39;</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">))</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Configuration:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Stop Loss: </span><span class="si">{</span><span class="n">stop_loss_pct</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Take Profit: </span><span class="si">{</span><span class="n">take_profit_pct</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Test 1: Stop Loss Trigger</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Test 2a: Stop Loss Should Trigger&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">entry_price</span> <span class="o">=</span> <span class="mf">95000.0</span>
+    <span class="n">stop_loss_price</span> <span class="o">=</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">stop_loss_pct</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># -3.59%</span>
+    
+    <span class="n">position</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;side&#39;</span><span class="p">:</span> <span class="s1">&#39;long&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;entry_price&#39;</span><span class="p">:</span> <span class="n">entry_price</span><span class="p">,</span>
+        <span class="s1">&#39;quantity&#39;</span><span class="p">:</span> <span class="mf">0.001053</span>
+    <span class="p">}</span>
+    
+    <span class="n">pnl_pct</span> <span class="o">=</span> <span class="p">((</span><span class="n">stop_loss_price</span> <span class="o">-</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry Price: $</span><span class="si">{</span><span class="n">entry_price</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Price: $</span><span class="si">{</span><span class="n">stop_loss_price</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P&amp;L: </span><span class="si">{</span><span class="n">pnl_pct</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stop Loss Threshold: -</span><span class="si">{</span><span class="n">stop_loss_pct</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    
+    <span class="n">should_exit</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">stop_loss_price</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Should Exit: </span><span class="si">{</span><span class="n">should_exit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected: True&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="s1">&#39;✅ PASS&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">should_exit</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌ FAIL&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Test 2: Take Profit Trigger</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Test 2b: Take Profit Should Trigger&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">take_profit_price</span> <span class="o">=</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">take_profit_pct</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># +5.5%</span>
+    
+    <span class="n">pnl_pct</span> <span class="o">=</span> <span class="p">((</span><span class="n">take_profit_price</span> <span class="o">-</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry Price: $</span><span class="si">{</span><span class="n">entry_price</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Price: $</span><span class="si">{</span><span class="n">take_profit_price</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P&amp;L: </span><span class="si">{</span><span class="n">pnl_pct</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Take Profit Threshold: +</span><span class="si">{</span><span class="n">take_profit_pct</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    
+    <span class="n">should_exit</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">take_profit_price</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Should Exit: </span><span class="si">{</span><span class="n">should_exit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected: True&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="s1">&#39;✅ PASS&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">should_exit</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌ FAIL&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Test 3: No Exit (Within Range)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Test 2c: No Exit (Within Range)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+    
+    <span class="n">neutral_price</span> <span class="o">=</span> <span class="n">entry_price</span> <span class="o">*</span> <span class="mf">1.01</span>  <span class="c1"># +1%</span>
+    
+    <span class="n">pnl_pct</span> <span class="o">=</span> <span class="p">((</span><span class="n">neutral_price</span> <span class="o">-</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Entry Price: $</span><span class="si">{</span><span class="n">entry_price</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current Price: $</span><span class="si">{</span><span class="n">neutral_price</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;P&amp;L: </span><span class="si">{</span><span class="n">pnl_pct</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Range: -</span><span class="si">{</span><span class="n">stop_loss_pct</span><span class="si">}</span><span class="s2">% to +</span><span class="si">{</span><span class="n">take_profit_pct</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    
+    <span class="n">should_exit</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">neutral_price</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Should Exit: </span><span class="si">{</span><span class="n">should_exit</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected: False&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Result: </span><span class="si">{</span><span class="s1">&#39;✅ PASS&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">should_exit</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;❌ FAIL&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../api_reference.html#verify_signals.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run all verification tests.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;█&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;█&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">*</span><span class="mi">68</span> <span class="o">+</span> <span class="s2">&quot;█&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;█&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">*</span><span class="mi">18</span> <span class="o">+</span> <span class="s2">&quot;SIGNAL VERIFICATION TESTS&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">*</span><span class="mi">25</span> <span class="o">+</span> <span class="s2">&quot;█&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;█&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">*</span><span class="mi">68</span> <span class="o">+</span> <span class="s2">&quot;█&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;█&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📋 Configuration:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Entry Strategy: </span><span class="si">{</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ENTRY_STRATEGY&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Short MA Period: </span><span class="si">{</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SHORT_MA_PERIOD&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Long MA Period: </span><span class="si">{</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LONG_MA_PERIOD&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Stop Loss: </span><span class="si">{</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;STOP_LOSS_PCT&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Take Profit: </span><span class="si">{</span><span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TAKE_PROFIT_PCT&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Run tests</span>
+    <span class="n">test_signal_generation</span><span class="p">()</span>
+    <span class="n">test_stop_loss_logic</span><span class="p">()</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;VERIFICATION COMPLETE&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">💡 These tests verify the core logic works correctly.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   If all tests pass, the algorithms are functioning as expected.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;█&quot;</span><span class="o">*</span><span class="mi">70</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
 
            </div>
           </div>

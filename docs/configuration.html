@@ -213,7 +213,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#core-modules">Core Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade">trade</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade.cron"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade.Trade"><code class="docutils literal notranslate"><span class="pre">Trade</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
 </ul>
 </li>
@@ -295,10 +297,27 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#test-modules">Test Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-signals">test_signals</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-orderbook">test_orderbook</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_trade_workflow">test_trade_workflow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.print_section"><code class="docutils literal notranslate"><span class="pre">print_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.check_database_transactions"><code class="docutils literal notranslate"><span class="pre">check_database_transactions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_position_lifecycle"><code class="docutils literal notranslate"><span class="pre">test_position_lifecycle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_database_integrity"><code class="docutils literal notranslate"><span class="pre">test_database_integrity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_stop_loss_scenario"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_orderbook">test_orderbook</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_orderbook.test_orderbook_collection"><code class="docutils literal notranslate"><span class="pre">test_orderbook_collection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-verify_signals">verify_signals</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#verify_signals.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#verify_signals.test_stop_loss_logic"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_logic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#verify_signals.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_api">test_api</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
@@ -309,11 +328,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#examples">Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#examples-best-practices">examples_best_practices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-examples_best_practices">examples_best_practices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_safe_order_placement"><code class="docutils literal notranslate"><span class="pre">example_safe_order_placement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_market_order"><code class="docutils literal notranslate"><span class="pre">example_market_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_post_only_order"><code class="docutils literal notranslate"><span class="pre">example_post_only_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_account_balance"><code class="docutils literal notranslate"><span class="pre">example_account_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_order_validation"><code class="docutils literal notranslate"><span class="pre">example_order_validation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_retry_on_rate_limit"><code class="docutils literal notranslate"><span class="pre">example_retry_on_rate_limit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_precision_formatting"><code class="docutils literal notranslate"><span class="pre">example_precision_formatting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#id51"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#data-structures">Data Structures</a><ul>
@@ -548,9 +580,10 @@
 </div>
 <dl class="simple">
 <dt><strong>ma_crossover</strong> (Moving Average Crossover):</dt><dd><ul class="simple">
-<li><p>Long: Short MA crosses above Long MA</p></li>
-<li><p>Short: Short MA crosses below Long MA</p></li>
-<li><p>Parameters: <code class="docutils literal notranslate"><span class="pre">SHORT_MA_PERIOD</span></code>, <code class="docutils literal notranslate"><span class="pre">LONG_MA_PERIOD</span></code></p></li>
+<li><p>Long: Short MA crosses above Long MA × (1 + threshold%)</p></li>
+<li><p>Short: Short MA crosses below Long MA × (1 - threshold%)</p></li>
+<li><p>Parameters: <code class="docutils literal notranslate"><span class="pre">SHORT_MA_PERIOD</span></code>, <code class="docutils literal notranslate"><span class="pre">LONG_MA_PERIOD</span></code>, <code class="docutils literal notranslate"><span class="pre">MA_TIMEFRAME</span></code>, <code class="docutils literal notranslate"><span class="pre">MA_THRESHOLD</span></code></p></li>
+<li><p>Supports timeframe resampling (1s to hours) and threshold buffer to reduce false signals</p></li>
 </ul>
 </dd>
 <dt><strong>rsi</strong> (Relative Strength Index):</dt><dd><ul class="simple">
@@ -579,27 +612,40 @@
 <h2>Strategy Parameters<a class="headerlink" href="#strategy-parameters" title="Link to this heading"></a></h2>
 <section id="moving-average-crossover">
 <h3>Moving Average Crossover<a class="headerlink" href="#moving-average-crossover" title="Link to this heading"></a></h3>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">SHORT_MA_PERIOD</span><span class="o">=</span><span class="s">20</span><span class="w">   </span><span class="c1"># Fast moving average period</span>
-<span class="na">LONG_MA_PERIOD</span><span class="o">=</span><span class="s">50</span><span class="w">    </span><span class="c1"># Slow moving average period</span>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">SHORT_MA_PERIOD</span><span class="o">=</span><span class="s">20</span><span class="w">      </span><span class="c1"># Fast moving average period</span>
+<span class="na">LONG_MA_PERIOD</span><span class="o">=</span><span class="s">50</span><span class="w">       </span><span class="c1"># Slow moving average period</span>
+<span class="na">MA_TIMEFRAME</span><span class="o">=</span><span class="s">60</span><span class="w">         </span><span class="c1"># Timeframe in seconds (60 = 1 minute candles)</span>
+<span class="na">MA_THRESHOLD</span><span class="o">=</span><span class="s">2</span><span class="w">          </span><span class="c1"># Threshold percentage for crossover signal</span>
 </pre></div>
 </div>
+<p><strong>How it works:</strong></p>
+<ul class="simple">
+<li><p>Long Signal: Short MA &gt; Long MA × (1 + threshold%)</p></li>
+<li><p>Short Signal: Short MA &lt; Long MA × (1 - threshold%)</p></li>
+<li><p>With 2% threshold: Short MA must exceed Long MA by 2% to trigger long signal</p></li>
+</ul>
+<p><strong>Configuration tips:</strong></p>
 <ul class="simple">
 <li><p>Shorter periods = More signals, more false positives</p></li>
 <li><p>Longer periods = Fewer signals, more reliable</p></li>
 <li><p>Common combinations: 20/50, 50/200, 10/30</p></li>
+<li><p>Timeframe: 60s (1m), 300s (5m), 3600s (1h)</p></li>
+<li><p>Threshold reduces noise and false signals (recommended: 1-5%)</p></li>
 </ul>
 </section>
 <section id="rsi-strategy">
 <h3>RSI Strategy<a class="headerlink" href="#rsi-strategy" title="Link to this heading"></a></h3>
-<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">RSI_PERIOD</span><span class="o">=</span><span class="s">14</span><span class="w">        </span><span class="c1"># RSI calculation period</span>
-<span class="na">RSI_OVERSOLD</span><span class="o">=</span><span class="s">30</span><span class="w">      </span><span class="c1"># Oversold threshold (buy signal)</span>
-<span class="na">RSI_OVERBOUGHT</span><span class="o">=</span><span class="s">70</span><span class="w">    </span><span class="c1"># Overbought threshold (sell signal)</span>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">RSI_PERIOD</span><span class="o">=</span><span class="s">14</span><span class="w">           </span><span class="c1"># RSI calculation period</span>
+<span class="na">RSI_TIMEFRAME</span><span class="o">=</span><span class="s">60</span><span class="w">        </span><span class="c1"># Timeframe in seconds (60 = 1 minute candles)</span>
+<span class="na">RSI_OVERSOLD</span><span class="o">=</span><span class="s">30</span><span class="w">         </span><span class="c1"># Oversold threshold (buy signal)</span>
+<span class="na">RSI_OVERBOUGHT</span><span class="o">=</span><span class="s">70</span><span class="w">       </span><span class="c1"># Overbought threshold (sell signal)</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>RSI &lt; 30: Oversold (potential buy)</p></li>
 <li><p>RSI &gt; 70: Overbought (potential sell)</p></li>
 <li><p>Standard settings work well for most markets</p></li>
+<li><p>Timeframe: 60s (1m), 300s (5m), 3600s (1h) for candle resampling</p></li>
 </ul>
 </section>
 <section id="bollinger-bands">

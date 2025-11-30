@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+  <title>test_orderbook &mdash; WOOX Trading Bot 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1d87fc8b" />
@@ -507,7 +507,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Overview: module code</li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">test_orderbook</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -516,20 +517,113 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="account.html">account</a></li>
-<li><a href="balance_summary.html">balance_summary</a></li>
-<li><a href="config_loader.html">config_loader</a></li>
-<li><a href="examples_best_practices.html">examples_best_practices</a></li>
-<li><a href="order_helper.html">order_helper</a></li>
-<li><a href="signal.html">signal</a></li>
-<li><a href="test_api.html">test_api</a></li>
-<li><a href="test_orderbook.html">test_orderbook</a></li>
-<li><a href="test_trade_workflow.html">test_trade_workflow</a></li>
-<li><a href="trade.html">trade</a></li>
-<li><a href="verify_signals.html">verify_signals</a></li>
-<li><a href="woox_errors.html">woox_errors</a></li>
-</ul>
+  <h1>Source code for test_orderbook</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Test script to verify orderbook data collection and analysis.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trade</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trade</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">config_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">CONFIG</span>
+
+
+<div class="viewcode-block" id="test_orderbook_collection">
+<a class="viewcode-back" href="../api_reference.html#test_orderbook.test_orderbook_collection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_orderbook_collection</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test orderbook data fetching and metrics calculation.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Testing Orderbook Data Collection ===</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Initialize trader</span>
+    <span class="n">trader</span> <span class="o">=</span> <span class="n">Trade</span><span class="p">()</span>
+    
+    <span class="c1"># Fetch one update to get orderbook data</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fetching market data with orderbook...&quot;</span><span class="p">)</span>
+    <span class="n">trade_data</span> <span class="o">=</span> <span class="n">trader</span><span class="o">.</span><span class="n">trade_update</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">trade_data</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Failed to fetch trade data&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Trade data fetched successfully</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Check orderbook structure</span>
+    <span class="n">orderbook</span> <span class="o">=</span> <span class="n">trade_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;orderbook&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">orderbook</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ No orderbook data in response&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== Orderbook Data ===&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Timestamp: </span><span class="si">{</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bid Levels: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bids&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ask Levels: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asks&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[]))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bid Depth: </span><span class="si">{</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bid_depth&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ask Depth: </span><span class="si">{</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ask_depth&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spread: $</span><span class="si">{</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spread&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mid Price: $</span><span class="si">{</span><span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mid_price&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Show top 5 bids and asks</span>
+    <span class="n">bids</span> <span class="o">=</span> <span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bids&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">asks</span> <span class="o">=</span> <span class="n">orderbook</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asks&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Top 5 Bids ===&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">bid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bids</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. Price: $</span><span class="si">{</span><span class="n">bid</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, Quantity: </span><span class="si">{</span><span class="n">bid</span><span class="p">[</span><span class="s1">&#39;quantity&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Top 5 Asks ===&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">asks</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. Price: $</span><span class="si">{</span><span class="n">ask</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, Quantity: </span><span class="si">{</span><span class="n">ask</span><span class="p">[</span><span class="s1">&#39;quantity&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Test orderbook imbalance calculation</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Orderbook Analysis ===&quot;</span><span class="p">)</span>
+    <span class="n">imbalance</span> <span class="o">=</span> <span class="n">trader</span><span class="o">.</span><span class="n">get_orderbook_imbalance</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">imbalance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Orderbook Imbalance: </span><span class="si">{</span><span class="n">imbalance</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imbalance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → More buying pressure (bullish)&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">imbalance</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → More selling pressure (bearish)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Balanced order book&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Could not calculate imbalance&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Test support/resistance identification</span>
+    <span class="n">support_resistance</span> <span class="o">=</span> <span class="n">trader</span><span class="o">.</span><span class="n">get_orderbook_support_resistance</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">support_resistance</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Support Levels (Top 3 by quantity) ===&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">level</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">support_resistance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;support_levels&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. Price: $</span><span class="si">{</span><span class="n">level</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, Strength: </span><span class="si">{</span><span class="n">level</span><span class="p">[</span><span class="s1">&#39;strength&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Resistance Levels (Top 3 by quantity) ===&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">level</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">support_resistance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;resistance_levels&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. Price: $</span><span class="si">{</span><span class="n">level</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, Strength: </span><span class="si">{</span><span class="n">level</span><span class="p">[</span><span class="s1">&#39;strength&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Verify orderbook is stored in trade_px_list</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Historical Storage ===&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Call updateTradePxList to store the data</span>
+    <span class="n">trader</span><span class="o">.</span><span class="n">updateTradePxList</span><span class="p">(</span><span class="n">trade_data</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">trader</span><span class="o">.</span><span class="n">trade_px_list</span><span class="p">:</span>
+        <span class="n">latest_entry</span> <span class="o">=</span> <span class="n">trader</span><span class="o">.</span><span class="n">trade_px_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;orderbook&#39;</span> <span class="ow">in</span> <span class="n">latest_entry</span><span class="p">:</span>
+            <span class="n">ob_bids</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latest_entry</span><span class="p">[</span><span class="s1">&#39;orderbook&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;bids&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">ob_asks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latest_entry</span><span class="p">[</span><span class="s1">&#39;orderbook&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asks&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✅ Orderbook stored in price history&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Bids: </span><span class="si">{</span><span class="n">ob_bids</span><span class="si">}</span><span class="s2">, Asks: </span><span class="si">{</span><span class="n">ob_asks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Orderbook not found in price history&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Price history is empty&quot;</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Test Complete ===&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">test_orderbook_collection</span><span class="p">()</span>
+</pre></div>
 
            </div>
           </div>

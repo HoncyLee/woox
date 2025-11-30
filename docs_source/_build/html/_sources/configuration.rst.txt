@@ -57,9 +57,10 @@ Entry Strategy
    ENTRY_STRATEGY=ma_crossover  # ma_crossover, rsi, bollinger_bands
 
 **ma_crossover** (Moving Average Crossover):
-   * Long: Short MA crosses above Long MA
-   * Short: Short MA crosses below Long MA
-   * Parameters: ``SHORT_MA_PERIOD``, ``LONG_MA_PERIOD``
+   * Long: Short MA crosses above Long MA × (1 + threshold%)
+   * Short: Short MA crosses below Long MA × (1 - threshold%)
+   * Parameters: ``SHORT_MA_PERIOD``, ``LONG_MA_PERIOD``, ``MA_TIMEFRAME``, ``MA_THRESHOLD``
+   * Supports timeframe resampling (1s to hours) and threshold buffer to reduce false signals
 
 **rsi** (Relative Strength Index):
    * Long: RSI crosses above oversold threshold
@@ -88,25 +89,39 @@ Moving Average Crossover
 
 .. code-block:: ini
 
-   SHORT_MA_PERIOD=20   # Fast moving average period
-   LONG_MA_PERIOD=50    # Slow moving average period
+   SHORT_MA_PERIOD=20      # Fast moving average period
+   LONG_MA_PERIOD=50       # Slow moving average period
+   MA_TIMEFRAME=60         # Timeframe in seconds (60 = 1 minute candles)
+   MA_THRESHOLD=2          # Threshold percentage for crossover signal
+
+**How it works:**
+
+* Long Signal: Short MA > Long MA × (1 + threshold%)
+* Short Signal: Short MA < Long MA × (1 - threshold%)
+* With 2% threshold: Short MA must exceed Long MA by 2% to trigger long signal
+
+**Configuration tips:**
 
 * Shorter periods = More signals, more false positives
 * Longer periods = Fewer signals, more reliable
 * Common combinations: 20/50, 50/200, 10/30
+* Timeframe: 60s (1m), 300s (5m), 3600s (1h)
+* Threshold reduces noise and false signals (recommended: 1-5%)
 
 RSI Strategy
 ~~~~~~~~~~~~
 
 .. code-block:: ini
 
-   RSI_PERIOD=14        # RSI calculation period
-   RSI_OVERSOLD=30      # Oversold threshold (buy signal)
-   RSI_OVERBOUGHT=70    # Overbought threshold (sell signal)
+   RSI_PERIOD=14           # RSI calculation period
+   RSI_TIMEFRAME=60        # Timeframe in seconds (60 = 1 minute candles)
+   RSI_OVERSOLD=30         # Oversold threshold (buy signal)
+   RSI_OVERBOUGHT=70       # Overbought threshold (sell signal)
 
 * RSI < 30: Oversold (potential buy)
 * RSI > 70: Overbought (potential sell)
 * Standard settings work well for most markets
+* Timeframe: 60s (1m), 300s (5m), 3600s (1h) for candle resampling
 
 Bollinger Bands
 ~~~~~~~~~~~~~~~

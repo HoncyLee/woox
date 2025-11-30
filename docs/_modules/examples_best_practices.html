@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; WOOX Trading Bot 1.0.0 documentation</title>
+  <title>examples_best_practices &mdash; WOOX Trading Bot 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=1d87fc8b" />
@@ -507,7 +507,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Overview: module code</li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">examples_best_practices</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -516,20 +517,332 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="account.html">account</a></li>
-<li><a href="balance_summary.html">balance_summary</a></li>
-<li><a href="config_loader.html">config_loader</a></li>
-<li><a href="examples_best_practices.html">examples_best_practices</a></li>
-<li><a href="order_helper.html">order_helper</a></li>
-<li><a href="signal.html">signal</a></li>
-<li><a href="test_api.html">test_api</a></li>
-<li><a href="test_orderbook.html">test_orderbook</a></li>
-<li><a href="test_trade_workflow.html">test_trade_workflow</a></li>
-<li><a href="trade.html">trade</a></li>
-<li><a href="verify_signals.html">verify_signals</a></li>
-<li><a href="woox_errors.html">woox_errors</a></li>
-</ul>
+  <h1>Source code for examples_best_practices</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example usage of WOOX API best practices implementation.</span>
+<span class="sd">Demonstrates proper error handling, order placement, and precision management.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trade</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trade</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">account</span><span class="w"> </span><span class="kn">import</span> <span class="n">Account</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">order_helper</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderHelper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">woox_errors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">WooxError</span><span class="p">,</span>
+    <span class="n">WooxRateLimitError</span><span class="p">,</span>
+    <span class="n">WooxAuthenticationError</span><span class="p">,</span>
+    <span class="n">ErrorFormatter</span>
+<span class="p">)</span>
+
+<span class="c1"># Configure logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+<span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;ExampleUsage&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="example_safe_order_placement">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_safe_order_placement">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_safe_order_placement</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Place order with proper error handling and precision.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Initialize trading bot</span>
+        <span class="n">trader</span> <span class="o">=</span> <span class="n">Trade</span><span class="p">(</span><span class="n">trade_mode</span><span class="o">=</span><span class="s1">&#39;paper&#39;</span><span class="p">)</span>
+        <span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+        
+        <span class="c1"># Get current market price</span>
+        <span class="n">market_data</span> <span class="o">=</span> <span class="n">trader</span><span class="o">.</span><span class="n">trade_update</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">market_data</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">market_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Failed to get market data&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="n">current_price</span> <span class="o">=</span> <span class="n">market_data</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Current market price: </span><span class="si">%.2f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">current_price</span><span class="p">)</span>
+        
+        <span class="c1"># Create a limit buy order with proper formatting</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="s2">&quot;SPOT_BTC_USDT&quot;</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="s2">&quot;BUY&quot;</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="n">current_price</span> <span class="o">*</span> <span class="mf">0.99</span>  <span class="c1"># Buy at 1% below market</span>
+        <span class="n">quantity</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c1"># 0.001 BTC</span>
+        
+        <span class="c1"># Format order using helper (handles precision automatically)</span>
+        <span class="n">order_data</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">create_limit_order</span><span class="p">(</span>
+            <span class="n">symbol</span><span class="o">=</span><span class="n">symbol</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="n">side</span><span class="p">,</span>
+            <span class="n">price</span><span class="o">=</span><span class="n">price</span><span class="p">,</span>
+            <span class="n">quantity</span><span class="o">=</span><span class="n">quantity</span><span class="p">,</span>
+            <span class="n">order_tag</span><span class="o">=</span><span class="s2">&quot;algo_bot&quot;</span><span class="p">,</span>
+            <span class="n">reduce_only</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        
+        <span class="c1"># Log order details</span>
+        <span class="n">order_helper</span><span class="o">.</span><span class="n">log_order_details</span><span class="p">(</span><span class="n">order_data</span><span class="p">)</span>
+        
+        <span class="c1"># Place order (would use trader._make_request in production)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Order prepared successfully&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Order data: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">order_data</span><span class="p">)</span>
+        
+        <span class="c1"># Example of what the order data looks like:</span>
+        <span class="c1"># {</span>
+        <span class="c1">#     &quot;symbol&quot;: &quot;SPOT_BTC_USDT&quot;,</span>
+        <span class="c1">#     &quot;client_order_id&quot;: 171234567890,</span>
+        <span class="c1">#     &quot;order_tag&quot;: &quot;algo_bot&quot;,</span>
+        <span class="c1">#     &quot;order_type&quot;: &quot;LIMIT&quot;,</span>
+        <span class="c1">#     &quot;side&quot;: &quot;BUY&quot;,</span>
+        <span class="c1">#     &quot;order_price&quot;: &quot;49500.50&quot;,  # String with proper precision</span>
+        <span class="c1">#     &quot;order_quantity&quot;: &quot;0.001&quot;,   # String with proper precision</span>
+        <span class="c1">#     &quot;reduce_only&quot;: false</span>
+        <span class="c1"># }</span>
+        
+    <span class="k">except</span> <span class="n">WooxAuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Authentication failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Full error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">WooxRateLimitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Rate limit exceeded: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Please reduce request frequency&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">WooxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;WOOX API error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Full error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_error</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="example_market_order">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_market_order">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_market_order</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Place market order with amount (quote currency).&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+        
+        <span class="c1"># Market BUY using amount in USDT</span>
+        <span class="n">order_data</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">create_market_order</span><span class="p">(</span>
+            <span class="n">symbol</span><span class="o">=</span><span class="s2">&quot;SPOT_BTC_USDT&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="s2">&quot;BUY&quot;</span><span class="p">,</span>
+            <span class="n">amount</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>  <span class="c1"># Buy 100 USDT worth of BTC</span>
+            <span class="n">order_tag</span><span class="o">=</span><span class="s2">&quot;algo_bot&quot;</span>
+        <span class="p">)</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Market order prepared: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">order_data</span><span class="p">)</span>
+        
+        <span class="c1"># Output:</span>
+        <span class="c1"># {</span>
+        <span class="c1">#     &quot;symbol&quot;: &quot;SPOT_BTC_USDT&quot;,</span>
+        <span class="c1">#     &quot;client_order_id&quot;: 171234567890,</span>
+        <span class="c1">#     &quot;order_tag&quot;: &quot;algo_bot&quot;,</span>
+        <span class="c1">#     &quot;order_type&quot;: &quot;MARKET&quot;,</span>
+        <span class="c1">#     &quot;side&quot;: &quot;BUY&quot;,</span>
+        <span class="c1">#     &quot;order_amount&quot;: &quot;100&quot;,</span>
+        <span class="c1">#     &quot;reduce_only&quot;: false</span>
+        <span class="c1"># }</span>
+        
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error creating market order: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="example_post_only_order">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_post_only_order">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_post_only_order</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Place POST_ONLY order (maker-only).&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+        
+        <span class="n">order_data</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">create_post_only_order</span><span class="p">(</span>
+            <span class="n">symbol</span><span class="o">=</span><span class="s2">&quot;SPOT_BTC_USDT&quot;</span><span class="p">,</span>
+            <span class="n">side</span><span class="o">=</span><span class="s2">&quot;SELL&quot;</span><span class="p">,</span>
+            <span class="n">price</span><span class="o">=</span><span class="mf">51000.00</span><span class="p">,</span>
+            <span class="n">quantity</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+            <span class="n">order_tag</span><span class="o">=</span><span class="s2">&quot;algo_bot&quot;</span><span class="p">,</span>
+            <span class="n">post_only_adjusted</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;POST_ONLY order prepared: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">order_data</span><span class="p">)</span>
+        
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error creating POST_ONLY order: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="example_account_balance">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_account_balance">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_account_balance</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Fetch account balance with error handling.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">account</span> <span class="o">=</span> <span class="n">Account</span><span class="p">(</span><span class="n">trade_mode</span><span class="o">=</span><span class="s1">&#39;paper&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Get balance from API</span>
+        <span class="n">balance</span> <span class="o">=</span> <span class="n">account</span><span class="o">.</span><span class="n">get_api_balance</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">balance</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Account balance retrieved successfully&quot;</span><span class="p">)</span>
+            <span class="n">holding</span> <span class="o">=</span> <span class="n">balance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;holding&#39;</span><span class="p">,</span> <span class="p">[])</span>
+            
+            <span class="k">for</span> <span class="n">token_info</span> <span class="ow">in</span> <span class="n">holding</span><span class="p">:</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">token_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;token&#39;</span><span class="p">)</span>
+                <span class="n">available</span> <span class="o">=</span> <span class="n">token_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;holding&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">frozen</span> <span class="o">=</span> <span class="n">token_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;frozen&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">available</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">frozen</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Token: </span><span class="si">%s</span><span class="s2">, Available: </span><span class="si">%.8f</span><span class="s2">, Frozen: </span><span class="si">%.8f</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">token</span><span class="p">,</span> <span class="n">available</span><span class="p">,</span> <span class="n">frozen</span>
+                    <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to retrieve balance&quot;</span><span class="p">)</span>
+            
+    <span class="k">except</span> <span class="n">WooxAuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Authentication failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">WooxError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;API error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ErrorFormatter</span><span class="o">.</span><span class="n">format_user_message</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unexpected error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="example_order_validation">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_order_validation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_order_validation</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Validate order parameters against symbol info.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+        
+        <span class="c1"># Mock symbol info (would come from /v1/public/info/{symbol})</span>
+        <span class="n">symbol_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;quote_min&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;quote_max&#39;</span><span class="p">:</span> <span class="mi">100000</span><span class="p">,</span>
+            <span class="s1">&#39;quote_tick&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+            <span class="s1">&#39;base_min&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span>
+            <span class="s1">&#39;base_max&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+            <span class="s1">&#39;base_tick&#39;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">,</span>
+            <span class="s1">&#39;min_notional&#39;</span><span class="p">:</span> <span class="mi">10</span>
+        <span class="p">}</span>
+        
+        <span class="c1"># Example 1: Valid order</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="mf">50000.00</span>
+        <span class="n">quantity</span> <span class="o">=</span> <span class="mf">0.001</span>
+        
+        <span class="n">is_price_valid</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_price_filters</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">)</span>
+        <span class="n">is_quantity_valid</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_quantity_filters</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">)</span>
+        <span class="n">is_notional_valid</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_min_notional</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">is_price_valid</span> <span class="ow">and</span> <span class="n">is_quantity_valid</span> <span class="ow">and</span> <span class="n">is_notional_valid</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Order parameters are valid&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Order parameters validation failed&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Example 2: Invalid order (quantity too small)</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="mf">50000.00</span>
+        <span class="n">quantity</span> <span class="o">=</span> <span class="mf">0.00005</span>  <span class="c1"># Below base_min</span>
+        
+        <span class="n">is_quantity_valid</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_quantity_filters</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_quantity_valid</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Quantity </span><span class="si">%.8f</span><span class="s2"> is too small (min: </span><span class="si">%.8f</span><span class="s2">)&quot;</span><span class="p">,</span> 
+                         <span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">[</span><span class="s1">&#39;base_min&#39;</span><span class="p">])</span>
+        
+        <span class="c1"># Example 3: Invalid order (notional too small)</span>
+        <span class="n">price</span> <span class="o">=</span> <span class="mf">100.00</span>
+        <span class="n">quantity</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c1"># Only $5 notional, below $10 minimum</span>
+        
+        <span class="n">is_notional_valid</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">validate_min_notional</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_notional_valid</span><span class="p">:</span>
+            <span class="n">notional</span> <span class="o">=</span> <span class="n">price</span> <span class="o">*</span> <span class="n">quantity</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Notional value </span><span class="si">%.2f</span><span class="s2"> is too small (min: </span><span class="si">%.2f</span><span class="s2">)&quot;</span><span class="p">,</span>
+                         <span class="n">notional</span><span class="p">,</span> <span class="n">symbol_info</span><span class="p">[</span><span class="s1">&#39;min_notional&#39;</span><span class="p">])</span>
+            
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Validation error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="example_retry_on_rate_limit">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_retry_on_rate_limit">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_retry_on_rate_limit</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Automatic retry on rate limit errors.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">trader</span> <span class="o">=</span> <span class="n">Trade</span><span class="p">(</span><span class="n">trade_mode</span><span class="o">=</span><span class="s1">&#39;paper&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># The _make_request method automatically retries on rate limits</span>
+        <span class="c1"># with exponential backoff (implemented in trade.py)</span>
+        
+        <span class="c1"># This will automatically retry up to 3 times if rate limited</span>
+        <span class="n">market_data</span> <span class="o">=</span> <span class="n">trader</span><span class="o">.</span><span class="n">trade_update</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="n">market_data</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Successfully fetched market data&quot;</span><span class="p">)</span>
+        
+    <span class="k">except</span> <span class="n">WooxRateLimitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># This only happens if all retries are exhausted</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Rate limit error after all retries: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="example_precision_formatting">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.example_precision_formatting">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">example_precision_formatting</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Example: Proper number formatting for API requests.&quot;&quot;&quot;</span>
+    <span class="n">order_helper</span> <span class="o">=</span> <span class="n">OrderHelper</span><span class="p">(</span><span class="n">logger</span><span class="p">)</span>
+    
+    <span class="c1"># Floating point numbers should NEVER be sent directly to API</span>
+    <span class="n">price_float</span> <span class="o">=</span> <span class="mf">50123.456789012345</span>
+    <span class="n">quantity_float</span> <span class="o">=</span> <span class="mf">0.001234567890</span>
+    
+    <span class="c1"># WRONG - Don&#39;t do this:</span>
+    <span class="c1"># order_data = {&quot;order_price&quot;: price_float}  # ❌ Precision loss</span>
+    
+    <span class="c1"># CORRECT - Use helper to format as string:</span>
+    <span class="n">price_str</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">format_price</span><span class="p">(</span><span class="n">price_float</span><span class="p">)</span>
+    <span class="n">quantity_str</span> <span class="o">=</span> <span class="n">order_helper</span><span class="o">.</span><span class="n">format_quantity</span><span class="p">(</span><span class="n">quantity_float</span><span class="p">)</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Price formatted: </span><span class="si">%s</span><span class="s2"> (from </span><span class="si">%.15f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">price_str</span><span class="p">,</span> <span class="n">price_float</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Quantity formatted: </span><span class="si">%s</span><span class="s2"> (from </span><span class="si">%.15f</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">quantity_str</span><span class="p">,</span> <span class="n">quantity_float</span><span class="p">)</span></div>
+
+    
+    <span class="c1"># Output:</span>
+    <span class="c1"># Price formatted: 50123.45678901 (from 50123.456789012345)</span>
+    <span class="c1"># Quantity formatted: 0.00123456 (from 0.001234567890)</span>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../api_reference.html#examples_best_practices.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run all examples.&quot;&quot;&quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;WOOX API Best Practices Examples&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">1. Safe Order Placement&quot;</span><span class="p">)</span>
+    <span class="n">example_safe_order_placement</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">2. Market Order&quot;</span><span class="p">)</span>
+    <span class="n">example_market_order</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">3. POST_ONLY Order&quot;</span><span class="p">)</span>
+    <span class="n">example_post_only_order</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">4. Account Balance&quot;</span><span class="p">)</span>
+    <span class="n">example_account_balance</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">5. Order Validation&quot;</span><span class="p">)</span>
+    <span class="n">example_order_validation</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">6. Retry on Rate Limit&quot;</span><span class="p">)</span>
+    <span class="n">example_retry_on_rate_limit</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">7. Precision Formatting&quot;</span><span class="p">)</span>
+    <span class="n">example_precision_formatting</span><span class="p">()</span>
+    
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Examples completed&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
 
            </div>
           </div>

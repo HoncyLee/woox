@@ -213,7 +213,9 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#core-modules">Core Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#trade">trade</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#trade.cron"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trade.Trade"><code class="docutils literal notranslate"><span class="pre">Trade</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#trade-class">Trade Class</a></li>
 </ul>
 </li>
@@ -295,10 +297,27 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#test-modules">Test Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#test-trade-workflow">test_trade_workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#test-signals">test_signals</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#test-orderbook">test_orderbook</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-test_trade_workflow">test_trade_workflow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.print_section"><code class="docutils literal notranslate"><span class="pre">print_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.check_database_transactions"><code class="docutils literal notranslate"><span class="pre">check_database_transactions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.test_position_lifecycle"><code class="docutils literal notranslate"><span class="pre">test_position_lifecycle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.test_database_integrity"><code class="docutils literal notranslate"><span class="pre">test_database_integrity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.test_stop_loss_scenario"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#test_trade_workflow.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-test_signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-test_orderbook">test_orderbook</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#test_orderbook.test_orderbook_collection"><code class="docutils literal notranslate"><span class="pre">test_orderbook_collection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-verify_signals">verify_signals</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#verify_signals.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#verify_signals.test_stop_loss_logic"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_logic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#verify_signals.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-test_api">test_api</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
@@ -309,11 +328,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#examples-best-practices">examples_best_practices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-examples_best_practices">examples_best_practices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_safe_order_placement"><code class="docutils literal notranslate"><span class="pre">example_safe_order_placement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_market_order"><code class="docutils literal notranslate"><span class="pre">example_market_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_post_only_order"><code class="docutils literal notranslate"><span class="pre">example_post_only_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_account_balance"><code class="docutils literal notranslate"><span class="pre">example_account_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_order_validation"><code class="docutils literal notranslate"><span class="pre">example_order_validation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_retry_on_rate_limit"><code class="docutils literal notranslate"><span class="pre">example_retry_on_rate_limit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.example_precision_formatting"><code class="docutils literal notranslate"><span class="pre">example_precision_formatting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples_best_practices.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#decorators">Decorators</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cron">cron</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cron">cron</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id51"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#data-structures">Data Structures</a><ul>
@@ -495,10 +527,460 @@
 </div>
 <section id="core-modules">
 <h2>Core Modules<a class="headerlink" href="#core-modules" title="Link to this heading"></a></h2>
-<section id="trade">
-<h3>trade<a class="headerlink" href="#trade" title="Link to this heading"></a></h3>
+<section id="module-trade">
+<span id="trade"></span><h3>trade<a class="headerlink" href="#module-trade" title="Link to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="trade.cron">
+<span class="sig-prename descclassname"><span class="pre">trade.</span></span><span class="sig-name descname"><span class="pre">cron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#cron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.cron" title="Link to this definition"></a></dt>
+<dd><p>Decorator to control method execution frequency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Frequency unit - ‘ms’ (milliseconds), ‘s’ (seconds), ‘m’ (minutes)</p></li>
+<li><p><strong>period</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Number of units between executions</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>&#64;cron(freq=’s’, period=5)  # Execute every 5 seconds
+&#64;cron(freq=’m’, period=1)  # Execute every 1 minute
+&#64;cron(freq=’ms’, period=100)  # Execute every 100 milliseconds</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="trade.Trade">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trade.</span></span><span class="sig-name descname"><span class="pre">Trade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Trading bot for WOOX API that monitors BTC_USDT spot market
+and executes trading strategies.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the Trade class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>api_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – WOOX API key for authenticated requests (optional)</p></li>
+<li><p><strong>api_secret</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – WOOX API secret for authenticated requests (optional)</p></li>
+<li><p><strong>trade_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Trading mode - ‘paper’ or ‘live’ (optional, defaults to TRADE_MODE constant)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.trade_update">
+<span class="sig-name descname"><span class="pre">trade_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.trade_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.trade_update" title="Link to this definition"></a></dt>
+<dd><p>Fetch the latest price, volume, and full orderbook from WOOX API.
+Called frequently to keep data fresh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing price, volume, bid, ask, and orderbook data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.updateTradePxList">
+<span class="sig-name descname"><span class="pre">updateTradePxList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trade_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.updateTradePxList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.updateTradePxList" title="Link to this definition"></a></dt>
+<dd><p>Monitor and record price data with orderbook information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trade_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Dictionary containing trade and orderbook information</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.get_orderbook_imbalance">
+<span class="sig-name descname"><span class="pre">get_orderbook_imbalance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.get_orderbook_imbalance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.get_orderbook_imbalance" title="Link to this definition"></a></dt>
+<dd><p>Calculate orderbook imbalance ratio.
+Positive value indicates more buying pressure (bid depth &gt; ask depth).
+Negative value indicates more selling pressure (ask depth &gt; bid depth).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Imbalance ratio between -1.0 and 1.0, or None if no data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.get_orderbook_support_resistance">
+<span class="sig-name descname"><span class="pre">get_orderbook_support_resistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.get_orderbook_support_resistance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.get_orderbook_support_resistance" title="Link to this definition"></a></dt>
+<dd><p>Identify potential support and resistance levels from orderbook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>levels</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of top levels to analyze</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with support/resistance prices and strengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.determineOpenTrade">
+<span class="sig-name descname"><span class="pre">determineOpenTrade</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.determineOpenTrade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.determineOpenTrade" title="Link to this definition"></a></dt>
+<dd><p>Determine the logic to open a position (long or short).
+Uses the configured entry strategy from signal module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>‘long’, ‘short’, or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.determineStopTrade">
+<span class="sig-name descname"><span class="pre">determineStopTrade</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.determineStopTrade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.determineStopTrade" title="Link to this definition"></a></dt>
+<dd><p>Determine when to close a position.
+Uses the configured exit strategy from signal module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if position should be closed, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.getOpenPositionCount">
+<span class="sig-name descname"><span class="pre">getOpenPositionCount</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.getOpenPositionCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.getOpenPositionCount" title="Link to this definition"></a></dt>
+<dd><p>Count the total number of open positions across all symbols.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of open positions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.hasPosition">
+<span class="sig-name descname"><span class="pre">hasPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.hasPosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.hasPosition" title="Link to this definition"></a></dt>
+<dd><p>Check what position is currently held.
+Updates self.current_position from API if in live mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>silent</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If True, suppresses info logs about current position status</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with position details or None if no position</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.openPosition">
+<span class="sig-name descname"><span class="pre">openPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.openPosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.openPosition" title="Link to this definition"></a></dt>
+<dd><p>Open a position at a specific limit price and quantity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘long’ or ‘short’ (for spot: long=BUY, short not applicable)</p></li>
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Limit price for the order</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Quantity to trade</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if position opened successfully, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.closePosition">
+<span class="sig-name descname"><span class="pre">closePosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.closePosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.closePosition" title="Link to this definition"></a></dt>
+<dd><p>Close the existing position at a specific price.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Price at which to close the position</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if position closed successfully, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.fetch_historical_data">
+<span class="sig-name descname"><span class="pre">fetch_historical_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.fetch_historical_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.fetch_historical_data" title="Link to this definition"></a></dt>
+<dd><p>Fetch historical k-line data to populate trade_px_list on startup.
+This ensures MAs/RSI are accurate immediately.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.run" title="Link to this definition"></a></dt>
+<dd><p>Main loop that continuously monitors the market and executes trading logic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="trade.Trade.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trade.Trade.stop" title="Link to this definition"></a></dt>
+<dd><p>Stop the trading bot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <section id="trade-class">
 <h4>Trade Class<a class="headerlink" href="#trade-class" title="Link to this heading"></a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="id0">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">trade.</span></span><span class="sig-name descname"><span class="pre">Trade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Trading bot for WOOX API that monitors BTC_USDT spot market
+and executes trading strategies.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd><p>Initialize the Trade class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>api_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – WOOX API key for authenticated requests (optional)</p></li>
+<li><p><strong>api_secret</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – WOOX API secret for authenticated requests (optional)</p></li>
+<li><p><strong>trade_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Trading mode - ‘paper’ or ‘live’ (optional, defaults to TRADE_MODE constant)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">trade_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.trade_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd><p>Fetch the latest price, volume, and full orderbook from WOOX API.
+Called frequently to keep data fresh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing price, volume, bid, ask, and orderbook data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">updateTradePxList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trade_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.updateTradePxList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd><p>Monitor and record price data with orderbook information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>trade_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Dictionary containing trade and orderbook information</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">get_orderbook_imbalance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.get_orderbook_imbalance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dd><p>Calculate orderbook imbalance ratio.
+Positive value indicates more buying pressure (bid depth &gt; ask depth).
+Negative value indicates more selling pressure (ask depth &gt; bid depth).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Imbalance ratio between -1.0 and 1.0, or None if no data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">get_orderbook_support_resistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.get_orderbook_support_resistance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dd><p>Identify potential support and resistance levels from orderbook.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>levels</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of top levels to analyze</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with support/resistance prices and strengths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">determineOpenTrade</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.determineOpenTrade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd><p>Determine the logic to open a position (long or short).
+Uses the configured entry strategy from signal module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>‘long’, ‘short’, or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">determineStopTrade</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.determineStopTrade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd><p>Determine when to close a position.
+Uses the configured exit strategy from signal module.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if position should be closed, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">getOpenPositionCount</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.getOpenPositionCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dd><p>Count the total number of open positions across all symbols.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of open positions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">hasPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.hasPosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dd><p>Check what position is currently held.
+Updates self.current_position from API if in live mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>silent</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If True, suppresses info logs about current position status</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with position details or None if no position</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">openPosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.openPosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dd><p>Open a position at a specific limit price and quantity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>side</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – ‘long’ or ‘short’ (for spot: long=BUY, short not applicable)</p></li>
+<li><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Limit price for the order</p></li>
+<li><p><strong>quantity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Quantity to trade</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if position opened successfully, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">closePosition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.closePosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dd><p>Close the existing position at a specific price.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Price at which to close the position</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if position closed successfully, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">fetch_historical_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.fetch_historical_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
+<dd><p>Fetch historical k-line data to populate trade_px_list on startup.
+This ensures MAs/RSI are accurate immediately.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
+<dd><p>Main loop that continuously monitors the market and executes trading logic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id14">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#Trade.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
+<dd><p>Stop the trading bot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 <section id="module-signal">
@@ -826,15 +1308,33 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="account.Account.get_transaction_summary">
-<span class="sig-name descname"><span class="pre">get_transaction_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_transaction_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#account.Account.get_transaction_summary" title="Link to this definition"></a></dt>
-<dd><p>Get transaction summary from database.</p>
+<dt class="sig sig-object py" id="account.Account.get_account_info">
+<span class="sig-name descname"><span class="pre">get_account_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_account_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#account.Account.get_account_info" title="Link to this definition"></a></dt>
+<dd><p>Get account information from WOOX API (V3).
+Includes total collateral, leverage, etc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary with transaction statistics</p>
+<dd class="field-even"><p>Dictionary with account info or None if error</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="account.Account.get_transaction_summary">
+<span class="sig-name descname"><span class="pre">get_transaction_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_price</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_transaction_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#account.Account.get_transaction_summary" title="Link to this definition"></a></dt>
+<dd><p>Get transaction summary from database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Current market price (optional) to calculate unrealized P&amp;L</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with transaction statistics</p>
 </dd>
 </dl>
 </dd></dl>
@@ -898,16 +1398,16 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 <section id="account-class">
 <h4>Account Class<a class="headerlink" href="#account-class" title="Link to this heading"></a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="id0">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">account.</span></span><span class="sig-name descname"><span class="pre">Account</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'paper'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id15">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">account.</span></span><span class="sig-name descname"><span class="pre">Account</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'paper'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Account management class for WOOX trading bot.
 Displays balance and P&amp;L from database transactions and API account info.</p>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'paper'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trade_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'paper'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_secret</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
 <dd><p>Initialize the Account class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -921,8 +1421,8 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">get_api_balance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_api_balance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">get_api_balance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_api_balance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
 <dd><p>Get account balance from WOOX API.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -935,22 +1435,40 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">get_transaction_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_transaction_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
-<dd><p>Get transaction summary from database.</p>
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">get_account_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_account_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
+<dd><p>Get account information from WOOX API (V3).
+Includes total collateral, leverage, etc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dictionary with transaction statistics</p>
+<dd class="field-even"><p>Dictionary with account info or None if error</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">get_open_positions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_open_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id19">
+<span class="sig-name descname"><span class="pre">get_transaction_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_price</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_transaction_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id19" title="Link to this definition"></a></dt>
+<dd><p>Get transaction summary from database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>current_price</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Current market price (optional) to calculate unrealized P&amp;L</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary with transaction statistics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id20">
+<span class="sig-name descname"><span class="pre">get_open_positions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.get_open_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
 <dd><p>Get currently open positions (BUY without matching SELL).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -963,8 +1481,8 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">calculate_unrealized_pnl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_prices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.calculate_unrealized_pnl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id21">
+<span class="sig-name descname"><span class="pre">calculate_unrealized_pnl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_prices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.calculate_unrealized_pnl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
 <dd><p>Calculate unrealized P&amp;L for open positions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -980,8 +1498,8 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">display_account_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_prices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.display_account_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id22">
+<span class="sig-name descname"><span class="pre">display_account_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_prices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.display_account_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
 <dd><p>Display comprehensive account summary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -991,8 +1509,8 @@ Displays balance and P&amp;L from database transactions and API account info.</p
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id23">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/account.html#Account.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id23" title="Link to this definition"></a></dt>
 <dd><p>Close database connection.</p>
 </dd></dl>
 
@@ -1045,8 +1563,8 @@ Reads settings from .config file in the project root.</p>
 <section id="configuration-functions">
 <h4>Configuration Functions<a class="headerlink" href="#configuration-functions" title="Link to this heading"></a></h4>
 <dl class="py function">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-prename descclassname"><span class="pre">config_loader.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.config'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config_loader.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id24">
+<span class="sig-prename descclassname"><span class="pre">config_loader.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.config'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config_loader.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
 <dd><p>Load configuration from .config file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1062,8 +1580,8 @@ Reads settings from .config file in the project root.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-prename descclassname"><span class="pre">config_loader.</span></span><span class="sig-name descname"><span class="pre">get_config_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.config'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config_loader.html#get_config_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id25">
+<span class="sig-prename descclassname"><span class="pre">config_loader.</span></span><span class="sig-name descname"><span class="pre">get_config_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.config'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config_loader.html#get_config_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
 <dd><p>Get a specific configuration value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1110,7 +1628,7 @@ Based on official WOOX API documentation.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="woox_errors.WooxAuthenticationError">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxAuthenticationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxAuthenticationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxAuthenticationError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Authentication-related errors.</p>
 <dl class="field-list simple">
 </dl>
@@ -1119,7 +1637,7 @@ Based on official WOOX API documentation.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="woox_errors.WooxRateLimitError">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxRateLimitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxRateLimitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxRateLimitError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Rate limit exceeded.</p>
 <dl class="field-list simple">
 </dl>
@@ -1128,7 +1646,7 @@ Based on official WOOX API documentation.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="woox_errors.WooxInvalidParameterError">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxInvalidParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxInvalidParameterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxInvalidParameterError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Invalid parameter in request.</p>
 <dl class="field-list simple">
 </dl>
@@ -1137,7 +1655,7 @@ Based on official WOOX API documentation.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="woox_errors.WooxResourceNotFoundError">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxResourceNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxResourceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxResourceNotFoundError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Requested resource not found.</p>
 <dl class="field-list simple">
 </dl>
@@ -1146,7 +1664,7 @@ Based on official WOOX API documentation.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="woox_errors.WooxServerError">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxServerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxServerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#woox_errors.WooxServerError" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Internal server error.</p>
 <dl class="field-list simple">
 </dl>
@@ -1237,7 +1755,7 @@ Based on official WOOX API documentation.</p>
 <dd><p>Format error for logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -1254,7 +1772,7 @@ Based on official WOOX API documentation.</p>
 <dd><p>Format user-friendly error message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -1270,15 +1788,15 @@ Based on official WOOX API documentation.</p>
 <section id="exception-classes">
 <h4>Exception Classes<a class="headerlink" href="#exception-classes" title="Link to this heading"></a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="id10">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id26">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Base exception for WOOX API errors.</p>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id27">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxError.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 </dl>
 </dd></dl>
@@ -1286,45 +1804,45 @@ Based on official WOOX API documentation.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="id12">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxAuthenticationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxAuthenticationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dt class="sig sig-object py" id="id28">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxAuthenticationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxAuthenticationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id28" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Authentication-related errors.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="id13">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxRateLimitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxRateLimitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dt class="sig sig-object py" id="id29">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxRateLimitError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxRateLimitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id29" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Rate limit exceeded.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="id14">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxInvalidParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxInvalidParameterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dt class="sig sig-object py" id="id30">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxInvalidParameterError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxInvalidParameterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id30" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Invalid parameter in request.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="id15">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxResourceNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxResourceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dt class="sig sig-object py" id="id31">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxResourceNotFoundError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxResourceNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id31" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Requested resource not found.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="id16">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxServerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxServerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
+<dt class="sig sig-object py" id="id32">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">WooxServerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#WooxServerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id32" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></p>
 <p>Internal server error.</p>
 <dl class="field-list simple">
 </dl>
@@ -1334,8 +1852,8 @@ Based on official WOOX API documentation.</p>
 <section id="error-handling-functions">
 <h4>Error Handling Functions<a class="headerlink" href="#error-handling-functions" title="Link to this heading"></a></h4>
 <dl class="py function">
-<dt class="sig sig-object py" id="id17">
-<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">handle_api_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#handle_api_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id33">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">handle_api_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#handle_api_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id33" title="Link to this definition"></a></dt>
 <dd><p>Handle API error response and raise appropriate exception.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1354,8 +1872,8 @@ Based on official WOOX API documentation.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="id18">
-<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">is_retryable_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#is_retryable_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id34">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">is_retryable_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#is_retryable_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id34" title="Link to this definition"></a></dt>
 <dd><p>Check if an error is retryable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1371,8 +1889,8 @@ Based on official WOOX API documentation.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="id19">
-<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">get_retry_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#get_retry_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id19" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id35">
+<span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">get_retry_delay</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#get_retry_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id35" title="Link to this definition"></a></dt>
 <dd><p>Get suggested retry delay in seconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1394,17 +1912,17 @@ Based on official WOOX API documentation.</p>
 <section id="error-formatter">
 <h4>Error Formatter<a class="headerlink" href="#error-formatter" title="Link to this heading"></a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="id20">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">ErrorFormatter</span></span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id20" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id36">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">woox_errors.</span></span><span class="sig-name descname"><span class="pre">ErrorFormatter</span></span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id36" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Format error messages for logging and user display.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="id21">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id21" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id37">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id37" title="Link to this definition"></a></dt>
 <dd><p>Format error for logging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -1416,12 +1934,12 @@ Based on official WOOX API documentation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id22">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_user_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_user_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id22" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id38">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_user_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/woox_errors.html#ErrorFormatter.format_user_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id38" title="Link to this definition"></a></dt>
 <dd><p>Format user-friendly error message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id10" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
+<dd class="field-odd"><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#id26" title="woox_errors.WooxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">WooxError</span></code></a></span>) – WooxError instance</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -1687,22 +2205,22 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 <section id="orderhelper-class">
 <h4>OrderHelper Class<a class="headerlink" href="#orderhelper-class" title="Link to this heading"></a></h4>
 <dl class="py class">
-<dt class="sig sig-object py" id="id23">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">order_helper.</span></span><span class="sig-name descname"><span class="pre">OrderHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id23" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id39">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">order_helper.</span></span><span class="sig-name descname"><span class="pre">OrderHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id39" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Helper class for creating properly formatted orders.</p>
 <dl class="field-list simple">
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="id24">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id24" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id40">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id40" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id25">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_client_order_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.generate_client_order_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id25" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id41">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_client_order_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.generate_client_order_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id41" title="Link to this definition"></a></dt>
 <dd><p>Generate unique client_order_id.
 Uses last 12 digits of current timestamp in milliseconds.</p>
 <dl class="field-list simple">
@@ -1716,8 +2234,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id26">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_price</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_price"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id26" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id42">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_price</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_price"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id42" title="Link to this definition"></a></dt>
 <dd><p>Format price as string with proper precision.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1736,8 +2254,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id27">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_quantity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_quantity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id27" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id43">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">format_quantity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.format_quantity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id43" title="Link to this definition"></a></dt>
 <dd><p>Format quantity as string with proper precision.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1756,8 +2274,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id28">
-<span class="sig-name descname"><span class="pre">validate_price_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_price_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id28" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id44">
+<span class="sig-name descname"><span class="pre">validate_price_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_price_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id44" title="Link to this definition"></a></dt>
 <dd><p>Validate price against symbol’s price filters.</p>
 <p>Price filter requirements:
 - price &gt;= quote_min
@@ -1782,8 +2300,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id29">
-<span class="sig-name descname"><span class="pre">validate_quantity_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_quantity_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id29" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id45">
+<span class="sig-name descname"><span class="pre">validate_quantity_filters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_quantity_filters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id45" title="Link to this definition"></a></dt>
 <dd><p>Validate quantity against symbol’s size filters.</p>
 <p>Size filter requirements:
 - base_min &lt;= quantity &lt;= base_max
@@ -1805,8 +2323,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id30">
-<span class="sig-name descname"><span class="pre">validate_min_notional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_min_notional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id30" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id46">
+<span class="sig-name descname"><span class="pre">validate_min_notional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.validate_min_notional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id46" title="Link to this definition"></a></dt>
 <dd><p>Validate that price * quantity meets minimum notional requirement.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1826,8 +2344,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id31">
-<span class="sig-name descname"><span class="pre">create_limit_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_limit_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id31" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id47">
+<span class="sig-name descname"><span class="pre">create_limit_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_limit_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id47" title="Link to this definition"></a></dt>
 <dd><p>Create a properly formatted limit order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1849,8 +2367,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id32">
-<span class="sig-name descname"><span class="pre">create_market_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_market_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id32" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id48">
+<span class="sig-name descname"><span class="pre">create_market_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_market_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id48" title="Link to this definition"></a></dt>
 <dd><p>Create a properly formatted market order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1872,8 +2390,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id33">
-<span class="sig-name descname"><span class="pre">create_post_only_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_post_only_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id33" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id49">
+<span class="sig-name descname"><span class="pre">create_post_only_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantity</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.create_post_only_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id49" title="Link to this definition"></a></dt>
 <dd><p>Create a POST_ONLY order (maker-only).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1895,8 +2413,8 @@ Uses last 12 digits of current timestamp in milliseconds.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="id34">
-<span class="sig-name descname"><span class="pre">log_order_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.log_order_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id34" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id50">
+<span class="sig-name descname"><span class="pre">log_order_details</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order_helper.html#OrderHelper.log_order_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id50" title="Link to this definition"></a></dt>
 <dd><p>Log order details for debugging.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2011,17 +2529,90 @@ Displays comprehensive account balance, positions, and P&amp;L information</p>
 </section>
 <section id="test-modules">
 <h2>Test Modules<a class="headerlink" href="#test-modules" title="Link to this heading"></a></h2>
-<section id="test-trade-workflow">
-<h3>test_trade_workflow<a class="headerlink" href="#test-trade-workflow" title="Link to this heading"></a></h3>
+<section id="module-test_trade_workflow">
+<span id="test-trade-workflow"></span><h3>test_trade_workflow<a class="headerlink" href="#module-test_trade_workflow" title="Link to this heading"></a></h3>
+<p>Comprehensive test for trade workflow including buy/sell triggers,
+database transactions, and complete trading cycle.
+Open Position → Monitor Price → Stop-Loss Triggered → Close Position → Record to DB</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.print_section">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">print_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#print_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.print_section" title="Link to this definition"></a></dt>
+<dd><p>Print formatted section header.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.check_database_transactions">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">check_database_transactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'paper_transaction.db'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#check_database_transactions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.check_database_transactions" title="Link to this definition"></a></dt>
+<dd><p>Check and display database transactions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.test_signal_generation">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">test_signal_generation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#test_signal_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.test_signal_generation" title="Link to this definition"></a></dt>
+<dd><p>Test signal generation with mock data.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.test_position_lifecycle">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">test_position_lifecycle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">price_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#test_position_lifecycle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.test_position_lifecycle" title="Link to this definition"></a></dt>
+<dd><p>Test opening and closing a position.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.test_database_integrity">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">test_database_integrity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#test_database_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.test_database_integrity" title="Link to this definition"></a></dt>
+<dd><p>Test database schema and data integrity.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.test_stop_loss_scenario">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">test_stop_loss_scenario</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trader</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#test_stop_loss_scenario"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.test_stop_loss_scenario" title="Link to this definition"></a></dt>
+<dd><p>Test stop-loss trigger.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="test_trade_workflow.main">
+<span class="sig-prename descclassname"><span class="pre">test_trade_workflow.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_trade_workflow.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_trade_workflow.main" title="Link to this definition"></a></dt>
+<dd><p>Run all tests.</p>
+</dd></dl>
+
 </section>
-<section id="test-signals">
-<h3>test_signals<a class="headerlink" href="#test-signals" title="Link to this heading"></a></h3>
+<section id="module-test_signals">
+<span id="test-signals"></span><h3>test_signals<a class="headerlink" href="#module-test_signals" title="Link to this heading"></a></h3>
+<p>Test script to demonstrate signal module strategies.</p>
 </section>
-<section id="test-orderbook">
-<h3>test_orderbook<a class="headerlink" href="#test-orderbook" title="Link to this heading"></a></h3>
+<section id="module-test_orderbook">
+<span id="test-orderbook"></span><h3>test_orderbook<a class="headerlink" href="#module-test_orderbook" title="Link to this heading"></a></h3>
+<p>Test script to verify orderbook data collection and analysis.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="test_orderbook.test_orderbook_collection">
+<span class="sig-prename descclassname"><span class="pre">test_orderbook.</span></span><span class="sig-name descname"><span class="pre">test_orderbook_collection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/test_orderbook.html#test_orderbook_collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#test_orderbook.test_orderbook_collection" title="Link to this definition"></a></dt>
+<dd><p>Test orderbook data fetching and metrics calculation.</p>
+</dd></dl>
+
 </section>
-<section id="verify-signals">
-<h3>verify_signals<a class="headerlink" href="#verify-signals" title="Link to this heading"></a></h3>
+<section id="module-verify_signals">
+<span id="verify-signals"></span><h3>verify_signals<a class="headerlink" href="#module-verify_signals" title="Link to this heading"></a></h3>
+<p>Simple verification script to test signal generation and stop-loss logic independently.
+This helps verify the core logic works before testing the full workflow.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="verify_signals.test_signal_generation">
+<span class="sig-prename descclassname"><span class="pre">verify_signals.</span></span><span class="sig-name descname"><span class="pre">test_signal_generation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/verify_signals.html#test_signal_generation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#verify_signals.test_signal_generation" title="Link to this definition"></a></dt>
+<dd><p>Test MA crossover signal generation with clear patterns.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="verify_signals.test_stop_loss_logic">
+<span class="sig-prename descclassname"><span class="pre">verify_signals.</span></span><span class="sig-name descname"><span class="pre">test_stop_loss_logic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/verify_signals.html#test_stop_loss_logic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#verify_signals.test_stop_loss_logic" title="Link to this definition"></a></dt>
+<dd><p>Test stop-loss and take-profit logic.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="verify_signals.main">
+<span class="sig-prename descclassname"><span class="pre">verify_signals.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/verify_signals.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#verify_signals.main" title="Link to this definition"></a></dt>
+<dd><p>Run all verification tests.</p>
+</dd></dl>
+
 </section>
 <section id="module-test_api">
 <span id="test-api"></span><h3>test_api<a class="headerlink" href="#module-test_api" title="Link to this heading"></a></h3>
@@ -2055,14 +2646,105 @@ This script tests the public API endpoints without requiring authentication.</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<section id="examples-best-practices">
-<h3>examples_best_practices<a class="headerlink" href="#examples-best-practices" title="Link to this heading"></a></h3>
+<section id="module-examples_best_practices">
+<span id="examples-best-practices"></span><h3>examples_best_practices<a class="headerlink" href="#module-examples_best_practices" title="Link to this heading"></a></h3>
+<p>Example usage of WOOX API best practices implementation.
+Demonstrates proper error handling, order placement, and precision management.</p>
+<p>Comprehensive examples demonstrating WOOX API best practices:</p>
+<ul class="simple">
+<li><p>Safe order placement with error handling</p></li>
+<li><p>Market and POST_ONLY order creation</p></li>
+<li><p>Account balance fetching with retry logic</p></li>
+<li><p>Order parameter validation</p></li>
+<li><p>Automatic retry on rate limits</p></li>
+<li><p>Proper precision formatting</p></li>
+</ul>
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_safe_order_placement">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_safe_order_placement</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_safe_order_placement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_safe_order_placement" title="Link to this definition"></a></dt>
+<dd><p>Example: Place order with proper error handling and precision.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_market_order">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_market_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_market_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_market_order" title="Link to this definition"></a></dt>
+<dd><p>Example: Place market order with amount (quote currency).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_post_only_order">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_post_only_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_post_only_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_post_only_order" title="Link to this definition"></a></dt>
+<dd><p>Example: Place POST_ONLY order (maker-only).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_account_balance">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_account_balance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_account_balance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_account_balance" title="Link to this definition"></a></dt>
+<dd><p>Example: Fetch account balance with error handling.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_order_validation">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_order_validation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_order_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_order_validation" title="Link to this definition"></a></dt>
+<dd><p>Example: Validate order parameters against symbol info.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_retry_on_rate_limit">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_retry_on_rate_limit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_retry_on_rate_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_retry_on_rate_limit" title="Link to this definition"></a></dt>
+<dd><p>Example: Automatic retry on rate limit errors.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.example_precision_formatting">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">example_precision_formatting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#example_precision_formatting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.example_precision_formatting" title="Link to this definition"></a></dt>
+<dd><p>Example: Proper number formatting for API requests.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="examples_best_practices.main">
+<span class="sig-prename descclassname"><span class="pre">examples_best_practices.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/examples_best_practices.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#examples_best_practices.main" title="Link to this definition"></a></dt>
+<dd><p>Run all examples.</p>
+</dd></dl>
+
 </section>
 </section>
 <section id="decorators">
 <h2>Decorators<a class="headerlink" href="#decorators" title="Link to this heading"></a></h2>
 <section id="cron">
 <h3>cron<a class="headerlink" href="#cron" title="Link to this heading"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="id51">
+<span class="sig-prename descclassname"><span class="pre">trade.</span></span><span class="sig-name descname"><span class="pre">cron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/trade.html#cron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id51" title="Link to this definition"></a></dt>
+<dd><p>Decorator to control method execution frequency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freq</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Frequency unit - ‘ms’ (milliseconds), ‘s’ (seconds), ‘m’ (minutes)</p></li>
+<li><p><strong>period</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Number of units between executions</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>&#64;cron(freq=’s’, period=5)  # Execute every 5 seconds
+&#64;cron(freq=’m’, period=1)  # Execute every 1 minute
+&#64;cron(freq=’ms’, period=100)  # Execute every 100 milliseconds</p>
+<p>Control method execution frequency. Used to throttle API calls and trading decisions.</p>
+<p><strong>Example</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@cron</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>  <span class="c1"># Execute every 60 seconds</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trade_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Parameters</strong>:</dt><dd><ul class="simple">
+<li><p>freq (str): Frequency unit - ‘ms’ (milliseconds), ‘s’ (seconds), ‘m’ (minutes)</p></li>
+<li><p>period (float): Number of units between executions</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 <section id="data-structures">
