@@ -12,8 +12,11 @@ import threading
 import time
 from trade import Trade
 from account import Account
+import config_loader
 import logging
 from collections import deque
+import duckdb
+import psutil
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -63,6 +66,31 @@ app.index_string = '''
         <title>{%title%}</title>
         {%favicon%}
         {%css%}
+        <script>
+            var serverDownAlertShown = false;
+            setInterval(function() {
+                fetch('/', { method: 'HEAD' })
+                    .then(function(response) {
+                        if (response.ok) {
+                            if (serverDownAlertShown) {
+                                // Server came back
+                                serverDownAlertShown = false;
+                                document.body.style.opacity = "1";
+                                document.body.style.pointerEvents = "auto";
+                                console.log("Server connection restored");
+                            }
+                        }
+                    })
+                    .catch(function(error) {
+                        if (!serverDownAlertShown) {
+                            alert('⚠️ CRITICAL: Connection to server lost! The bot process has stopped.');
+                            serverDownAlertShown = true;
+                            document.body.style.opacity = "0.5";
+                            document.body.style.pointerEvents = "none";
+                        }
+                    });
+            }, 2000);
+        </script>
         <style>
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -86,13 +114,12 @@ app.index_string = '''
             .metric-card {
                 background-color: #1e2130;
                 border-radius: 8px;
-                padding: 20px;
-                margin: 10px;
+                padding: 15px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.2);
                 border-left: 4px solid #667eea;
             }
             .metric-value {
-                font-size: 32px;
+                font-size: 24px;
                 font-weight: bold;
                 color: #ffffff;
                 margin: 5px 0;
@@ -202,6 +229,127 @@ app.index_string = '''
             .print-only {
                 display: none;
             }
+            /* Modal Styles */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0,0,0,0.5);
+            }
+            .modal-content {
+                background-color: #1e2130;
+                margin: 10% auto;
+                padding: 20px;
+                border: 1px solid #667eea;
+                border-radius: 10px;
+                width: 50%;
+                color: white;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                font-size: 10px;
+            }
+            .close {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+            .close:hover,
+            .close:focus {
+                color: white;
+                text-decoration: none;
+                cursor: pointer;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-label {
+                display: block;
+                margin-bottom: 5px;
+                color: #a0a0a0;
+                font-size: 10px;
+            }
+            .form-input {
+                width: 100%;
+                padding: 8px;
+                border-radius: 4px;
+                border: 1px solid #444;
+                background-color: #2d3142;
+                color: white;
+                font-size: 10px;
+            }
+            /* Dropdown Dark Mode */
+            .Select-control {
+                background-color: #2d3142 !important;
+                border: 1px solid #444 !important;
+                color: white !important;
+                font-size: 10px !important;
+            }
+            .Select-value-label {
+                color: white !important;
+            }
+            .Select-menu-outer {
+                background-color: #2d3142 !important;
+                border: 1px solid #444 !important;
+            }
+            .Select-option {
+                background-color: #2d3142 !important;
+                color: white !important;
+            }
+            .Select-option:hover {
+                background-color: #667eea !important;
+            }
+            .Select-placeholder {
+                color: #a0a0a0 !important;
+            }
+            .Select-arrow-zone {
+                color: white !important;
+            }
+            .Select-clear-zone {
+                color: white !important;
+            }
+            .chart-card {
+                background-color: #1e2130;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+            /* Neon Mode Indicators */
+            @keyframes neon-green {
+                0% { box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; opacity: 1; }
+                50% { box-shadow: 0 0 2px #00ff00, 0 0 5px #00ff00; opacity: 0.7; }
+                100% { box-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; opacity: 1; }
+            }
+            @keyframes neon-orange {
+                0% { box-shadow: 0 0 5px #ff9900, 0 0 10px #ff9900; opacity: 1; }
+                50% { box-shadow: 0 0 2px #ff9900, 0 0 5px #ff9900; opacity: 0.7; }
+                100% { box-shadow: 0 0 5px #ff9900, 0 0 10px #ff9900; opacity: 1; }
+            }
+            .mode-indicator {
+                padding: 5px 15px;
+                border-radius: 15px;
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 12px;
+                letter-spacing: 1px;
+                transition: all 0.5s ease;
+                display: inline-block;
+            }
+            .mode-live {
+                color: #00ff00;
+                border: 1px solid #00ff00;
+                animation: neon-green 2s infinite alternate;
+            }
+            .mode-paper {
+                color: #ff9900;
+                border: 1px solid #ff9900;
+                animation: neon-orange 2s infinite alternate;
+            }
         </style>
     </head>
     <body>
@@ -227,11 +375,16 @@ app.layout = html.Div([
     
     # Control Panel
     html.Div([
-        html.H3("Control Panel", style={'color': '#ffffff', 'marginBottom': '15px'}),
+        html.Div([
+            html.H3("Control Panel", style={'color': '#ffffff', 'margin': '0', 'display': 'inline-block'}),
+            html.Div(id='mode-indicator', style={'float': 'right'})
+        ], style={'marginBottom': '15px'}),
+        
         html.Div([
             html.Button("▶ Start Bot", id='start-btn', n_clicks=0, className='control-button start-btn'),
             html.Button("⏸ Stop Bot", id='stop-btn', n_clicks=0, className='control-button stop-btn'),
             html.Button("❌ Close Position", id='close-btn', n_clicks=0, className='control-button close-btn'),
+            html.Button("⚙️ Config", id='config-btn', n_clicks=0, className='control-button', style={'backgroundColor': '#607d8b', 'color': 'white'}),
             html.Button("🖨️ Print Report", id='print-btn', n_clicks=0, className='control-button print-btn'),
             html.Div(id='control-feedback', style={'color': '#ffffff', 'marginTop': '10px', 'fontSize': '14px'})
         ]),
@@ -241,105 +394,153 @@ app.layout = html.Div([
     html.Div([
         # Price Metric
         html.Div([
-            html.Div("Current Price", className='metric-label'),
+            html.Div("Current Price", id='price-label', className='metric-label'),
             html.Div(id='price-metric', className='metric-value'),
             html.Div(id='price-change', className='metric-change'),
-        ], className='metric-card', style={'width': '18%', 'display': 'inline-block'}),
+        ], className='metric-card', style={'flex': '1'}),
         
         # Position Metric
         html.Div([
             html.Div("Position", className='metric-label'),
             html.Div(id='position-metric', className='metric-value'),
             html.Div(id='position-size', className='metric-change'),
-        ], className='metric-card', style={'width': '18%', 'display': 'inline-block'}),
+        ], className='metric-card', style={'flex': '1'}),
         
         # P&L Metric
         html.Div([
             html.Div("Unrealized P&L", className='metric-label'),
             html.Div(id='pnl-metric', className='metric-value'),
             html.Div(id='pnl-percent', className='metric-change'),
-        ], className='metric-card', style={'width': '18%', 'display': 'inline-block'}),
+        ], className='metric-card', style={'flex': '1'}),
         
         # Total Trades
         html.Div([
             html.Div("Total Trades", className='metric-label'),
             html.Div(id='trades-metric', className='metric-value'),
             html.Div(id='win-rate', className='metric-change'),
-        ], className='metric-card', style={'width': '18%', 'display': 'inline-block'}),
+        ], className='metric-card', style={'flex': '1'}),
         
-        # Data Points
+        # Account Balance
         html.Div([
-            html.Div("Data Points", className='metric-label'),
-            html.Div(id='datapoints-metric', className='metric-value'),
-            html.Div(id='data-coverage', className='metric-change'),
-        ], className='metric-card', style={'width': '18%', 'display': 'inline-block'}),
-    ], style={'marginBottom': '20px'}),
+            html.Div("Account Balance", className='metric-label'),
+            html.Div(id='balance-metric', className='metric-value'),
+            html.Div(id='monthly-return', className='metric-change'),
+        ], className='metric-card', style={'flex': '1'}),
+    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
     
+    # Strategy Info Row
+    html.Div([
+        # Entry Strategy
+        html.Div([
+            html.Div("Entry Strategy", className='metric-label'),
+            html.Div(id='entry-strategy-metric', className='metric-value', style={'fontSize': '18px'}),
+        ], className='metric-card', style={'flex': '1'}),
+        
+        # Exit Strategy
+        html.Div([
+            html.Div("Exit Strategy", className='metric-label'),
+            html.Div(id='exit-strategy-metric', className='metric-value', style={'fontSize': '18px'}),
+        ], className='metric-card', style={'flex': '1'}),
+        
+        # Take Profit
+        html.Div([
+            html.Div("Take Profit", className='metric-label'),
+            html.Div(id='take-profit-metric', className='metric-value', style={'color': '#00c853'}),
+        ], className='metric-card', style={'flex': '1'}),
+        
+        # Stop Loss
+        html.Div([
+            html.Div("Stop Loss", className='metric-label'),
+            html.Div(id='stop-loss-metric', className='metric-value', style={'color': '#ff1744'}),
+        ], className='metric-card', style={'flex': '1'}),
+    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
+
+    # System Monitor Row
+    html.Div([
+        # CPU Usage
+        html.Div([
+            html.Div("CPU Usage", className='metric-label'),
+            html.Div(id='cpu-usage-metric', className='metric-value'),
+            dcc.Graph(id='cpu-gauge', config={'displayModeBar': False}, style={'height': '100px', 'marginTop': '-20px'}),
+        ], className='metric-card', style={'flex': '1'}),
+        
+        # Memory Usage
+        html.Div([
+            html.Div("Memory Usage", className='metric-label'),
+            html.Div(id='memory-usage-metric', className='metric-value'),
+            dcc.Graph(id='memory-gauge', config={'displayModeBar': False}, style={'height': '100px', 'marginTop': '-20px'}),
+        ], className='metric-card', style={'flex': '1'}),
+    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
+
+    # Performance & P&L Row
+    html.Div([
+        html.Div([
+            html.H3("Performance Metrics", style={'color': '#ffffff', 'marginBottom': '15px'}),
+            html.Div(id='performance-table', style={'color': '#e0e0e0'}),
+        ], style={'flex': '1', 'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px'}),
+        
+        html.Div([
+            dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
+        ], className='chart-card', style={'flex': '2'}),
+    ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
+
     # Main Charts Row
     html.Div([
         html.Div([
             dcc.Graph(id='price-chart', config={'displayModeBar': False}),
-        ], style={'width': '66%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+        ], className='chart-card', style={'flex': '2'}),
         
         html.Div([
             dcc.Graph(id='orderbook-chart', config={'displayModeBar': False}),
-        ], style={'width': '33%', 'display': 'inline-block', 'verticalAlign': 'top'}),
-    ], className='no-print'),
-    
-    # Secondary Charts Row
-    html.Div([
-        html.Div([
-            dcc.Graph(id='volume-chart', config={'displayModeBar': False}),
-        ], style={'width': '50%', 'display': 'inline-block'}),
-        
-        html.Div([
-            dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
-        ], style={'width': '50%', 'display': 'inline-block'}),
-    ], className='no-print'),
+        ], className='chart-card', style={'flex': '1'}),
+    ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
     
     # Technical Analysis Charts Row
     html.Div([
         html.Div([
             dcc.Graph(id='rsi-chart', config={'displayModeBar': False}),
-        ], style={'width': '33%', 'display': 'inline-block'}),
+        ], className='chart-card', style={'width': '33%', 'display': 'inline-block'}),
         
         html.Div([
             dcc.Graph(id='ma-chart', config={'displayModeBar': False}),
-        ], style={'width': '33%', 'display': 'inline-block'}),
+        ], className='chart-card', style={'width': '33%', 'display': 'inline-block'}),
         
         html.Div([
             dcc.Graph(id='spread-chart', config={'displayModeBar': False}),
-        ], style={'width': '33%', 'display': 'inline-block'}),
-    ], className='no-print'),
+        ], className='chart-card', style={'width': '33%', 'display': 'inline-block'}),
+    ], className='no-print', style={'marginBottom': '20px'}),
     
     # Trade Analytics Row
     html.Div([
         html.Div([
             dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
-        ], style={'width': '50%', 'display': 'inline-block'}),
+        ], className='chart-card', style={'width': '50%', 'display': 'inline-block'}),
         
         html.Div([
             dcc.Graph(id='cumulative-return-chart', config={'displayModeBar': False}),
-        ], style={'width': '50%', 'display': 'inline-block'}),
-    ], className='no-print'),
-    
-    # Performance Metrics and Logs
+        ], className='chart-card', style={'width': '50%', 'display': 'inline-block'}),
+    ], className='no-print', style={'marginBottom': '20px'}),
+
+    # Trading Record Row
     html.Div([
         html.Div([
-            html.H3("Performance Metrics", style={'color': '#ffffff', 'marginBottom': '15px'}),
-            html.Div(id='performance-table', style={'color': '#e0e0e0'}),
-        ], style={'width': '50%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
-                  'padding': '20px', 'borderRadius': '10px', 'marginRight': '10px', 'verticalAlign': 'top'}),
-        
+            html.H3("Trading Record", style={'color': '#ffffff', 'marginBottom': '15px'}),
+            html.Div(id='trading-record-table', style={'overflowX': 'auto', 'maxHeight': '300px', 'overflowY': 'auto'}),
+        ], style={'width': '100%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
+                  'padding': '20px', 'borderRadius': '10px', 'verticalAlign': 'top'}),
+    ], className='no-print', style={'marginBottom': '20px'}),
+
+    # Activity Log Row
+    html.Div([
         html.Div([
             html.H3("Recent Activity Log", style={'color': '#ffffff', 'marginBottom': '15px'}),
             html.Div(id='activity-log', style={'height': '200px', 'overflowY': 'scroll', 
                                                 'backgroundColor': '#0e1117', 'padding': '10px',
                                                 'borderRadius': '5px', 'fontFamily': 'monospace',
                                                 'fontSize': '12px', 'color': '#a0a0a0'}),
-        ], style={'width': '48%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
+        ], style={'width': '100%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
                   'padding': '20px', 'borderRadius': '10px', 'verticalAlign': 'top'}),
-    ]),
+    ], className='no-print', style={'marginBottom': '20px'}),
     
     # Detailed Report Section (visible only when printing)
     html.Div([
@@ -363,6 +564,116 @@ app.layout = html.Div([
     
     # Hidden div to store logs
     html.Div(id='log-store', style={'display': 'none'}),
+    
+    # Store to track config loading state
+    dcc.Store(id='config-loaded-flag', data=False),
+
+    # Config Modal
+    html.Div(id='config-modal', className='modal', children=[
+        html.Div(className='modal-content', children=[
+            html.Span("×", id='close-config-btn', className='close'),
+            html.H2("⚙️ Configuration Settings"),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Trading Mode", className='form-label'),
+                dcc.Dropdown(
+                    id='conf-trade-mode',
+                    options=[
+                        {'label': 'Paper Trading', 'value': 'paper'},
+                        {'label': 'Live Trading', 'value': 'live'}
+                    ],
+                    className='form-input',
+                )
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Trade Type", className='form-label'),
+                dcc.Dropdown(
+                    id='conf-trade-type',
+                    options=[
+                        {'label': 'Future (Perpetual)', 'value': 'future'},
+                        {'label': 'Spot', 'value': 'spot'}
+                    ],
+                    className='form-input',
+                ),
+                html.Div(id='spot-warning', style={'color': '#ff9900', 'fontSize': '12px', 'marginTop': '5px'})
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Symbol", className='form-label'),
+                dcc.Dropdown(id='conf-symbol', className='form-input')
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Position Size Type", className='form-label'),
+                dcc.Dropdown(
+                    id='conf-pos-size-type',
+                    options=[
+                        {'label': 'Fixed Value (USDT)', 'value': 'value'},
+                        {'label': 'Percentage of Balance (%)', 'value': 'percentage'},
+                        {'label': 'Fixed Quantity (Asset)', 'value': 'quantity'}
+                    ],
+                    className='form-input',
+                )
+            ]),
+
+            html.Div(className='form-group', children=[
+                html.Label("Position Size Value", id='pos-size-value-label', className='form-label'),
+                dcc.Input(id='conf-pos-size-value', type='number', className='form-input')
+            ]),
+
+            html.Div(className='form-group', children=[
+                html.Label("Max Open Position", className='form-label'),
+                dcc.Input(id='conf-max-pos', type='number', min=1, step=1, className='form-input')
+            ]),
+
+            html.Div(className='form-group', children=[
+                html.Label("Entry Strategy", className='form-label'),
+                dcc.Dropdown(
+                    id='conf-strategy',
+                    options=[
+                        {'label': 'MA Crossover', 'value': 'ma_crossover'},
+                        {'label': 'RSI', 'value': 'rsi'},
+                        {'label': 'Bollinger Bands', 'value': 'bollinger_bands'}
+                    ],
+                    className='form-input',
+                )
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Short MA Period", className='form-label'),
+                dcc.Input(id='conf-short-ma', type='number', className='form-input')
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Long MA Period", className='form-label'),
+                dcc.Input(id='conf-long-ma', type='number', className='form-input')
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Stop Loss %", className='form-label'),
+                dcc.Input(id='conf-sl', type='number', step=0.1, className='form-input')
+            ]),
+            
+            html.Div(className='form-group', children=[
+                html.Label("Take Profit %", className='form-label'),
+                dcc.Input(id='conf-tp', type='number', step=0.1, className='form-input')
+            ]),
+            
+            html.Div(style={'marginTop': '20px', 'textAlign': 'right'}, children=[
+                html.Button("Cancel", id='cancel-config-btn', className='control-button', style={'backgroundColor': '#757575', 'marginRight': '10px'}),
+                html.Button("Save Changes", id='save-config-btn', className='control-button', style={'backgroundColor': '#00c853'})
+            ]),
+            
+            html.Div(id='config-feedback', style={'marginTop': '10px', 'fontWeight': 'bold'})
+        ])
+    ]),
+
+    # Alert Dialog
+    dcc.ConfirmDialog(
+        id='alert-dialog',
+        message='⚠️ Warning: The trading bot has stopped unexpectedly! Please check the logs.',
+    ),
     
 ], className='container', style={'backgroundColor': '#0e1117', 'minHeight': '100vh', 'padding': '20px'})
 
@@ -389,12 +700,16 @@ def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
     try:
         if button_id == 'start-btn':
             if not is_running:
-                trader = Trade(trade_mode='paper')
+                # Load config to get trade mode
+                config = config_loader.load_config()
+                trade_mode = config.get('TRADE_MODE', 'paper')
+                
+                trader = Trade(trade_mode=trade_mode)
                 is_running = True
                 trader_thread = threading.Thread(target=trader.run, daemon=True)
                 trader_thread.start()
-                logger.info("Trading bot started")
-                return "✅ Bot started successfully", {'color': '#00c853'}
+                logger.info(f"Trading bot started in {trade_mode} mode")
+                return f"✅ Bot started successfully ({trade_mode})", {'color': '#00c853'}
             else:
                 return "⚠️ Bot is already running", {'color': '#ffd600'}
         
@@ -434,25 +749,58 @@ def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
 # Callback: Update status indicator
 @app.callback(
     Output('status-indicator', 'children'),
+    Output('mode-indicator', 'children'),
+    Output('mode-indicator', 'className'),
+    Output('alert-dialog', 'displayed'),
     Input('interval-component', 'n_intervals')
 )
 def update_status(n):
-    global is_running
+    global is_running, trader, trader_thread
     
+    show_alert = False
+    
+    # Check for unexpected stop
+    if is_running and trader_thread and not trader_thread.is_alive():
+        is_running = False
+        logger.warning("Trading bot thread died unexpectedly")
+        show_alert = True
+    
+    # Status indicator logic
     if is_running:
-        return html.Span([
+        status_child = html.Span([
             html.Span(className='status-indicator status-running'),
             "Running"
         ])
     else:
-        return html.Span([
+        status_child = html.Span([
             html.Span(className='status-indicator status-stopped'),
             "Stopped"
         ])
+        
+    # Mode indicator logic
+    mode = 'paper'
+    if trader:
+        mode = trader.trade_mode
+    else:
+        try:
+            config = config_loader.load_config()
+            mode = config.get('TRADE_MODE', 'paper')
+        except:
+            mode = 'paper'
+            
+    if mode == 'live':
+        mode_text = "LIVE MODE"
+        mode_class = "mode-indicator mode-live"
+    else:
+        mode_text = "PAPER MODE"
+        mode_class = "mode-indicator mode-paper"
+        
+    return status_child, mode_text, mode_class, show_alert
 
 
 # Callback: Update metrics
 @app.callback(
+    Output('price-label', 'children'),
     Output('price-metric', 'children'),
     Output('price-change', 'children'),
     Output('price-change', 'className'),
@@ -463,29 +811,51 @@ def update_status(n):
     Output('pnl-percent', 'className'),
     Output('trades-metric', 'children'),
     Output('win-rate', 'children'),
-    Output('datapoints-metric', 'children'),
-    Output('data-coverage', 'children'),
+    Output('balance-metric', 'children'),
+    Output('monthly-return', 'children'),
     Input('interval-component', 'n_intervals')
 )
 def update_metrics(n):
     global trader, chart_data, performance_metrics
     
     if not trader or not is_running:
-        return ("--", "No data", "metric-change neutral", 
+        return ("Current Price", "--", "No data", "metric-change neutral", 
                 "NONE", "No position", 
                 "$0.00", "0.0%", "metric-change neutral",
                 "0", "Win Rate: 0%",
-                "0", "0/1440 mins")
+                "$0.00", "Return: 0.0%")
     
     try:
         # Price metrics
+        symbol_label = "Current Price"
+        if trader and trader.symbol:
+            # Format symbol: PERP_BTC_USDT -> BTC/USDT
+            s = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/')
+            symbol_label = f"{s}"
+
         price = trader.current_price or 0
         price_str = f"${price:,.2f}" if price else "--"
         
-        # Calculate price change
+        # Calculate price change (24h)
         price_change = 0
         price_change_pct = 0
-        if len(chart_data['prices']) > 1:
+        used_24h_stats = False
+        
+        if trader and hasattr(trader, 'stats_24h') and trader.stats_24h:
+            try:
+                # Ensure we are using stats for the correct symbol
+                stats_symbol = trader.stats_24h.get('symbol', '')
+                if stats_symbol == trader.symbol:
+                    open_24h = float(trader.stats_24h.get('24h_open', 0))
+                    if open_24h > 0:
+                        price_change = price - open_24h
+                        price_change_pct = (price_change / open_24h) * 100
+                        used_24h_stats = True
+            except (ValueError, TypeError):
+                pass
+        
+        # Fallback to session change if 24h stats not available
+        if not used_24h_stats and len(chart_data['prices']) > 1:
             old_price = list(chart_data['prices'])[0]
             if old_price:
                 price_change = price - old_price
@@ -496,21 +866,26 @@ def update_metrics(n):
         
         # Position metrics
         position = trader.current_position
-        if position:
-            position_side = position['side'].upper()
-            position_qty = position['quantity']
+        if position and isinstance(position, dict) and 'side' in position:
+            position_side = position.get('side', 'NONE').upper()
+            position_qty = position.get('quantity', 0)
             position_str = f"{position_side}"
-            position_size_str = f"{position_qty:.6f} BTC"
+            position_size_str = f"{position_qty:.6f} BTC" # Assuming BTC for now, should be dynamic
             
             # Calculate P&L
-            entry_price = position['entry_price']
+            entry_price = position.get('entry_price', 0)
             current_price = price
-            if position['side'] == 'long':
-                pnl = (current_price - entry_price) * position_qty
+            if entry_price > 0:
+                if position_side == 'LONG':
+                    pnl = (current_price - entry_price) * position_qty
+                else:
+                    pnl = (entry_price - current_price) * position_qty
+                
+                pnl_pct = (pnl / (entry_price * position_qty)) * 100 if position_qty > 0 else 0
             else:
-                pnl = (entry_price - current_price) * position_qty
-            
-            pnl_pct = (pnl / (entry_price * position_qty)) * 100
+                pnl = 0
+                pnl_pct = 0
+
             pnl_str = f"${pnl:,.2f}"
             pnl_pct_str = f"{pnl_pct:+.2f}%"
             pnl_class = "metric-change positive" if pnl >= 0 else "metric-change negative"
@@ -526,10 +901,36 @@ def update_metrics(n):
         win_rate = performance_metrics['win_rate']
         win_rate_str = f"Win Rate: {win_rate:.1f}%"
         
-        # Data points
-        data_points = len(trader.trade_px_list)
-        coverage = (data_points / 1440) * 100
-        coverage_str = f"{data_points}/1440 mins ({coverage:.0f}%)"
+        # Account Balance & Monthly Return
+        account = Account(trade_mode=trader.trade_mode)
+        balance_val = "$0.00"
+        return_val = "Return: 0.0%"
+        
+        if trader.trade_mode == 'paper':
+            summary = account.get_transaction_summary()
+            net_pnl = summary.get('net_pnl', 0.0)
+            initial_balance = 100000.0
+            current_balance = initial_balance + net_pnl
+            balance_val = f"${current_balance:,.2f}"
+            roi = (net_pnl / initial_balance) * 100
+            return_val = f"Return: {roi:+.2f}%"
+        else:
+            # Live mode
+            acct_info = account.get_account_info()
+            if acct_info and 'totalCollateral' in acct_info:
+                 total = float(acct_info.get('totalCollateral', 0))
+                 balance_val = f"${total:,.2f}"
+                 return_val = "Live Balance"
+            else:
+                 # Fallback to balance check if account info fails
+                 api_bal = account.get_api_balance()
+                 if api_bal:
+                     # Try to sum up holdings if totalCollateral not available
+                     balance_val = "Check Logs"
+                     return_val = "Partial Data"
+                 else:
+                     balance_val = "N/A"
+                     return_val = "Check API"
         
         # Update chart data
         if price:
@@ -541,19 +942,130 @@ def update_metrics(n):
                 chart_data['bid_depth'].append(trader.orderbook.get('bid_depth', 0))
                 chart_data['ask_depth'].append(trader.orderbook.get('ask_depth', 0))
         
-        return (price_str, price_change_str, price_change_class,
+        return (symbol_label, price_str, price_change_str, price_change_class,
                 position_str, position_size_str,
                 pnl_str, pnl_pct_str, pnl_class,
                 str(trades_count), win_rate_str,
-                str(data_points), coverage_str)
+                balance_val, return_val)
     
     except Exception as e:
         logger.error(f"Error updating metrics: {str(e)}")
-        return ("Error", "Error", "metric-change neutral",
+        return ("Error", "Error", "Error", "metric-change neutral",
                 "Error", "Error",
                 "Error", "Error", "metric-change neutral",
                 "Error", "Error",
                 "Error", "Error")
+
+
+# Callback: Update Strategy Info
+@app.callback(
+    Output('entry-strategy-metric', 'children'),
+    Output('exit-strategy-metric', 'children'),
+    Output('take-profit-metric', 'children'),
+    Output('stop-loss-metric', 'children'),
+    Input('interval-component', 'n_intervals')
+)
+def update_strategy_info(n):
+    try:
+        # Load config (it's fast enough)
+        config = config_loader.load_config()
+        
+        entry_strat = config.get('ENTRY_STRATEGY', 'ma_crossover').replace('_', ' ').title()
+        exit_strat = config.get('EXIT_STRATEGY', 'ma_crossover').replace('_', ' ').title()
+        tp_pct = float(config.get('TAKE_PROFIT_PCT', 5.0))
+        sl_pct = float(config.get('STOP_LOSS_PCT', 2.0))
+        
+        return (
+            entry_strat,
+            exit_strat,
+            f"{tp_pct}%",
+            f"{sl_pct}%"
+        )
+    except Exception as e:
+        logger.error(f"Error updating strategy info: {str(e)}")
+        return ("--", "--", "--", "--")
+
+
+# Callback: Update System Metrics
+@app.callback(
+    Output('cpu-usage-metric', 'children'),
+    Output('cpu-gauge', 'figure'),
+    Output('memory-usage-metric', 'children'),
+    Output('memory-gauge', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_system_metrics(n):
+    try:
+        # Get CPU usage
+        cpu_percent = psutil.cpu_percent(interval=None)
+        
+        # Get Memory usage
+        memory = psutil.virtual_memory()
+        memory_percent = memory.percent
+        
+        # Create CPU Gauge
+        cpu_fig = go.Figure(go.Indicator(
+            mode = "gauge+number",
+            value = cpu_percent,
+            domain = {'x': [0, 1], 'y': [0, 1]},
+            gauge = {
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "white"},
+                'bar': {'color': "#667eea"},
+                'bgcolor': "rgba(0,0,0,0)",
+                'borderwidth': 2,
+                'bordercolor': "#444",
+                'steps': [
+                    {'range': [0, 50], 'color': "rgba(0, 200, 83, 0.3)"},
+                    {'range': [50, 80], 'color': "rgba(255, 214, 0, 0.3)"},
+                    {'range': [80, 100], 'color': "rgba(255, 23, 68, 0.3)"}
+                ],
+            }
+        ))
+        cpu_fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font={'color': "white"},
+            margin={'t': 0, 'b': 0, 'l': 20, 'r': 20},
+            height=100
+        )
+        
+        # Create Memory Gauge
+        mem_fig = go.Figure(go.Indicator(
+            mode = "gauge+number",
+            value = memory_percent,
+            domain = {'x': [0, 1], 'y': [0, 1]},
+            gauge = {
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "white"},
+                'bar': {'color': "#764ba2"},
+                'bgcolor': "rgba(0,0,0,0)",
+                'borderwidth': 2,
+                'bordercolor': "#444",
+                'steps': [
+                    {'range': [0, 50], 'color': "rgba(0, 200, 83, 0.3)"},
+                    {'range': [50, 80], 'color': "rgba(255, 214, 0, 0.3)"},
+                    {'range': [80, 100], 'color': "rgba(255, 23, 68, 0.3)"}
+                ],
+            }
+        ))
+        mem_fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font={'color': "white"},
+            margin={'t': 0, 'b': 0, 'l': 20, 'r': 20},
+            height=100
+        )
+        
+        return (
+            f"{cpu_percent}%",
+            cpu_fig,
+            f"{memory_percent}%",
+            mem_fig
+        )
+    except Exception as e:
+        # logger.error(f"Error updating system metrics: {str(e)}")
+        empty_fig = go.Figure()
+        empty_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+        return ("--", empty_fig, "--", empty_fig)
 
 
 # Callback: Update price chart
@@ -562,53 +1074,112 @@ def update_metrics(n):
     Input('interval-component', 'n_intervals')
 )
 def update_price_chart(n):
-    global chart_data
+    global chart_data, trader
+    
+    symbol_display = "BTC/USDT"
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/')
     
     fig = make_subplots(
-        rows=2, cols=1,
+        rows=3, cols=1,
         shared_xaxes=True,
         vertical_spacing=0.05,
-        row_heights=[0.7, 0.3],
-        subplot_titles=('BTC/USDT Price', 'Order Book Depth')
+        row_heights=[0.6, 0.2, 0.2],
+        subplot_titles=(f'{symbol_display} Price', f'{symbol_display} Volume', f'{symbol_display} Order Book Depth')
     )
     
     if len(chart_data['timestamps']) > 0:
-        # Price line
-        fig.add_trace(
-            go.Scatter(
-                x=list(chart_data['timestamps']),
-                y=list(chart_data['prices']),
-                mode='lines',
-                name='Price',
-                line=dict(color='#667eea', width=2),
-                fill='tozeroy',
-                fillcolor='rgba(102, 126, 234, 0.1)'
-            ),
-            row=1, col=1
-        )
+        # Filter data for last 10 minutes
+        now = datetime.now()
+        cutoff = now - timedelta(minutes=10)
         
-        # Bid/Ask depth
-        fig.add_trace(
-            go.Scatter(
-                x=list(chart_data['timestamps']),
-                y=list(chart_data['bid_depth']),
-                mode='lines',
-                name='Bid Depth',
-                line=dict(color='#00c853', width=1.5)
-            ),
-            row=2, col=1
-        )
+        timestamps = list(chart_data['timestamps'])
+        prices = list(chart_data['prices'])
+        volumes = list(chart_data['volumes'])
+        bid_depth = list(chart_data['bid_depth'])
+        ask_depth = list(chart_data['ask_depth'])
         
-        fig.add_trace(
-            go.Scatter(
-                x=list(chart_data['timestamps']),
-                y=list(chart_data['ask_depth']),
-                mode='lines',
-                name='Ask Depth',
-                line=dict(color='#ff1744', width=1.5)
-            ),
-            row=2, col=1
-        )
+        # Find indices where timestamp >= cutoff
+        indices = [i for i, t in enumerate(timestamps) if t >= cutoff]
+        
+        if indices:
+            filtered_timestamps = [timestamps[i] for i in indices]
+            filtered_prices = [prices[i] for i in indices]
+            filtered_volumes = [volumes[i] for i in indices]
+            filtered_bid_depth = [bid_depth[i] for i in indices]
+            filtered_ask_depth = [ask_depth[i] for i in indices]
+            
+            # Price line
+            fig.add_trace(
+                go.Scatter(
+                    x=filtered_timestamps,
+                    y=filtered_prices,
+                    mode='lines',
+                    name='Price',
+                    line=dict(color='#667eea', width=2),
+                    fill='tozeroy',
+                    fillcolor='rgba(102, 126, 234, 0.1)'
+                ),
+                row=1, col=1
+            )
+            
+            # Bid/Ask depth
+            fig.add_trace(
+                go.Scatter(
+                    x=filtered_timestamps,
+                    y=filtered_bid_depth,
+                    mode='lines',
+                    name='Bid Depth',
+                    line=dict(color='#00c853', width=1.5)
+                ),
+                row=3, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(
+                    x=filtered_timestamps,
+                    y=filtered_ask_depth,
+                    mode='lines',
+                    name='Ask Depth',
+                    line=dict(color='#ff1744', width=1.5)
+                ),
+                row=3, col=1
+            )
+            
+            # Volume
+            up_x, up_y = [], []
+            down_x, down_y = [], []
+            
+            for i in range(len(filtered_prices)):
+                if i == 0 or filtered_prices[i] >= filtered_prices[i-1]:
+                    up_x.append(filtered_timestamps[i])
+                    up_y.append(filtered_volumes[i])
+                else:
+                    down_x.append(filtered_timestamps[i])
+                    down_y.append(filtered_volumes[i])
+            
+            if up_x:
+                fig.add_trace(go.Bar(
+                    x=up_x,
+                    y=up_y,
+                    name='Up Volume',
+                    marker=dict(color='#00c853')
+                ), row=2, col=1)
+                
+            if down_x:
+                fig.add_trace(go.Bar(
+                    x=down_x,
+                    y=down_y,
+                    name='Down Volume',
+                    marker=dict(color='#ff1744')
+                ), row=2, col=1)
+            
+            # Set y-axis range for Price chart (row 1) based on filtered min/max
+            if filtered_prices:
+                min_price = min(filtered_prices)
+                max_price = max(filtered_prices)
+                if min_price > 0 and max_price > 0:
+                    fig.update_yaxes(range=[min_price * 0.99, max_price * 1.01], row=1, col=1)
     
     fig.update_xaxes(showgrid=False, gridcolor='#2e2e2e')
     fig.update_yaxes(showgrid=True, gridcolor='#2e2e2e')
@@ -673,8 +1244,12 @@ def update_orderbook_chart(n):
             fillcolor='rgba(255, 23, 68, 0.3)'
         ))
     
+    symbol_display = ""
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
+
     fig.update_layout(
-        title='Order Book Depth',
+        title=f'{symbol_display}Order Book Depth',
         template='plotly_dark',
         paper_bgcolor='#1e2130',
         plot_bgcolor='#1e2130',
@@ -690,38 +1265,13 @@ def update_orderbook_chart(n):
     return fig
 
 
-# Callback: Update volume chart
-@app.callback(
-    Output('volume-chart', 'figure'),
-    Input('interval-component', 'n_intervals')
-)
+# Callback: Update volume chart (Deprecated - Merged into Price Chart)
+# @app.callback(
+#     Output('volume-chart', 'figure'),
+#     Input('interval-component', 'n_intervals')
+# )
 def update_volume_chart(n):
-    global chart_data
-    
-    fig = go.Figure()
-    
-    if len(chart_data['timestamps']) > 0:
-        fig.add_trace(go.Bar(
-            x=list(chart_data['timestamps']),
-            y=list(chart_data['volumes']),
-            name='Volume',
-            marker=dict(color='#764ba2')
-        ))
-    
-    fig.update_layout(
-        title='Trading Volume',
-        template='plotly_dark',
-        paper_bgcolor='#1e2130',
-        plot_bgcolor='#1e2130',
-        font=dict(color='#ffffff'),
-        height=300,
-        margin=dict(l=50, r=20, t=40, b=40),
-        xaxis_title='Time',
-        yaxis_title='Volume (BTC)',
-        showlegend=False
-    )
-    
-    return fig
+    return go.Figure()
 
 
 # Callback: Update P&L chart
@@ -798,7 +1348,8 @@ def update_rsi_chart(n):
     
     if trader and len(trader.trade_px_list) >= 14:
         # Calculate RSI
-        prices = list(trader.trade_px_list)
+        # Extract prices from the list of dictionaries
+        prices = [entry['price'] for entry in trader.trade_px_list]
         period = 14
         
         if len(prices) >= period:
@@ -834,8 +1385,12 @@ def update_rsi_chart(n):
                 fig.add_hline(y=30, line_dash="dash", line_color="#00c853", line_width=1, annotation_text="Oversold")
                 fig.add_hline(y=50, line_dash="dot", line_color="#666666", line_width=1)
     
+    symbol_display = ""
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
+
     fig.update_layout(
-        title='RSI Indicator (14)',
+        title=f'{symbol_display}RSI Indicator (14)',
         xaxis_title='Time',
         yaxis_title='RSI',
         template='plotly_dark',
@@ -904,8 +1459,12 @@ def update_ma_chart(n):
                     line=dict(color='#ff1744', width=1.5, dash='dot')
                 ))
     
+    symbol_display = ""
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
+
     fig.update_layout(
-        title='Moving Averages (MA20/MA50)',
+        title=f'{symbol_display}Moving Averages (MA20/MA50)',
         xaxis_title='Time',
         yaxis_title='Price (USD)',
         template='plotly_dark',
@@ -956,8 +1515,12 @@ def update_spread_chart(n):
                     fillcolor='rgba(156, 39, 176, 0.1)'
                 ))
     
+    symbol_display = ""
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
+
     fig.update_layout(
-        title='Bid-Ask Spread %',
+        title=f'{symbol_display}Bid-Ask Spread %',
         xaxis_title='Time',
         yaxis_title='Spread (%)',
         template='plotly_dark',
@@ -977,7 +1540,7 @@ def update_spread_chart(n):
     Input('interval-component', 'n_intervals')
 )
 def update_trade_distribution_chart(n):
-    global performance_metrics
+    global performance_metrics, trader
     
     fig = go.Figure()
     
@@ -994,8 +1557,12 @@ def update_trade_distribution_chart(n):
             textfont=dict(size=14, color='white')
         ))
     
+    symbol_display = ""
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
+
     fig.update_layout(
-        title='Trade Distribution',
+        title=f'{symbol_display}Trade Distribution',
         template='plotly_dark',
         paper_bgcolor='#1e2130',
         plot_bgcolor='#1e2130',
@@ -1049,8 +1616,12 @@ def update_cumulative_return_chart(n):
         except Exception as e:
             logger.error(f"Error calculating cumulative return: {e}")
     
+    symbol_display = ""
+    if trader and trader.symbol:
+        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
+
     fig.update_layout(
-        title='Cumulative Return',
+        title=f'{symbol_display}Cumulative Return',
         xaxis_title='Time',
         yaxis_title='Total P&L (USD)',
         template='plotly_dark',
@@ -1076,13 +1647,15 @@ def update_performance_table(n):
     
     if trader:
         try:
-            account = Account(trade_mode=trader.trade_mode)
-            summary = account.get_transaction_summary()
-            
-            if summary:
-                performance_metrics['total_trades'] = summary['buy_count'] + summary['sell_count']
-                # Calculate win rate from realized P&L
-                # This is simplified - you may want to enhance this
+            with Account(trade_mode=trader.trade_mode) as account:
+                summary = account.get_transaction_summary()
+                
+                if summary:
+                    performance_metrics['total_trades'] = summary['buy_count'] + summary['sell_count']
+                    performance_metrics['total_pnl'] = summary.get('net_pnl', 0.0)
+                    
+                    # Update win/loss counts if available in summary or calculate from trades
+                    # For now, we rely on what's in summary or default
         except Exception as e:
             logger.error(f"Error getting account summary: {str(e)}")
     
@@ -1114,7 +1687,8 @@ def update_activity_log(n):
     # Read recent log entries
     try:
         with open('trade.log', 'r') as f:
-            lines = f.readlines()[-20:]  # Last 20 lines
+            # Use deque to efficiently get the last 20 lines
+            lines = deque(f, maxlen=20)
             log_entries = []
             for line in lines:
                 # Color code based on log level
@@ -1128,6 +1702,11 @@ def update_activity_log(n):
                     color = '#b0b0b0'
                 
                 log_entries.append(html.Div(line.strip(), style={'color': color, 'marginBottom': '5px', 'fontSize': '13px', 'fontFamily': 'monospace'}))
+            
+            # Reverse to show newest at top if desired, but usually logs are top-down. 
+            # If the UI scrolls to bottom, standard order is fine.
+            # The current UI has overflowY: scroll, so it's a scrollable box.
+            # Usually logs are appended.
             
             return log_entries
     except FileNotFoundError:
@@ -1262,6 +1841,284 @@ def update_print_account_summary(n):
     except Exception as e:
         logger.error(f"Error generating print account summary: {str(e)}")
         return html.Div(f"Error: {str(e)}", style={'color': 'red'})
+
+
+# Callback: Update Symbol Options based on Trade Type
+@app.callback(
+    Output('conf-symbol', 'options'),
+    Input('conf-trade-type', 'value')
+)
+def update_symbol_options(trade_type):
+    if trade_type == 'spot':
+        return [
+            {'label': 'BTC/USDT', 'value': 'SPOT_BTC_USDT'},
+            {'label': 'ETH/USDT', 'value': 'SPOT_ETH_USDT'},
+            {'label': 'XRP/USDT', 'value': 'SPOT_XRP_USDT'},
+            {'label': 'SOL/USDT', 'value': 'SPOT_SOL_USDT'}
+        ]
+    else:
+        return [
+            {'label': 'BTC/USDT', 'value': 'PERP_BTC_USDT'},
+            {'label': 'ETH/USDT', 'value': 'PERP_ETH_USDT'},
+            {'label': 'XRP/USDT', 'value': 'PERP_XRP_USDT'},
+            {'label': 'SOL/USDT', 'value': 'PERP_SOL_USDT'}
+        ]
+
+
+@app.callback(
+    Output('spot-warning', 'children'),
+    Input('conf-trade-type', 'value')
+)
+def update_spot_warning(trade_type):
+    if trade_type == 'spot':
+        return "⚠️ Spot trading does not support short selling."
+    return ""
+
+
+# Callback: Update Position Size Label and Default Value
+@app.callback(
+    [Output('pos-size-value-label', 'children'),
+     Output('conf-pos-size-value', 'value', allow_duplicate=True),
+     Output('config-loaded-flag', 'data', allow_duplicate=True)],
+    [Input('conf-pos-size-type', 'value'),
+     Input('conf-symbol', 'value'),
+     Input('config-loaded-flag', 'data')],
+    prevent_initial_call=True
+)
+def update_pos_size_ui(size_type, symbol, is_loading):
+    label = "Position Size Value"
+    new_value = dash.no_update
+    
+    # Determine label
+    if size_type == 'value':
+        label = "Position Size Value ($ USDT)"
+    elif size_type == 'percentage':
+        label = "Position Size Value (% of Balance)"
+    elif size_type == 'quantity':
+        asset = "Asset"
+        if symbol:
+            parts = symbol.split('_')
+            if len(parts) >= 2:
+                asset = parts[1]
+        label = f"Position Size Value (Number of {asset})"
+    
+    # Determine default value if not loading from config
+    if not is_loading:
+        if size_type == 'quantity' and symbol:
+            asset = symbol.split('_')[1] if len(symbol.split('_')) >= 2 else ''
+            defaults = {
+                'BTC': 0.0001,
+                'ETH': 0.002,
+                'SOL': 0.05,
+                'XRP': 5.0
+            }
+            if asset in defaults:
+                new_value = defaults[asset]
+        elif size_type == 'value':
+            new_value = 10.0
+            
+    return label, new_value, False
+
+
+# Callback: Toggle Config Modal and Load Settings
+@app.callback(
+    [Output('config-modal', 'style'),
+     Output('conf-trade-mode', 'value'),
+     Output('conf-trade-type', 'value'),
+     Output('conf-symbol', 'value'),
+     Output('conf-pos-size-type', 'value'),
+     Output('conf-pos-size-value', 'value'),
+     Output('conf-max-pos', 'value'),
+     Output('conf-strategy', 'value'),
+     Output('conf-short-ma', 'value'),
+     Output('conf-long-ma', 'value'),
+     Output('conf-sl', 'value'),
+     Output('conf-tp', 'value'),
+     Output('config-loaded-flag', 'data')],
+    [Input('config-btn', 'n_clicks'),
+     Input('close-config-btn', 'n_clicks'),
+     Input('cancel-config-btn', 'n_clicks'),
+     Input('save-config-btn', 'n_clicks')],
+    [State('config-modal', 'style')]
+)
+def toggle_config_modal(n1, n2, n3, n4, current_style):
+    ctx = callback_context
+    if not ctx.triggered:
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    if button_id == 'config-btn':
+        # Open modal and load config
+        try:
+            config = config_loader.load_config()
+            return (
+                {'display': 'block'},
+                config.get('TRADE_MODE', 'paper'),
+                config.get('TRADE_TYPE', 'future'),
+                config.get('SYMBOL', 'PERP_BTC_USDT'),
+                config.get('MAX_POS_SIZE_TYPE', 'value'),
+                float(config.get('MAX_POS_SIZE_VALUE', 10.0)),
+                int(config.get('MAX_OPEN_POSITIONS', 1)),
+                config.get('ENTRY_STRATEGY', 'ma_crossover'),
+                int(config.get('SHORT_MA_PERIOD', 20)),
+                int(config.get('LONG_MA_PERIOD', 50)),
+                float(config.get('STOP_LOSS_PCT', 3.0)),
+                float(config.get('TAKE_PROFIT_PCT', 5.0)),
+                True # Set flag to True indicating config just loaded
+            )
+        except Exception as e:
+            logger.error(f"Error loading config: {e}")
+            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 'ma_crossover', 20, 50, 3.0, 5.0, True
+            
+    elif button_id in ['close-config-btn', 'cancel-config-btn', 'save-config-btn']:
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+    
+    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+
+# Callback: Save Config
+@app.callback(
+    Output('config-feedback', 'children'),
+    Input('save-config-btn', 'n_clicks'),
+    [State('conf-trade-mode', 'value'),
+     State('conf-trade-type', 'value'),
+     State('conf-symbol', 'value'),
+     State('conf-pos-size-type', 'value'),
+     State('conf-pos-size-value', 'value'),
+     State('conf-max-pos', 'value'),
+     State('conf-strategy', 'value'),
+     State('conf-short-ma', 'value'),
+     State('conf-long-ma', 'value'),
+     State('conf-sl', 'value'),
+     State('conf-tp', 'value')],
+    prevent_initial_call=True
+)
+def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, strategy, ma_short, ma_long, sl, tp):
+    try:
+        # Read existing config to preserve comments
+        with open('.config', 'r') as f:
+            lines = f.readlines()
+        
+        new_lines = []
+        updates = {
+            'TRADE_MODE': trade_mode,
+            'TRADE_TYPE': trade_type,
+            'SYMBOL': symbol,
+            'MAX_POS_SIZE_TYPE': pos_size_type,
+            'MAX_POS_SIZE_VALUE': str(pos_size_value),
+            'MAX_OPEN_POSITIONS': str(max_pos),
+            'ENTRY_STRATEGY': strategy,
+            'EXIT_STRATEGY': strategy, # Assume same for now
+            'SHORT_MA_PERIOD': str(ma_short),
+            'LONG_MA_PERIOD': str(ma_long),
+            'STOP_LOSS_PCT': str(sl),
+            'TAKE_PROFIT_PCT': str(tp)
+        }
+        
+        for line in lines:
+            key = line.split('=')[0].strip() if '=' in line else None
+            if key and key in updates:
+                new_lines.append(f"{key}={updates[key]}\n")
+                del updates[key]
+            else:
+                new_lines.append(line)
+        
+        # Append any new keys
+        for key, value in updates.items():
+            new_lines.append(f'{key}={value}\n')
+            
+        with open('.config', 'w') as f:
+            f.writelines(new_lines)
+            
+        return html.Span("✅ Settings saved successfully! Restart bot to apply.", style={'color': '#00c853'})
+    except Exception as e:
+        logger.error(f"Error saving config: {e}")
+        return html.Span(f"❌ Error saving settings: {str(e)}", style={'color': '#ff1744'})
+
+
+def get_trading_records():
+    try:
+        # Determine DB file based on config
+        config = config_loader.load_config()
+        trade_mode = config.get('TRADE_MODE', 'paper')
+        db_file = 'live_transaction.db' if trade_mode == 'live' else 'paper_transaction.db'
+        
+        # Use read_only=True to avoid locking issues if the bot is writing
+        conn = duckdb.connect(db_file, read_only=True)
+        
+        # Check if table exists
+        try:
+            conn.execute("SELECT 1 FROM trades LIMIT 1")
+        except:
+            conn.close()
+            return []
+            
+        # Fetch records, latest first
+        records = conn.execute("SELECT * FROM trades ORDER BY trade_datetime DESC LIMIT 50").fetchall()
+        columns = [desc[0] for desc in conn.description]
+        conn.close()
+        
+        return [dict(zip(columns, row)) for row in records]
+    except Exception as e:
+        # logger.error(f"Error fetching trading records: {e}") # Reduce noise if DB doesn't exist yet
+        return []
+
+
+# Callback: Update Trading Records
+@app.callback(
+    Output('trading-record-table', 'children'),
+    Input('interval-component', 'n_intervals')
+)
+def update_trading_records(n):
+    records = get_trading_records()
+    
+    if not records:
+        return html.Div("No trading records found.", style={'color': '#a0a0a0', 'textAlign': 'center', 'padding': '20px'})
+    
+    # Create table header
+    header = html.Tr([
+        html.Th("Time", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Symbol", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Type", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Action", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Price", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Quantity", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Proceeds", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+    ])
+    
+    rows = []
+    for r in records:
+        # Format values
+        dt = r.get('trade_datetime', '')
+        symbol = r.get('symbol', '').replace('PERP_', '').replace('SPOT_', '').replace('_', '/')
+        trade_type = r.get('trade_type', '')
+        code = r.get('code', '') # O=Open, C=Close
+        
+        action_map = {'O': 'OPEN', 'C': 'CLOSE'}
+        action = action_map.get(code, code)
+        
+        price = f"${r.get('price', 0):,.2f}"
+        qty = f"{abs(r.get('quantity', 0)):.4f}"
+        proceeds = f"${r.get('proceeds', 0):,.2f}"
+        
+        row_style = {'borderBottom': '1px solid #2e3241', 'color': '#e0e0e0', 'fontSize': '13px'}
+        
+        if trade_type == 'BUY':
+            type_style = {'color': '#00c853', 'fontWeight': 'bold'}
+        else:
+            type_style = {'color': '#ff1744', 'fontWeight': 'bold'}
+            
+        rows.append(html.Tr([
+            html.Td(str(dt), style={'padding': '10px'}),
+            html.Td(symbol, style={'padding': '10px'}),
+            html.Td(trade_type, style={'padding': '10px', **type_style}),
+            html.Td(action, style={'padding': '10px'}),
+            html.Td(price, style={'padding': '10px', 'textAlign': 'right'}),
+            html.Td(qty, style={'padding': '10px', 'textAlign': 'right'}),
+            html.Td(proceeds, style={'padding': '10px', 'textAlign': 'right'}),
+        ], style=row_style))
+        
+    return html.Table([html.Thead(header), html.Tbody(rows)], style={'width': '100%', 'borderCollapse': 'collapse'})
 
 
 if __name__ == '__main__':

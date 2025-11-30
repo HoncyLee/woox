@@ -5,7 +5,7 @@ This helps verify the core logic works before testing the full workflow.
 """
 from collections import deque
 from config_loader import CONFIG
-from signal import MovingAverageCrossover
+from trading_signal import MovingAverageCrossover
 
 def test_signal_generation():
     """Test MA crossover signal generation with clear patterns."""

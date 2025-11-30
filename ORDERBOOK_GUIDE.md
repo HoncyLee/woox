@@ -7,7 +7,7 @@
 ```python
 from typing import Optional, Dict, Any
 from collections import deque
-from signal import BaseStrategy
+from trading_signal import BaseStrategy
 
 class MyCustomStrategy(BaseStrategy):
     def generate_entry_signal(

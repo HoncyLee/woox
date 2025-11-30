@@ -1,17 +1,20 @@
 import requests
 import time
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 import hmac
 import hashlib
+import threading
 from collections import deque
 from typing import Optional, Dict, Any, Callable
 import json
 import functools
 import duckdb
 from decimal import Decimal
-from config_loader import CONFIG, get_config_value
-from signal import get_strategy
+from config_loader import CONFIG, get_config_value, load_config
+from trading_signal import get_strategy
+from account import Account
 from woox_errors import (
     handle_api_error,
     is_retryable_error,
@@ -79,14 +82,33 @@ TRADE_MODE = CONFIG.get('TRADE_MODE', 'paper')  # 'paper' or 'live'
 log_level = getattr(logging, CONFIG.get('LOG_LEVEL', 'INFO'))
 log_file = CONFIG.get('LOG_FILE', 'trade.log')
 
-logging.basicConfig(
-    level=log_level,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()
-    ]
-)
+# Ensure logging is configured correctly even if basicConfig was already called
+root_logger = logging.getLogger()
+root_logger.setLevel(log_level)
+
+# Check if FileHandler exists for our log file
+has_file_handler = False
+for h in root_logger.handlers:
+    if isinstance(h, logging.FileHandler):
+        # Check if it's the same file (handling absolute/relative paths)
+        if os.path.abspath(h.baseFilename) == os.path.abspath(log_file):
+            has_file_handler = True
+            break
+
+if not has_file_handler:
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # Use RotatingFileHandler to prevent log file from growing indefinitely (10MB limit, 5 backups)
+    file_handler = RotatingFileHandler(log_file, maxBytes=10*1024*1024, backupCount=5)
+    file_handler.setFormatter(formatter)
+    root_logger.addHandler(file_handler)
+
+# Ensure StreamHandler exists
+has_stream_handler = any(isinstance(h, logging.StreamHandler) for h in root_logger.handlers)
+if not has_stream_handler:
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+    root_logger.addHandler(stream_handler)
 
 
 class Trade:
@@ -104,12 +126,31 @@ class Trade:
             api_secret: WOOX API secret for authenticated requests (optional)
             trade_mode: Trading mode - 'paper' or 'live' (optional, defaults to TRADE_MODE constant)
         """
+        # Reload config to ensure fresh settings
+        fresh_config = load_config()
+        
         self.logger = logging.getLogger('Trade')
-        self.base_url = BASE_URL
-        self.api_key = api_key if api_key else CONFIG.get('WOOX_API_KEY')
-        self.api_secret = api_secret if api_secret else CONFIG.get('WOOX_API_SECRET')
-        self.trade_mode = trade_mode if trade_mode else TRADE_MODE
-        self.symbol = CONFIG.get('SYMBOL', 'PERP_BTC_USDT')
+        self.base_url = fresh_config.get('BASE_URL', 'https://api.woox.io')
+        self.api_key = api_key if api_key else fresh_config.get('WOOX_API_KEY')
+        self.api_secret = api_secret if api_secret else fresh_config.get('WOOX_API_SECRET')
+        self.trade_mode = trade_mode if trade_mode else fresh_config.get('TRADE_MODE', 'paper')
+        self.symbol = fresh_config.get('SYMBOL', 'PERP_BTC_USDT')
+        
+        # Validate and normalize symbol format
+        # WOO X uses PERP_ prefix for perpetual futures and SPOT_ for spot markets
+        if not self.symbol.startswith(('SPOT_', 'PERP_')):
+            # Check if TRADE_TYPE is specified in config
+            trade_type = fresh_config.get('TRADE_TYPE', 'future').lower()
+            
+            if trade_type == 'spot':
+                new_symbol = f"SPOT_{self.symbol}"
+                self.logger.warning(f"Symbol '{self.symbol}' missing prefix. Auto-correcting to '{new_symbol}' based on trade type '{trade_type}'.")
+                self.symbol = new_symbol
+            else:
+                # Default to PERP_ for futures/perpetuals
+                new_symbol = f"PERP_{self.symbol}"
+                self.logger.warning(f"Symbol '{self.symbol}' missing prefix. Auto-correcting to '{new_symbol}' based on trade type '{trade_type}'.")
+                self.symbol = new_symbol
         
         # Store 1440 minutes (24 hours) of price data
         self.trade_px_list = deque(maxlen=1440)
@@ -119,6 +160,7 @@ class Trade:
         self.current_volume = None
         self.current_bid = None
         self.current_ask = None
+        self.stats_24h = None
         
         # Orderbook data storage (up to 30 levels each side)
         self.orderbook = {
@@ -135,12 +177,12 @@ class Trade:
         self.current_position = None  # {'side': 'long'/'short', 'quantity': float, 'entry_price': float}
         
         # Initialize trading strategies
-        entry_strategy_name = CONFIG.get('ENTRY_STRATEGY', 'ma_crossover')
-        exit_strategy_name = CONFIG.get('EXIT_STRATEGY', 'ma_crossover')
+        entry_strategy_name = fresh_config.get('ENTRY_STRATEGY', 'ma_crossover')
+        exit_strategy_name = fresh_config.get('EXIT_STRATEGY', 'ma_crossover')
         
         try:
-            self.entry_strategy = get_strategy(entry_strategy_name, CONFIG)
-            self.exit_strategy = get_strategy(exit_strategy_name, CONFIG)
+            self.entry_strategy = get_strategy(entry_strategy_name, fresh_config)
+            self.exit_strategy = get_strategy(exit_strategy_name, fresh_config)
             self.logger.info(
                 "Strategies loaded - Entry: %s, Exit: %s",
                 entry_strategy_name, exit_strategy_name
@@ -152,8 +194,7 @@ class Trade:
         self.running = True
         
         # Initialize database connection based on trade mode
-        db_file = 'live_transaction.db' if self.trade_mode == 'live' else 'paper_transaction.db'
-        self.db_conn = duckdb.connect(db_file)
+        self.db_file = 'live_transaction.db' if self.trade_mode == 'live' else 'paper_transaction.db'
         self._init_database()
         
         self.logger.info("Trade class initialized for symbol: %s in %s mode", self.symbol, self.trade_mode.upper())
@@ -161,23 +202,24 @@ class Trade:
     def _init_database(self) -> None:
         """Initialize the DuckDB database and create trades table if not exists."""
         try:
-            self.db_conn.execute("""
-            CREATE TABLE IF NOT EXISTS trades (
-                acct_id TEXT,
-                symbol TEXT,
-                trade_datetime TIMESTAMP,
-                exchange TEXT,
-                signal TEXT,
-                trade_type TEXT,
-                quantity DOUBLE,
-                price DOUBLE,
-                proceeds DOUBLE,
-                commission DOUBLE,
-                fee DOUBLE,
-                order_type TEXT,
-                code TEXT
-            )
-            """)
+            with duckdb.connect(self.db_file) as conn:
+                conn.execute("""
+                CREATE TABLE IF NOT EXISTS trades (
+                    acct_id TEXT,
+                    symbol TEXT,
+                    trade_datetime TIMESTAMP,
+                    exchange TEXT,
+                    signal TEXT,
+                    trade_type TEXT,
+                    quantity DOUBLE,
+                    price DOUBLE,
+                    proceeds DOUBLE,
+                    commission DOUBLE,
+                    fee DOUBLE,
+                    order_type TEXT,
+                    code TEXT
+                )
+                """)
             self.logger.info("Database initialized successfully")
         except Exception as e:
             self.logger.error("Error initializing database: %s", str(e))
@@ -204,23 +246,24 @@ class Trade:
             # Use negative quantity for SELL in database
             db_quantity = quantity if trade_type == 'BUY' else -quantity
             
-            self.db_conn.execute("""
-            INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                CONFIG.get('USER', 'TRADER'),  # acct_id
-                self.symbol,  # symbol
-                datetime.fromtimestamp(time.time()),  # trade_datetime as TIMESTAMP
-                'woox',  # exchange
-                signal,  # signal
-                trade_type,  # trade_type
-                db_quantity,  # quantity
-                price,  # price
-                proceeds,  # proceeds
-                commission,  # commission
-                fee,  # fee
-                order_type,  # order_type
-                code  # code (O=Open, C=Close)
-            ))
+            with duckdb.connect(self.db_file) as conn:
+                conn.execute("""
+                INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    CONFIG.get('USER', 'TRADER'),  # acct_id
+                    self.symbol,  # symbol
+                    datetime.fromtimestamp(time.time()),  # trade_datetime as TIMESTAMP
+                    'woox',  # exchange
+                    signal,  # signal
+                    trade_type,  # trade_type
+                    db_quantity,  # quantity
+                    price,  # price
+                    proceeds,  # proceeds
+                    commission,  # commission
+                    fee,  # fee
+                    order_type,  # order_type
+                    code  # code (O=Open, C=Close)
+                ))
             
             self.logger.info(
                 "Transaction recorded - Type: %s, Quantity: %.6f, Price: %.2f, Proceeds: %.2f",
@@ -375,6 +418,18 @@ class Trade:
                 params={"symbol": self.symbol, "limit": 1},
                 authenticated=False
             )
+            
+            # Get 24h stats
+            try:
+                stats_data = self._make_request(
+                    'GET',
+                    f"/v1/public/futures/{self.symbol}",
+                    authenticated=False
+                )
+                if stats_data.get('success'):
+                    self.stats_24h = stats_data.get('info')
+            except Exception as e:
+                self.logger.warning(f"Failed to fetch 24h stats: {e}")
             
             # Process orderbook data
             if orderbook_data.get('success'):
@@ -568,47 +623,133 @@ class Trade:
             self.logger.error("Error determining stop trade: %s", str(e))
             return False
     
-    def hasPosition(self) -> Optional[Dict[str, Any]]:
+    def getOpenPositionCount(self) -> int:
         """
-        Check what position is currently held.
-        For spot trading, we check if we have open orders or holdings.
+        Count the total number of open positions across all symbols.
         
         Returns:
-            Dictionary with position details or None if no position
+            Number of open positions
         """
         try:
-            # For spot trading, check open orders via V3 API (only in live mode)
             if self.trade_mode == 'live' and self.api_key and self.api_secret:
-                try:
-                    request_path = f"/v3/trade/orders"
+                if self.symbol.startswith('SPOT_'):
+                    # For Spot, count tokens with non-zero balance (excluding USDT/USDC if used as quote)
+                    request_path = "/v3/balances"
                     headers = self._get_auth_headers('GET', request_path)
-                    
-                    response = requests.get(
-                        f"{self.base_url}{request_path}",
-                        headers=headers,
-                        params={"symbol": self.symbol},
-                        timeout=10
-                    )
+                    response = requests.get(f"{self.base_url}{request_path}", headers=headers, timeout=10)
                     
                     if response.status_code == 200:
                         data = response.json()
                         if data.get('success'):
-                            orders = data.get('data', {}).get('rows', [])
-                            if orders:
-                                self.logger.info("Found %d open orders", len(orders))
-                except Exception as api_error:
-                    self.logger.warning("Could not fetch open orders from API: %s", str(api_error))
+                            holdings = data.get('data', {}).get('holding', [])
+                            count = 0
+                            for h in holdings:
+                                # Exclude stablecoins usually used as quote
+                                if h['token'] not in ['USDT', 'USDC'] and float(h['holding']) > 0.0001:
+                                    count += 1
+                            return count
+                else:
+                    # For Futures, count positions with non-zero holding
+                    request_path = "/v3/positions"
+                    headers = self._get_auth_headers('GET', request_path)
+                    response = requests.get(f"{self.base_url}{request_path}", headers=headers, timeout=10)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get('success'):
+                            positions = data.get('data', {}).get('positions', [])
+                            count = 0
+                            for p in positions:
+                                if float(p['holding']) != 0:
+                                    count += 1
+                            return count
             
-            # Return local position tracking
-            if self.current_position:
-                self.logger.info(
-                    "Current position - Side: %s, Quantity: %s, Entry Price: %s",
-                    self.current_position['side'],
-                    self.current_position['quantity'],
-                    self.current_position['entry_price']
-                )
-            else:
-                self.logger.info("No position currently held")
+            # For paper trading, we only track the current symbol's position in this instance
+            # To support multi-symbol paper trading, we'd need a shared DB or state
+            return 1 if self.current_position else 0
+            
+        except Exception as e:
+            self.logger.error("Error counting open positions: %s", str(e))
+            return 1 if self.current_position else 0
+
+    def hasPosition(self, silent: bool = False) -> Optional[Dict[str, Any]]:
+        """
+        Check what position is currently held.
+        Updates self.current_position from API if in live mode.
+        
+        Args:
+            silent: If True, suppresses info logs about current position status
+            
+        Returns:
+            Dictionary with position details or None if no position
+        """
+        try:
+            # In live mode, fetch actual position from API
+            if self.trade_mode == 'live' and self.api_key and self.api_secret:
+                try:
+                    if self.symbol.startswith('SPOT_'):
+                        # For Spot, check balances
+                        base_token = self.symbol.split('_')[1]
+                        request_path = "/v3/balances"
+                        headers = self._get_auth_headers('GET', request_path)
+                        response = requests.get(f"{self.base_url}{request_path}", headers=headers, params={"token": base_token}, timeout=10)
+                        
+                        if response.status_code == 200:
+                            data = response.json()
+                            if data.get('success'):
+                                holdings = data.get('data', {}).get('holding', [])
+                                for h in holdings:
+                                    if h['token'] == base_token and float(h['holding']) > 0.0001: # Threshold
+                                        self.current_position = {
+                                            'side': 'long',
+                                            'quantity': float(h['holding']),
+                                            'entry_price': float(h.get('averageOpenPrice', 0) or self.current_price or 0),
+                                            'open_time': time.time() # Approximate
+                                        }
+                                        return self.current_position
+                                
+                                # If we get here, no position found
+                                self.current_position = None
+                                
+                    else:
+                        # For Futures, check positions
+                        request_path = "/v3/positions"
+                        headers = self._get_auth_headers('GET', request_path)
+                        response = requests.get(f"{self.base_url}{request_path}", headers=headers, timeout=10)
+                        
+                        if response.status_code == 200:
+                            data = response.json()
+                            if data.get('success'):
+                                positions = data.get('data', {}).get('positions', [])
+                                for p in positions:
+                                    if p['symbol'] == self.symbol and float(p['holding']) != 0:
+                                        qty = float(p['holding'])
+                                        side = 'long' if qty > 0 else 'short'
+                                        self.current_position = {
+                                            'side': side,
+                                            'quantity': abs(qty),
+                                            'entry_price': float(p['averageOpenPrice']),
+                                            'open_time': p.get('timestamp', time.time())
+                                        }
+                                        return self.current_position
+                                
+                                # If we get here, no position found
+                                self.current_position = None
+
+                except Exception as api_error:
+                    self.logger.warning("Could not fetch position from API: %s", str(api_error))
+            
+            # Return local position tracking (for paper mode or if API failed)
+            if not silent:
+                if self.current_position:
+                    self.logger.info(
+                        "Current position - Side: %s, Quantity: %s, Entry Price: %s",
+                        self.current_position['side'],
+                        self.current_position['quantity'],
+                        self.current_position['entry_price']
+                    )
+                else:
+                    self.logger.info("No position currently held")
             
             return self.current_position
             
@@ -814,13 +955,38 @@ class Trade:
         try:
             last_price_display_time = 0
             last_trade_check_time = 0
-            price_display_interval = 5  # Display price every 5 seconds
+            last_position_check_time = 0
+            price_display_interval = 1  # Display price every 1 second
             trade_check_interval = float(CONFIG.get('UPDATE_INTERVAL_SECONDS', 60))  # Trading decisions interval
+            position_check_interval = 3 # Check position every 3 seconds
+            
+            # Initial position check on startup
+            self.logger.info("Performing initial position check...")
+            # Ensure we have price data first
+            self.trade_update()
+            current_pos = self.hasPosition()
+            
+            if current_pos:
+                # Reload config to be sure we have the latest setting
+                current_config = load_config()
+                startup_action = current_config.get('ON_STARTUP_POSITION_ACTION', 'KEEP').upper()
+                
+                self.logger.info("Existing position found: %s %s. Startup action: %s", 
+                               current_pos.get('side'), current_pos.get('quantity'), startup_action)
+                
+                if startup_action == 'CLOSE':
+                    self.logger.info("Closing existing position as per startup configuration...")
+                    if self.current_price:
+                        self.closePosition(self.current_price)
+                    else:
+                        self.logger.warning("Cannot close position: Price data unavailable.")
+                elif startup_action == 'KEEP':
+                    self.logger.info("Keeping existing position. Bot will monitor and manage it.")
             
             while self.running:
                 current_time = time.time()
                 
-                # Fetch current market data every 5 seconds to keep entries updated
+                # Fetch current market data every 1 second to keep entries updated
                 if current_time - last_price_display_time >= price_display_interval:
                     trade_data = self.trade_update()
                     
@@ -830,23 +996,74 @@ class Trade:
                     
                     last_price_display_time = current_time
                 
+                # Check position frequently (every 3s) to keep dashboard updated
+                if current_time - last_position_check_time >= position_check_interval:
+                    self.hasPosition(silent=True)
+                    last_position_check_time = current_time
+                
                 # Make trading decisions at configured interval (default 60s)
                 if current_time - last_trade_check_time >= trade_check_interval:
                     # Check current position status
                     current_pos = self.hasPosition()
                     
+                    # Get max positions allowed
+                    max_positions = int(CONFIG.get('MAX_OPEN_POSITIONS', 1))
+                    
+                    # Check total open positions across account
+                    total_open_positions = self.getOpenPositionCount()
+                    
                     if current_pos:
                         # If we have a position, check if we should close it
                         if self.determineStopTrade():
                             self.closePosition(self.current_price)
-                    else:
-                        # If no position, check if we should open one
+                    
+                    # Only open new position if:
+                    # 1. We don't have a position in this symbol (current_pos is None)
+                    # 2. Total open positions across account is less than max allowed
+                    if not current_pos and total_open_positions < max_positions:
+                        # If below max positions, check if we should open one
                         signal = self.determineOpenTrade()
                         
                         if signal and self.current_price:
                             # Calculate quantity based on configured trade amount
-                            trade_amount_usd = float(CONFIG.get('TRADE_AMOUNT_USD', 100))
-                            quantity = trade_amount_usd / self.current_price
+                            pos_size_type = CONFIG.get('MAX_POS_SIZE_TYPE', 'value')
+                            pos_size_value = float(CONFIG.get('MAX_POS_SIZE_VALUE', 10.0))
+                            
+                            trade_amount_usd = 10.0 # Default
+                            
+                            if pos_size_type == 'percentage':
+                                try:
+                                    # Get total asset value
+                                    account_helper = Account(trade_mode=self.trade_mode)
+                                    total_asset = 0.0
+                                    
+                                    if self.trade_mode == 'live':
+                                        acct_info = account_helper.get_account_info()
+                                        if acct_info and 'totalCollateral' in acct_info:
+                                            total_asset = float(acct_info['totalCollateral'])
+                                    else:
+                                        # Paper mode: Initial 100k + PnL
+                                        summary = account_helper.get_transaction_summary()
+                                        net_pnl = summary.get('net_pnl', 0.0)
+                                        total_asset = 100000.0 + net_pnl
+                                        
+                                    trade_amount_usd = total_asset * (pos_size_value / 100.0)
+                                    self.logger.info(f"Calculated position size: ${trade_amount_usd:.2f} ({pos_size_value}% of ${total_asset:.2f})")
+                                except Exception as e:
+                                    self.logger.error(f"Error calculating percentage position size: {e}")
+                                    trade_amount_usd = 100.0 # Fallback
+                                
+                                quantity = trade_amount_usd / self.current_price
+                                
+                            elif pos_size_type == 'quantity':
+                                # Fixed quantity of asset (e.g. 0.001 BTC)
+                                quantity = pos_size_value
+                                self.logger.info(f"Using fixed quantity: {quantity}")
+                                
+                            else:
+                                # Fixed value (USDT)
+                                trade_amount_usd = pos_size_value
+                                quantity = trade_amount_usd / self.current_price
                             
                             # Use current ask/bid for limit price
                             if signal == 'long' and self.current_ask:

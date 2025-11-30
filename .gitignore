@@ -1,5 +1,6 @@
 # Files in folder
 trade.log
+references/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -141,3 +142,4 @@ config.ini
 *.swp
 *.swo
 *~
+*.db

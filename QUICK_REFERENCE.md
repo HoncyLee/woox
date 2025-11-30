@@ -67,6 +67,7 @@ TAKE_PROFIT_PCT=5.0
 # Trading
 TRADE_AMOUNT_USD=100
 UPDATE_INTERVAL_SECONDS=60
+ON_STARTUP_POSITION_ACTION=KEEP  # 'KEEP' (monitor) or 'CLOSE' (liquidate)
 ```
 
 ## 📊 Strategies Quick Reference

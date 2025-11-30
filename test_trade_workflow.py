@@ -9,7 +9,7 @@ import time
 import duckdb
 from collections import deque
 from config_loader import CONFIG
-from signal import get_strategy
+from trading_signal import get_strategy
 from trade import Trade
 
 

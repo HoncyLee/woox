@@ -57,12 +57,13 @@ class MovingAverageCrossover(BaseStrategy):
     Exit: Stop-loss or take-profit based on percentage
     """
     
-    def generate_entry_signal(self, price_history: deque) -> Optional[str]:
+    def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
         Generate entry signal using MA crossover.
         
         Args:
             price_history: Deque of price data dictionaries
+            orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
             'long' when short MA crosses above long MA

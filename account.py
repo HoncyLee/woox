@@ -42,12 +42,21 @@ class Account:
         self.api_key = os.environ.get('WOOX_API_KEY')
         self.api_secret = os.environ.get('WOOX_API_SECRET')
         self.base_url = CONFIG.get('BASE_URL', 'https://api.woox.io')
+        self.db_lock = None
         
         # Connect to appropriate database
+        # Use read_only=False to match Trade's connection config and avoid conflicts
+        # Create a new connection for thread safety
         db_file = 'live_transaction.db' if trade_mode == 'live' else 'paper_transaction.db'
-        self.db_conn = duckdb.connect(db_file, read_only=True)
+        self.db_conn = duckdb.connect(db_file, read_only=False)
         
         self.logger.info("Account initialized in %s mode", trade_mode.upper())
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
     
     def _generate_signature(self, timestamp: int, method: str, request_path: str, body: str = "") -> str:
         """Generate HMAC SHA256 signature for API authentication."""
@@ -116,6 +125,40 @@ class Account:
         except Exception as e:
             self.logger.error("Error fetching API balance: %s", str(e))
             return None
+
+    def get_account_info(self) -> Optional[Dict[str, Any]]:
+        """
+        Get account information from WOOX API (V3).
+        Includes total collateral, leverage, etc.
+        
+        Returns:
+            Dictionary with account info or None if error
+        """
+        if not self.api_key or not self.api_secret:
+            self.logger.warning("API credentials not available")
+            return None
+        
+        try:
+            request_path = "/v3/accountinfo"
+            headers = self._get_auth_headers('GET', request_path)
+            
+            response = requests.get(
+                f"{self.base_url}{request_path}",
+                headers=headers,
+                timeout=10
+            )
+            
+            response_data = response.json()
+            handle_api_error(response_data, self.logger)
+            
+            if response_data.get('success'):
+                return response_data.get('data', {})
+            
+            return None
+            
+        except Exception as e:
+            self.logger.error("Error fetching account info: %s", str(e))
+            return None
     
     def get_transaction_summary(self) -> Dict[str, Any]:
         """
@@ -126,33 +169,39 @@ class Account:
         """
         try:
             # Total transactions
-            total_trades = self.db_conn.execute("""
+            count_cursor = self.db_conn.execute("""
                 SELECT COUNT(*) as count FROM trades
-            """).fetchone()[0]
+            """)
+            count_row = count_cursor.fetchone()
+            total_trades = count_row[0] if count_row else 0
             
             # Total buy and sell volumes
-            buy_summary = self.db_conn.execute("""
+            buy_cursor = self.db_conn.execute("""
                 SELECT 
                     COUNT(*) as count,
                     SUM(quantity) as total_quantity,
                     SUM(proceeds) as total_proceeds
                 FROM trades 
                 WHERE trade_type = 'BUY'
-            """).fetchone()
+            """)
+            buy_summary = buy_cursor.fetchone()
             
-            sell_summary = self.db_conn.execute("""
+            sell_cursor = self.db_conn.execute("""
                 SELECT 
                     COUNT(*) as count,
                     SUM(ABS(quantity)) as total_quantity,
                     SUM(proceeds) as total_proceeds
                 FROM trades 
                 WHERE trade_type = 'SELL'
-            """).fetchone()
+            """)
+            sell_summary = sell_cursor.fetchone()
             
             # Net P&L from closed positions (paired trades)
-            net_pnl = self.db_conn.execute("""
+            pnl_cursor = self.db_conn.execute("""
                 SELECT SUM(proceeds) as net_pnl FROM trades
-            """).fetchone()[0] or 0.0
+            """)
+            pnl_row = pnl_cursor.fetchone()
+            net_pnl = pnl_row[0] if pnl_row else 0.0
             
             # Recent trades
             recent_trades = self.db_conn.execute("""
@@ -161,15 +210,24 @@ class Account:
                 LIMIT 10
             """).fetchall()
             
+            # Handle potential None results from empty tables
+            buy_count = buy_summary[0] if buy_summary else 0
+            buy_qty = buy_summary[1] if buy_summary and len(buy_summary) > 1 else 0.0
+            buy_proc = buy_summary[2] if buy_summary and len(buy_summary) > 2 else 0.0
+            
+            sell_count = sell_summary[0] if sell_summary else 0
+            sell_qty = sell_summary[1] if sell_summary and len(sell_summary) > 1 else 0.0
+            sell_proc = sell_summary[2] if sell_summary and len(sell_summary) > 2 else 0.0
+            
             return {
                 'total_trades': total_trades,
-                'buy_count': buy_summary[0] or 0,
-                'buy_quantity': buy_summary[1] or 0.0,
-                'buy_proceeds': buy_summary[2] or 0.0,
-                'sell_count': sell_summary[0] or 0,
-                'sell_quantity': sell_summary[1] or 0.0,
-                'sell_proceeds': sell_summary[2] or 0.0,
-                'net_pnl': net_pnl,
+                'buy_count': buy_count or 0,
+                'buy_quantity': buy_qty or 0.0,
+                'buy_proceeds': buy_proc or 0.0,
+                'sell_count': sell_count or 0,
+                'sell_quantity': sell_qty or 0.0,
+                'sell_proceeds': sell_proc or 0.0,
+                'net_pnl': net_pnl or 0.0,
                 'recent_trades': recent_trades
             }
             

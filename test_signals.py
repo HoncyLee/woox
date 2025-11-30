@@ -2,7 +2,7 @@
 """
 Test script to demonstrate signal module strategies.
 """
-from signal import get_strategy, STRATEGY_REGISTRY
+from trading_signal import get_strategy, STRATEGY_REGISTRY
 from config_loader import CONFIG
 from collections import deque
 import time
