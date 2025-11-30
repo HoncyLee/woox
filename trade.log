@@ -18886,3 +18886,173 @@ TypeError: unsupported operand type(s) for +: 'int' and 'dict'
 2025-11-30 13:43:13,779 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:13] "POST /_dash-update-component HTTP/1.1" 200 -
 2025-11-30 13:43:13,818 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:13] "POST /_dash-update-component HTTP/1.1" 200 -
 2025-11-30 13:43:13,820 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:13] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:13,899 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:13] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,100 - Trade - INFO - Trade update - Price: 90734.0, Volume: 1.17, Bid: 90774.0, Ask: 90775.0
+2025-11-30 13:43:14,101 - Trade - INFO - Trade price list updated - Total entries: 352, Latest price: 90734.0
+2025-11-30 13:43:14,597 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "HEAD / HTTP/1.1" 200 -
+2025-11-30 13:43:14,657 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,676 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:14,676 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,678 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,731 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,735 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,744 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,745 - dashboard - ERROR - Exception on /_dash-update-component [POST]
+Traceback (most recent call last):
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_get_app.py", line 17, in wrap
+    return ctx.run(func, self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/dash.py", line 1585, in dispatch
+    response_data = ctx.run(partial_func)
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 721, in add_context
+    raise err
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 712, in add_context
+    output_value = _invoke_callback(func, *func_args, **func_kwargs)  # type: ignore[reportArgumentType]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 59, in _invoke_callback
+    return func(*args, **kwargs)  # %% callback invoked %%
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/myproj/woox/dashboard.py", line 1423, in update_ma_chart
+    ma_short = sum(prices[-20:]) / 20
+               ^^^^^^^^^^^^^^^^^
+TypeError: unsupported operand type(s) for +: 'int' and 'dict'
+2025-11-30 13:43:14,768 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,770 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,777 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,777 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "[35m[1mPOST /_dash-update-component HTTP/1.1[0m" 500 -
+2025-11-30 13:43:14,778 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:14,780 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:14,781 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,782 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,783 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,792 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,793 - Account - INFO - Database connection closed
+2025-11-30 13:43:14,793 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,795 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:14,926 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:14] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,122 - Trade - INFO - Trade update - Price: 90734.0, Volume: 1.17, Bid: 90774.0, Ask: 90775.0
+2025-11-30 13:43:15,122 - Trade - INFO - Trade price list updated - Total entries: 353, Latest price: 90734.0
+2025-11-30 13:43:15,655 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,675 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:15,677 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,678 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,731 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,734 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,743 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,744 - dashboard - ERROR - Exception on /_dash-update-component [POST]
+Traceback (most recent call last):
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_get_app.py", line 17, in wrap
+    return ctx.run(func, self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/dash.py", line 1585, in dispatch
+    response_data = ctx.run(partial_func)
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 721, in add_context
+    raise err
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 712, in add_context
+    output_value = _invoke_callback(func, *func_args, **func_kwargs)  # type: ignore[reportArgumentType]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 59, in _invoke_callback
+    return func(*args, **kwargs)  # %% callback invoked %%
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/myproj/woox/dashboard.py", line 1423, in update_ma_chart
+    ma_short = sum(prices[-20:]) / 20
+               ^^^^^^^^^^^^^^^^^
+TypeError: unsupported operand type(s) for +: 'int' and 'dict'
+2025-11-30 13:43:15,754 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,768 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,776 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,776 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:15,776 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "[35m[1mPOST /_dash-update-component HTTP/1.1[0m" 500 -
+2025-11-30 13:43:15,778 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:15,779 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,781 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,782 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,788 - Account - INFO - Database connection closed
+2025-11-30 13:43:15,790 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,791 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,792 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:15,861 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:15] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,140 - Trade - INFO - Trade update - Price: 90734.0, Volume: 1.17, Bid: 90774.0, Ask: 90775.0
+2025-11-30 13:43:16,140 - Trade - INFO - Trade price list updated - Total entries: 354, Latest price: 90734.0
+2025-11-30 13:43:16,597 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "HEAD / HTTP/1.1" 200 -
+2025-11-30 13:43:16,657 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,678 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:16,680 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,682 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,732 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,744 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,747 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,762 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,763 - dashboard - ERROR - Exception on /_dash-update-component [POST]
+Traceback (most recent call last):
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_get_app.py", line 17, in wrap
+    return ctx.run(func, self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/dash.py", line 1585, in dispatch
+    response_data = ctx.run(partial_func)
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 721, in add_context
+    raise err
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 712, in add_context
+    output_value = _invoke_callback(func, *func_args, **func_kwargs)  # type: ignore[reportArgumentType]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/.virtualenvs/woox/lib/python3.12/site-packages/dash/_callback.py", line 59, in _invoke_callback
+    return func(*args, **kwargs)  # %% callback invoked %%
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/honcy/myproj/woox/dashboard.py", line 1423, in update_ma_chart
+    ma_short = sum(prices[-20:]) / 20
+               ^^^^^^^^^^^^^^^^^
+TypeError: unsupported operand type(s) for +: 'int' and 'dict'
+2025-11-30 13:43:16,773 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,780 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,781 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:16,781 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "[35m[1mPOST /_dash-update-component HTTP/1.1[0m" 500 -
+2025-11-30 13:43:16,782 - Account - INFO - Account initialized in LIVE mode
+2025-11-30 13:43:16,784 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,785 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,787 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,787 - Account - INFO - Database connection closed
+2025-11-30 13:43:16,787 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,795 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,797 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:16,863 - werkzeug - INFO - 127.0.0.1 - - [30/Nov/2025 13:43:16] "POST /_dash-update-component HTTP/1.1" 200 -
+2025-11-30 13:43:17,167 - Trade - INFO - Trade update - Price: 90734.0, Volume: 1.17, Bid: 90774.0, Ask: 90775.0
+2025-11-30 13:43:17,168 - Trade - INFO - Trade price list updated - Total entries: 355, Latest price: 90734.0
