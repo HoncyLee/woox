@@ -138,19 +138,25 @@ class Trade:
         
         # Validate and normalize symbol format
         # WOO X uses PERP_ prefix for perpetual futures and SPOT_ for spot markets
-        if not self.symbol.startswith(('SPOT_', 'PERP_')):
-            # Check if TRADE_TYPE is specified in config
-            trade_type = fresh_config.get('TRADE_TYPE', 'future').lower()
+        trade_type = fresh_config.get('TRADE_TYPE', 'future').lower()
+        
+        # Strip existing prefixes to ensure we apply the correct one based on TRADE_TYPE
+        clean_symbol = self.symbol
+        if clean_symbol.startswith('SPOT_'):
+            clean_symbol = clean_symbol[5:]
+        elif clean_symbol.startswith('PERP_'):
+            clean_symbol = clean_symbol[5:]
             
-            if trade_type == 'spot':
-                new_symbol = f"SPOT_{self.symbol}"
-                self.logger.warning(f"Symbol '{self.symbol}' missing prefix. Auto-correcting to '{new_symbol}' based on trade type '{trade_type}'.")
-                self.symbol = new_symbol
-            else:
-                # Default to PERP_ for futures/perpetuals
-                new_symbol = f"PERP_{self.symbol}"
-                self.logger.warning(f"Symbol '{self.symbol}' missing prefix. Auto-correcting to '{new_symbol}' based on trade type '{trade_type}'.")
-                self.symbol = new_symbol
+        # Apply prefix based on configured trade type
+        if trade_type == 'spot':
+            expected_symbol = f"SPOT_{clean_symbol}"
+        else:
+            # Default to PERP_ for futures/perpetuals
+            expected_symbol = f"PERP_{clean_symbol}"
+            
+        if self.symbol != expected_symbol:
+            self.logger.warning(f"Symbol '{self.symbol}' adjusted to '{expected_symbol}' to match trade type '{trade_type}'.")
+            self.symbol = expected_symbol
         
         # Store 1440 minutes (24 hours) of price data
         self.trade_px_list = deque(maxlen=1440)
@@ -246,7 +252,13 @@ class Trade:
             # Use negative quantity for SELL in database
             db_quantity = quantity if trade_type == 'BUY' else -quantity
             
-            with duckdb.connect(self.db_file) as conn:
+            # Reload config to ensure we use the correct DB file
+            # This is useful if the user changes the config while the bot is running
+            current_config = load_config()
+            current_mode = current_config.get('TRADE_MODE', 'paper')
+            db_file = 'live_transaction.db' if current_mode == 'live' else 'paper_transaction.db'
+            
+            with duckdb.connect(db_file) as conn:
                 conn.execute("""
                 INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
@@ -834,8 +846,11 @@ class Trade:
             }
             
             # Record transaction in database
+            # For opening position: Long -> BUY, Short -> SELL
+            trade_type = 'BUY' if side == 'long' else 'SELL'
+            
             self._record_transaction(
-                trade_type='BUY',
+                trade_type=trade_type,
                 quantity=quantity,
                 price=price,
                 signal='MA_CROSS',
@@ -922,8 +937,11 @@ class Trade:
             stop_loss_pct = float(CONFIG.get('STOP_LOSS_PCT', 2.0))
             signal = 'STOP_LOSS' if pnl_pct <= -stop_loss_pct else 'TAKE_PROFIT'
             
+            # For closing position: Long -> SELL, Short -> BUY
+            trade_type = 'SELL' if side == 'long' else 'BUY'
+            
             self._record_transaction(
-                trade_type='SELL',
+                trade_type=trade_type,
                 quantity=quantity,
                 price=price,
                 signal=signal,
@@ -946,11 +964,91 @@ class Trade:
             self.logger.error("Error closing position: %s", str(e))
             return False
     
+    def fetch_historical_data(self):
+        """
+        Fetch historical k-line data to populate trade_px_list on startup.
+        This ensures MAs/RSI are accurate immediately.
+        """
+        try:
+            # Determine timeframe from config
+            config = load_config()
+            strategy = config.get('ENTRY_STRATEGY', 'ma_crossover')
+            
+            if strategy == 'rsi':
+                timeframe_sec = int(config.get('RSI_TIMEFRAME', 60))
+                period = int(config.get('RSI_PERIOD', 14))
+                # Need period + 1 for RSI calculation
+                limit = min(1000, max(100, period * 2))
+            else:
+                # Default to MA settings
+                timeframe_sec = int(config.get('MA_TIMEFRAME', 60))
+                long_period = int(config.get('LONG_MA_PERIOD', 50))
+                limit = min(1000, max(100, long_period * 2))
+            
+            # Map seconds to WOO X kline type
+            timeframe_map = {
+                60: '1m',
+                300: '5m',
+                900: '15m',
+                1800: '30m',
+                3600: '1h',
+                14400: '4h',
+                43200: '12h',
+                86400: '1d'
+            }
+            
+            kline_type = timeframe_map.get(timeframe_sec, '1m')
+            
+            url = f"{self.base_url}/v1/public/kline"
+            params = {
+                'symbol': self.symbol,
+                'type': kline_type,
+                'limit': limit
+            }
+            
+            self.logger.info(f"Fetching historical data for {strategy}: {limit} candles of {kline_type}")
+            
+            response = requests.get(url, params=params, timeout=10)
+            data = response.json()
+            
+            if data.get('success'):
+                rows = data.get('rows', [])
+                # Sort by time ascending just in case
+                rows.sort(key=lambda x: x.get('start_timestamp', 0))
+                
+                count = 0
+                for row in rows:
+                    price = float(row.get('close', 0))
+                    # Timestamp in seconds for our system (WOO X uses ms)
+                    ts = row.get('start_timestamp', 0) / 1000.0
+                    
+                    entry = {
+                        'price': price,
+                        'volume': float(row.get('volume', 0)),
+                        'bid': price, # Approximation
+                        'ask': price, # Approximation
+                        'orderbook': {},
+                        'timestamp': ts
+                    }
+                    
+                    self.trade_px_list.append(entry)
+                    count += 1
+                    
+                self.logger.info(f"Successfully loaded {count} historical data points")
+            else:
+                self.logger.warning(f"Failed to fetch historical data: {data}")
+                
+        except Exception as e:
+            self.logger.error(f"Error fetching historical data: {e}")
+
     def run(self) -> None:
         """
         Main loop that continuously monitors the market and executes trading logic.
         """
         self.logger.info("Starting trading bot...")
+        
+        # Fetch historical data for MA calculation
+        self.fetch_historical_data()
         
         try:
             last_price_display_time = 0

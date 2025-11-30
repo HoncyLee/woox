@@ -243,14 +243,15 @@ app.index_string = '''
             }
             .modal-content {
                 background-color: #1e2130;
-                margin: 10% auto;
+                margin: 5% auto;
                 padding: 20px;
                 border: 1px solid #667eea;
                 border-radius: 10px;
-                width: 50%;
+                width: 80%;
+                max-width: 1200px;
                 color: white;
                 box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                font-size: 10px;
+                font-size: 11px;
             }
             .close {
                 color: #aaa;
@@ -271,7 +272,7 @@ app.index_string = '''
                 display: block;
                 margin-bottom: 5px;
                 color: #a0a0a0;
-                font-size: 10px;
+                font-size: 11px;
             }
             .form-input {
                 width: 100%;
@@ -280,14 +281,14 @@ app.index_string = '''
                 border: 1px solid #444;
                 background-color: #2d3142;
                 color: white;
-                font-size: 10px;
+                font-size: 11px;
             }
             /* Dropdown Dark Mode */
             .Select-control {
                 background-color: #2d3142 !important;
                 border: 1px solid #444 !important;
                 color: white !important;
-                font-size: 10px !important;
+                font-size: 11px !important;
             }
             .Select-value-label {
                 color: white !important;
@@ -574,93 +575,158 @@ app.layout = html.Div([
             html.Span("×", id='close-config-btn', className='close'),
             html.H2("⚙️ Configuration Settings"),
             
-            html.Div(className='form-group', children=[
-                html.Label("Trading Mode", className='form-label'),
-                dcc.Dropdown(
-                    id='conf-trade-mode',
-                    options=[
-                        {'label': 'Paper Trading', 'value': 'paper'},
-                        {'label': 'Live Trading', 'value': 'live'}
-                    ],
-                    className='form-input',
-                )
-            ]),
-            
-            html.Div(className='form-group', children=[
-                html.Label("Trade Type", className='form-label'),
-                dcc.Dropdown(
-                    id='conf-trade-type',
-                    options=[
-                        {'label': 'Future (Perpetual)', 'value': 'future'},
-                        {'label': 'Spot', 'value': 'spot'}
-                    ],
-                    className='form-input',
-                ),
-                html.Div(id='spot-warning', style={'color': '#ff9900', 'fontSize': '12px', 'marginTop': '5px'})
-            ]),
-            
-            html.Div(className='form-group', children=[
-                html.Label("Symbol", className='form-label'),
-                dcc.Dropdown(id='conf-symbol', className='form-input')
-            ]),
-            
-            html.Div(className='form-group', children=[
-                html.Label("Position Size Type", className='form-label'),
-                dcc.Dropdown(
-                    id='conf-pos-size-type',
-                    options=[
-                        {'label': 'Fixed Value (USDT)', 'value': 'value'},
-                        {'label': 'Percentage of Balance (%)', 'value': 'percentage'},
-                        {'label': 'Fixed Quantity (Asset)', 'value': 'quantity'}
-                    ],
-                    className='form-input',
-                )
-            ]),
+            html.Div(style={'display': 'flex', 'gap': '30px', 'flexWrap': 'wrap'}, children=[
+                # Column 1: General
+                html.Div(style={'flex': '1', 'minWidth': '300px'}, children=[
+                    html.H3("General Settings", style={'color': '#2196F3', 'borderBottom': '1px solid #444', 'paddingBottom': '10px', 'marginTop': '0'}),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Trading Mode", className='form-label'),
+                        dcc.Dropdown(
+                            id='conf-trade-mode',
+                            options=[
+                                {'label': 'Paper Trading', 'value': 'paper'},
+                                {'label': 'Live Trading', 'value': 'live'}
+                            ],
+                            className='form-input',
+                        )
+                    ]),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Trade Type", className='form-label'),
+                        dcc.Dropdown(
+                            id='conf-trade-type',
+                            options=[
+                                {'label': 'Future (Perpetual)', 'value': 'future'},
+                                {'label': 'Spot', 'value': 'spot'}
+                            ],
+                            className='form-input',
+                        ),
+                        html.Div(id='spot-warning', style={'color': '#ff9900', 'fontSize': '12px', 'marginTop': '5px'})
+                    ]),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Symbol", className='form-label'),
+                        dcc.Dropdown(id='conf-symbol', className='form-input')
+                    ]),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Position Size Type", className='form-label'),
+                        dcc.Dropdown(
+                            id='conf-pos-size-type',
+                            options=[
+                                {'label': 'Fixed Value (USDT)', 'value': 'value'},
+                                {'label': 'Percentage of Balance (%)', 'value': 'percentage'},
+                                {'label': 'Fixed Quantity (Asset)', 'value': 'quantity'}
+                            ],
+                            className='form-input',
+                        )
+                    ]),
 
-            html.Div(className='form-group', children=[
-                html.Label("Position Size Value", id='pos-size-value-label', className='form-label'),
-                dcc.Input(id='conf-pos-size-value', type='number', className='form-input')
-            ]),
+                    html.Div(className='form-group', children=[
+                        html.Label("Position Size Value", id='pos-size-value-label', className='form-label'),
+                        dcc.Input(id='conf-pos-size-value', type='number', className='form-input')
+                    ]),
 
-            html.Div(className='form-group', children=[
-                html.Label("Max Open Position", className='form-label'),
-                dcc.Input(id='conf-max-pos', type='number', min=1, step=1, className='form-input')
-            ]),
+                    html.Div(className='form-group', children=[
+                        html.Label("Max Open Position", className='form-label'),
+                        dcc.Input(id='conf-max-pos', type='number', min=1, step=1, className='form-input')
+                    ]),
+                ]),
 
-            html.Div(className='form-group', children=[
-                html.Label("Entry Strategy", className='form-label'),
-                dcc.Dropdown(
-                    id='conf-strategy',
-                    options=[
-                        {'label': 'MA Crossover', 'value': 'ma_crossover'},
-                        {'label': 'RSI', 'value': 'rsi'},
-                        {'label': 'Bollinger Bands', 'value': 'bollinger_bands'}
-                    ],
-                    className='form-input',
-                )
+                # Column 2: Signal
+                html.Div(style={'flex': '1', 'minWidth': '300px'}, children=[
+                    html.H3("Signal Strategy", style={'color': '#00e676', 'borderBottom': '1px solid #444', 'paddingBottom': '10px', 'marginTop': '0'}),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Entry Strategy", className='form-label'),
+                        dcc.Dropdown(
+                            id='conf-strategy',
+                            options=[
+                                {'label': 'MA Crossover', 'value': 'ma_crossover'},
+                                {'label': 'RSI', 'value': 'rsi'},
+                                {'label': 'Bollinger Bands', 'value': 'bollinger_bands'}
+                            ],
+                            className='form-input',
+                        )
+                    ]),
+                    
+                    html.Div(style={'border': '1px solid #444', 'padding': '10px', 'borderRadius': '5px', 'marginTop': '10px'}, children=[
+                        html.H4("MA Settings", style={'marginTop': '0', 'color': '#b0b0b0', 'fontSize': '12px'}),
+                        
+                        html.Div(className='form-group', children=[
+                            html.Label("Timeframe", className='form-label'),
+                            dcc.Dropdown(
+                                id='conf-ma-timeframe',
+                                options=[
+                                    {'label': '1 Second', 'value': 1},
+                                    {'label': '1 Minute', 'value': 60},
+                                    {'label': '5 Minutes', 'value': 300},
+                                    {'label': '15 Minutes', 'value': 900},
+                                    {'label': '1 Hour', 'value': 3600}
+                                ],
+                                className='form-input',
+                            )
+                        ]),
+
+                        html.Div(className='form-group', children=[
+                            html.Label("Short MA Period", className='form-label'),
+                            dcc.Input(id='conf-short-ma', type='number', className='form-input')
+                        ]),
+                        
+                        html.Div(className='form-group', children=[
+                            html.Label("Long MA Period", className='form-label'),
+                            dcc.Input(id='conf-long-ma', type='number', className='form-input')
+                        ]),
+
+                        html.Div(className='form-group', children=[
+                            html.Label("Threshold % (Diff)", className='form-label'),
+                            dcc.Input(id='conf-ma-threshold', type='number', step=0.1, className='form-input')
+                        ]),
+                    ]),
+
+                    html.Div(style={'border': '1px solid #444', 'padding': '10px', 'borderRadius': '5px', 'marginTop': '10px'}, children=[
+                        html.H4("RSI Settings", style={'marginTop': '0', 'color': '#b0b0b0', 'fontSize': '12px'}),
+                        
+                        html.Div(className='form-group', children=[
+                            html.Label("Timeframe", className='form-label'),
+                            dcc.Dropdown(
+                                id='conf-rsi-timeframe',
+                                options=[
+                                    {'label': '1 Second', 'value': 1},
+                                    {'label': '1 Minute', 'value': 60},
+                                    {'label': '5 Minutes', 'value': 300},
+                                    {'label': '15 Minutes', 'value': 900},
+                                    {'label': '1 Hour', 'value': 3600}
+                                ],
+                                className='form-input',
+                            )
+                        ]),
+
+                        html.Div(className='form-group', children=[
+                            html.Label("Period", className='form-label'),
+                            dcc.Input(id='conf-rsi-period', type='number', className='form-input')
+                        ]),
+                    ]),
+                ]),
+
+                # Column 3: Risk Control
+                html.Div(style={'flex': '1', 'minWidth': '300px'}, children=[
+                    html.H3("Risk Control", style={'color': '#ff5252', 'borderBottom': '1px solid #444', 'paddingBottom': '10px', 'marginTop': '0'}),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Stop Loss %", className='form-label'),
+                        dcc.Input(id='conf-sl', type='number', step=0.1, className='form-input')
+                    ]),
+                    
+                    html.Div(className='form-group', children=[
+                        html.Label("Take Profit %", className='form-label'),
+                        dcc.Input(id='conf-tp', type='number', step=0.1, className='form-input')
+                    ]),
+                ]),
             ]),
             
-            html.Div(className='form-group', children=[
-                html.Label("Short MA Period", className='form-label'),
-                dcc.Input(id='conf-short-ma', type='number', className='form-input')
-            ]),
-            
-            html.Div(className='form-group', children=[
-                html.Label("Long MA Period", className='form-label'),
-                dcc.Input(id='conf-long-ma', type='number', className='form-input')
-            ]),
-            
-            html.Div(className='form-group', children=[
-                html.Label("Stop Loss %", className='form-label'),
-                dcc.Input(id='conf-sl', type='number', step=0.1, className='form-input')
-            ]),
-            
-            html.Div(className='form-group', children=[
-                html.Label("Take Profit %", className='form-label'),
-                dcc.Input(id='conf-tp', type='number', step=0.1, className='form-input')
-            ]),
-            
-            html.Div(style={'marginTop': '20px', 'textAlign': 'right'}, children=[
+            html.Div(style={'marginTop': '30px', 'textAlign': 'right', 'borderTop': '1px solid #444', 'paddingTop': '20px'}, children=[
                 html.Button("Cancel", id='cancel-config-btn', className='control-button', style={'backgroundColor': '#757575', 'marginRight': '10px'}),
                 html.Button("Save Changes", id='save-config-btn', className='control-button', style={'backgroundColor': '#00c853'})
             ]),
@@ -1342,39 +1408,92 @@ def update_pnl_chart(n):
     Input('interval-component', 'n_intervals')
 )
 def update_rsi_chart(n):
-    global trader, chart_data
+    global trader
     
     fig = go.Figure()
     
     if trader and len(trader.trade_px_list) >= 14:
-        # Calculate RSI
-        # Extract prices from the list of dictionaries
-        prices = [entry['price'] for entry in trader.trade_px_list]
-        period = 14
-        
-        if len(prices) >= period:
-            deltas = [prices[i] - prices[i-1] for i in range(1, len(prices))]
-            gains = [d if d > 0 else 0 for d in deltas]
-            losses = [-d if d < 0 else 0 for d in deltas]
+        try:
+            # Get config
+            config = config_loader.load_config()
+            timeframe = int(config.get('RSI_TIMEFRAME', 60))
+            period = int(config.get('RSI_PERIOD', 14))
             
-            avg_gain = sum(gains[-period:]) / period
-            avg_loss = sum(losses[-period:]) / period
+            # Resample data
+            prices_resampled = []
+            timestamps_resampled = []
             
-            if avg_loss != 0:
-                rs = avg_gain / avg_loss
-                rsi = 100 - (100 / (1 + rs))
-            else:
-                rsi = 100
+            history_list = list(trader.trade_px_list)
             
-            chart_data['rsi'].append(rsi)
-            
-            if len(chart_data['timestamps']) > 0 and len(chart_data['rsi']) > 0:
-                # Trim to match timestamps
-                rsi_values = list(chart_data['rsi'])[-len(chart_data['timestamps']):]
+            if timeframe > 1:
+                current_bucket = None
+                last_entry_in_bucket = None
                 
+                for entry in history_list:
+                    if not entry.get('price') or not entry.get('timestamp'):
+                        continue
+                        
+                    ts = entry['timestamp']
+                    bucket = int(ts // timeframe)
+                    
+                    if current_bucket is not None and bucket != current_bucket:
+                        prices_resampled.append(last_entry_in_bucket['price'])
+                        timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+                    
+                    current_bucket = bucket
+                    last_entry_in_bucket = entry
+                
+                # Add the last partial bucket
+                if last_entry_in_bucket is not None:
+                    prices_resampled.append(last_entry_in_bucket['price'])
+                    timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+            else:
+                # Raw data
+                prices_resampled = [entry['price'] for entry in history_list if entry.get('price')]
+                timestamps_resampled = [datetime.fromtimestamp(entry['timestamp']) for entry in history_list if entry.get('timestamp')]
+
+            # Calculate RSI
+            rsi_values = []
+            
+            if len(prices_resampled) >= period + 1:
+                # Calculate deltas
+                deltas = [prices_resampled[i] - prices_resampled[i-1] for i in range(1, len(prices_resampled))]
+                
+                # Calculate RSI for each point (simple moving average method for simplicity in chart)
+                # For accurate RSI we should use Wilder's Smoothing, but simple SMA is often used for quick visualization
+                # Let's stick to the simple method used before but applied to the window
+                
+                for i in range(len(prices_resampled)):
+                    if i < period:
+                        rsi_values.append(None)
+                        continue
+                        
+                    # Get slice for this window
+                    window_deltas = deltas[i-period : i]
+                    gains = [d if d > 0 else 0 for d in window_deltas]
+                    losses = [-d if d < 0 else 0 for d in window_deltas]
+                    
+                    avg_gain = sum(gains) / period
+                    avg_loss = sum(losses) / period
+                    
+                    if avg_loss != 0:
+                        rs = avg_gain / avg_loss
+                        rsi = 100 - (100 / (1 + rs))
+                    else:
+                        rsi = 100
+                    
+                    rsi_values.append(rsi)
+            
+            # Plotting
+            display_limit = 200
+            
+            plot_timestamps = timestamps_resampled[-display_limit:]
+            plot_rsi = rsi_values[-display_limit:]
+            
+            if len(plot_timestamps) > 0 and len(plot_rsi) > 0:
                 fig.add_trace(go.Scatter(
-                    x=list(chart_data['timestamps'])[-len(rsi_values):],
-                    y=rsi_values,
+                    x=plot_timestamps,
+                    y=plot_rsi,
                     mode='lines',
                     name='RSI',
                     line=dict(color='#2196F3', width=2)
@@ -1384,13 +1503,16 @@ def update_rsi_chart(n):
                 fig.add_hline(y=70, line_dash="dash", line_color="#ff1744", line_width=1, annotation_text="Overbought")
                 fig.add_hline(y=30, line_dash="dash", line_color="#00c853", line_width=1, annotation_text="Oversold")
                 fig.add_hline(y=50, line_dash="dot", line_color="#666666", line_width=1)
+                
+        except Exception as e:
+            print(f"Error updating RSI chart: {e}")
     
     symbol_display = ""
     if trader and trader.symbol:
         symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
 
     fig.update_layout(
-        title=f'{symbol_display}RSI Indicator (14)',
+        title=f'{symbol_display}RSI Indicator ({config_loader.get_config_value("RSI_PERIOD", 14)})',
         xaxis_title='Time',
         yaxis_title='RSI',
         template='plotly_dark',
@@ -1411,66 +1533,122 @@ def update_rsi_chart(n):
     Input('interval-component', 'n_intervals')
 )
 def update_ma_chart(n):
-    global trader, chart_data
+    global trader
     
     fig = go.Figure()
     
-    if trader and len(trader.trade_px_list) >= 50:
-        prices = list(trader.trade_px_list)
-        
-        # Calculate MAs
-        if len(prices) >= 20:
-            ma_short = sum(prices[-20:]) / 20
-            chart_data['ma_short'].append(ma_short)
-        
-        if len(prices) >= 50:
-            ma_long = sum(prices[-50:]) / 50
-            chart_data['ma_long'].append(ma_long)
-        
-        if len(chart_data['timestamps']) > 0:
+    if trader and len(trader.trade_px_list) > 0:
+        try:
+            # Get config
+            config = config_loader.load_config()
+            timeframe = int(config.get('MA_TIMEFRAME', 60))
+            short_period = int(config.get('SHORT_MA_PERIOD', 20))
+            long_period = int(config.get('LONG_MA_PERIOD', 50))
+            
+            # Resample data
+            prices_resampled = []
+            timestamps_resampled = []
+            
+            history_list = list(trader.trade_px_list)
+            
+            if timeframe > 1:
+                current_bucket = None
+                last_entry_in_bucket = None
+                
+                for entry in history_list:
+                    if not entry.get('price') or not entry.get('timestamp'):
+                        continue
+                        
+                    ts = entry['timestamp']
+                    bucket = int(ts // timeframe)
+                    
+                    if current_bucket is not None and bucket != current_bucket:
+                        prices_resampled.append(last_entry_in_bucket['price'])
+                        timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+                    
+                    current_bucket = bucket
+                    last_entry_in_bucket = entry
+                
+                # Add the last partial bucket
+                if last_entry_in_bucket is not None:
+                    prices_resampled.append(last_entry_in_bucket['price'])
+                    timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+            else:
+                # Raw data
+                prices_resampled = [entry['price'] for entry in history_list if entry.get('price')]
+                timestamps_resampled = [datetime.fromtimestamp(entry['timestamp']) for entry in history_list if entry.get('timestamp')]
+
+            # Calculate MAs
+            ma_short_values = []
+            ma_long_values = []
+            
+            # Simple Moving Average Calculation
+            for i in range(len(prices_resampled)):
+                # Short MA
+                if i + 1 >= short_period:
+                    ma = sum(prices_resampled[i+1-short_period : i+1]) / short_period
+                    ma_short_values.append(ma)
+                else:
+                    ma_short_values.append(None)
+                
+                # Long MA
+                if i + 1 >= long_period:
+                    ma = sum(prices_resampled[i+1-long_period : i+1]) / long_period
+                    ma_long_values.append(ma)
+                else:
+                    ma_long_values.append(None)
+            
+            # Plotting
+            # Limit to last 200 points for better visibility
+            display_limit = 200
+            
+            plot_timestamps = timestamps_resampled[-display_limit:]
+            plot_prices = prices_resampled[-display_limit:]
+            plot_ma_short = ma_short_values[-display_limit:]
+            plot_ma_long = ma_long_values[-display_limit:]
+            
             # Price line
             fig.add_trace(go.Scatter(
-                x=list(chart_data['timestamps']),
-                y=list(chart_data['prices']),
+                x=plot_timestamps,
+                y=plot_prices,
                 mode='lines',
                 name='Price',
                 line=dict(color='#ffd600', width=2)
             ))
             
-            # MA20
-            if len(chart_data['ma_short']) > 0:
-                ma_short_values = list(chart_data['ma_short'])[-len(chart_data['timestamps']):]
-                fig.add_trace(go.Scatter(
-                    x=list(chart_data['timestamps'])[-len(ma_short_values):],
-                    y=ma_short_values,
-                    mode='lines',
-                    name='MA20',
-                    line=dict(color='#00c853', width=1.5, dash='dash')
-                ))
+            # MA Short
+            fig.add_trace(go.Scatter(
+                x=plot_timestamps,
+                y=plot_ma_short,
+                mode='lines',
+                name=f'MA{short_period}',
+                line=dict(color='#00c853', width=1.5, dash='dash')
+            ))
             
-            # MA50
-            if len(chart_data['ma_long']) > 0:
-                ma_long_values = list(chart_data['ma_long'])[-len(chart_data['timestamps']):]
-                fig.add_trace(go.Scatter(
-                    x=list(chart_data['timestamps'])[-len(ma_long_values):],
-                    y=ma_long_values,
-                    mode='lines',
-                    name='MA50',
-                    line=dict(color='#ff1744', width=1.5, dash='dot')
-                ))
-    
+            # MA Long
+            fig.add_trace(go.Scatter(
+                x=plot_timestamps,
+                y=plot_ma_long,
+                mode='lines',
+                name=f'MA{long_period}',
+                line=dict(color='#ff1744', width=1.5, dash='dot')
+            ))
+            
+        except Exception as e:
+            print(f"Error updating MA chart: {e}")
+
     symbol_display = ""
     if trader and trader.symbol:
         symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
 
     fig.update_layout(
-        title=f'{symbol_display}Moving Averages (MA20/MA50)',
+        title=f'{symbol_display}Moving Averages Strategy',
         xaxis_title='Time',
-        yaxis_title='Price (USD)',
+        yaxis_title='Price',
         template='plotly_dark',
         paper_bgcolor='#1e2130',
         plot_bgcolor='#1e2130',
-        height=300,
+        height=350,
         margin=dict(l=50, r=20, t=40, b=40),
         hovermode='x unified',
         legend=dict(x=0.01, y=0.99)
@@ -1645,19 +1823,31 @@ def update_cumulative_return_chart(n):
 def update_performance_table(n):
     global trader, performance_metrics
     
-    if trader:
-        try:
-            with Account(trade_mode=trader.trade_mode) as account:
-                summary = account.get_transaction_summary()
+    # Always load latest config to determine which DB to read from
+    try:
+        config = config_loader.load_config()
+        trade_mode = config.get('TRADE_MODE', 'paper')
+        
+        with Account(trade_mode=trade_mode) as account:
+            # Pass current price to calculate Total P&L (Realized + Unrealized)
+            current_price = trader.current_price if trader else None
+            summary = account.get_transaction_summary(current_price=current_price)
+            
+            if summary:
+                performance_metrics['total_trades'] = summary['buy_count'] + summary['sell_count']
+                performance_metrics['total_pnl'] = summary.get('net_pnl', 0.0)
+                performance_metrics['winning_trades'] = summary.get('winning_trades', 0)
+                performance_metrics['losing_trades'] = summary.get('losing_trades', 0)
+                performance_metrics['unrealized_pnl'] = summary.get('unrealized_pnl', 0.0)
                 
-                if summary:
-                    performance_metrics['total_trades'] = summary['buy_count'] + summary['sell_count']
-                    performance_metrics['total_pnl'] = summary.get('net_pnl', 0.0)
-                    
-                    # Update win/loss counts if available in summary or calculate from trades
-                    # For now, we rely on what's in summary or default
-        except Exception as e:
-            logger.error(f"Error getting account summary: {str(e)}")
+                # Calculate win rate
+                total_closed = performance_metrics['winning_trades'] + performance_metrics['losing_trades']
+                if total_closed > 0:
+                    performance_metrics['win_rate'] = (performance_metrics['winning_trades'] / total_closed) * 100
+                else:
+                    performance_metrics['win_rate'] = 0.0
+    except Exception as e:
+        logger.error(f"Error getting account summary: {str(e)}")
     
     metrics = [
         ("Total Trades", performance_metrics['total_trades']),
@@ -1665,6 +1855,7 @@ def update_performance_table(n):
         ("Losing Trades", performance_metrics['losing_trades']),
         ("Win Rate", f"{performance_metrics['win_rate']:.1f}%"),
         ("Total P&L", f"${performance_metrics['total_pnl']:.2f}"),
+        ("Unrealized P&L", f"${performance_metrics.get('unrealized_pnl', 0.0):.2f}"),
         ("Sharpe Ratio", f"{performance_metrics['sharpe_ratio']:.2f}"),
     ]
     
@@ -1932,6 +2123,10 @@ def update_pos_size_ui(size_type, symbol, is_loading):
      Output('conf-strategy', 'value'),
      Output('conf-short-ma', 'value'),
      Output('conf-long-ma', 'value'),
+     Output('conf-ma-timeframe', 'value'),
+     Output('conf-ma-threshold', 'value'),
+     Output('conf-rsi-timeframe', 'value'),
+     Output('conf-rsi-period', 'value'),
      Output('conf-sl', 'value'),
      Output('conf-tp', 'value'),
      Output('config-loaded-flag', 'data')],
@@ -1944,7 +2139,7 @@ def update_pos_size_ui(size_type, symbol, is_loading):
 def toggle_config_modal(n1, n2, n3, n4, current_style):
     ctx = callback_context
     if not ctx.triggered:
-        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
@@ -1963,18 +2158,22 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
                 config.get('ENTRY_STRATEGY', 'ma_crossover'),
                 int(config.get('SHORT_MA_PERIOD', 20)),
                 int(config.get('LONG_MA_PERIOD', 50)),
+                int(config.get('MA_TIMEFRAME', 60)),
+                float(config.get('MA_THRESHOLD', 5.0)),
+                int(config.get('RSI_TIMEFRAME', 60)),
+                int(config.get('RSI_PERIOD', 14)),
                 float(config.get('STOP_LOSS_PCT', 3.0)),
                 float(config.get('TAKE_PROFIT_PCT', 5.0)),
                 True # Set flag to True indicating config just loaded
             )
         except Exception as e:
             logger.error(f"Error loading config: {e}")
-            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 'ma_crossover', 20, 50, 3.0, 5.0, True
+            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 'ma_crossover', 20, 50, 60, 5.0, 60, 14, 3.0, 5.0, True
             
     elif button_id in ['close-config-btn', 'cancel-config-btn', 'save-config-btn']:
-        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
     
-    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
 
 # Callback: Save Config
 @app.callback(
@@ -1989,11 +2188,15 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
      State('conf-strategy', 'value'),
      State('conf-short-ma', 'value'),
      State('conf-long-ma', 'value'),
+     State('conf-ma-timeframe', 'value'),
+     State('conf-ma-threshold', 'value'),
+     State('conf-rsi-timeframe', 'value'),
+     State('conf-rsi-period', 'value'),
      State('conf-sl', 'value'),
      State('conf-tp', 'value')],
     prevent_initial_call=True
 )
-def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, strategy, ma_short, ma_long, sl, tp):
+def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, strategy, ma_short, ma_long, ma_timeframe, ma_threshold, rsi_timeframe, rsi_period, sl, tp):
     try:
         # Read existing config to preserve comments
         with open('.config', 'r') as f:
@@ -2011,6 +2214,10 @@ def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_siz
             'EXIT_STRATEGY': strategy, # Assume same for now
             'SHORT_MA_PERIOD': str(ma_short),
             'LONG_MA_PERIOD': str(ma_long),
+            'MA_TIMEFRAME': str(ma_timeframe),
+            'MA_THRESHOLD': str(ma_threshold),
+            'RSI_TIMEFRAME': str(rsi_timeframe),
+            'RSI_PERIOD': str(rsi_period),
             'STOP_LOSS_PCT': str(sl),
             'TAKE_PROFIT_PCT': str(tp)
         }

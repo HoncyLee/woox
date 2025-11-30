@@ -1,5 +1,7 @@
 # Files in folder
-trade.log
+trade.log*
+dashboard.log
+*.db
 references/
 
 # Byte-compiled / optimized / DLL files

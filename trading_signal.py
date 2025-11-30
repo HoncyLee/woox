@@ -59,57 +59,108 @@ class MovingAverageCrossover(BaseStrategy):
     
     def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
-        Generate entry signal using MA crossover.
+        Generate entry signal using MA crossover with configurable timeframe and threshold.
         
         Args:
             price_history: Deque of price data dictionaries
             orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
-            'long' when short MA crosses above long MA
-            'short' when short MA crosses below long MA
+            'long' when short MA crosses above long MA by threshold
+            'short' when short MA crosses below long MA by threshold
             None otherwise
         """
         try:
             short_period = int(self.config.get('SHORT_MA_PERIOD', 20))
             long_period = int(self.config.get('LONG_MA_PERIOD', 50))
+            timeframe = int(self.config.get('MA_TIMEFRAME', 60))  # Default 1 minute (60s)
+            threshold_pct = float(self.config.get('MA_THRESHOLD', 5.0))
             
-            if len(price_history) < long_period:
-                self.logger.debug("Not enough data: %d entries", len(price_history))
+            if not price_history:
                 return None
+
+            # Resample data if timeframe > 1s (assuming raw data is ~1s)
+            # We group by timestamp bucket to get "Close" prices for each timeframe bar
+            resampled_prices = []
             
-            # Extract prices
-            prices = [entry['price'] for entry in price_history if entry.get('price')]
+            # Convert deque to list for iteration
+            history_list = list(price_history)
             
-            if len(prices) < long_period:
+            if timeframe > 1:
+                current_bucket = None
+                last_price_in_bucket = None
+                
+                for entry in history_list:
+                    if not entry.get('price') or not entry.get('timestamp'):
+                        continue
+                        
+                    ts = entry['timestamp']
+                    bucket = int(ts // timeframe)
+                    
+                    if current_bucket is not None and bucket != current_bucket:
+                        resampled_prices.append(last_price_in_bucket)
+                    
+                    current_bucket = bucket
+                    last_price_in_bucket = entry['price']
+                
+                # Add the last partial bucket
+                if last_price_in_bucket is not None:
+                    resampled_prices.append(last_price_in_bucket)
+            else:
+                # Use raw data
+                resampled_prices = [entry['price'] for entry in history_list if entry.get('price')]
+
+            # Check if we have enough data points after resampling
+            if len(resampled_prices) < long_period + 1: # +1 for previous MA calculation
+                self.logger.debug("Not enough resampled data: %d/%d required", len(resampled_prices), long_period + 1)
                 return None
             
             # Calculate current moving averages
-            short_ma = sum(prices[-short_period:]) / short_period
-            long_ma = sum(prices[-long_period:]) / long_period
+            short_ma = sum(resampled_prices[-short_period:]) / short_period
+            long_ma = sum(resampled_prices[-long_period:]) / long_period
             
             # Calculate previous moving averages (for crossover detection)
-            prev_short_ma = sum(prices[-short_period-1:-1]) / short_period
-            prev_long_ma = sum(prices[-long_period-1:-1]) / long_period
+            prev_short_ma = sum(resampled_prices[-short_period-1:-1]) / short_period
+            prev_long_ma = sum(resampled_prices[-long_period-1:-1]) / long_period
             
-            # Detect crossover
+            # Calculate threshold multiplier
+            threshold_mult = threshold_pct / 100.0
+            
+            # Detect crossover with threshold
             signal = None
-            if prev_short_ma <= prev_long_ma and short_ma > long_ma:
+            
+            # Long: Short MA > Long MA * (1 + threshold)
+            # We check if we just crossed this threshold or are currently above it?
+            # Usually crossover strategy triggers ON the cross.
+            # But with threshold, "cross" means crossing the threshold line.
+            # Let's check if we are currently satisfying the condition and previously weren't (or just simple condition check if we want to be in position)
+            # Standard crossover: trigger when condition becomes true.
+            
+            # Condition: Short MA > Long MA * (1 + threshold)
+            current_long_condition = short_ma > long_ma * (1 + threshold_mult)
+            prev_long_condition = prev_short_ma > prev_long_ma * (1 + threshold_mult)
+            
+            # Condition: Short MA < Long MA * (1 - threshold)
+            current_short_condition = short_ma < long_ma * (1 - threshold_mult)
+            prev_short_condition = prev_short_ma < prev_long_ma * (1 - threshold_mult)
+            
+            if current_long_condition and not prev_long_condition:
                 signal = 'long'
                 self.logger.info(
-                    "LONG signal - Short MA: %.2f crossed above Long MA: %.2f",
-                    short_ma, long_ma
+                    "LONG signal - Short MA: %.2f, Long MA: %.2f, Threshold: %.1f%%",
+                    short_ma, long_ma, threshold_pct
                 )
-            elif prev_short_ma >= prev_long_ma and short_ma < long_ma:
+            elif current_short_condition and not prev_short_condition:
                 signal = 'short'
                 self.logger.info(
-                    "SHORT signal - Short MA: %.2f crossed below Long MA: %.2f",
-                    short_ma, long_ma
+                    "SHORT signal - Short MA: %.2f, Long MA: %.2f, Threshold: %.1f%%",
+                    short_ma, long_ma, threshold_pct
                 )
-            
+                
             return signal
-            
         except Exception as e:
+            self.logger.error("Error in MA crossover strategy: %s", str(e))
+            return None
             self.logger.error("Error generating entry signal: %s", str(e))
             return None
     
@@ -203,7 +254,7 @@ class RSIStrategy(BaseStrategy):
     
     def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
-        Generate entry signal using RSI.
+        Generate entry signal using RSI with configurable timeframe and period.
         
         Args:
             price_history: Deque of price data dictionaries
@@ -216,20 +267,47 @@ class RSIStrategy(BaseStrategy):
         """
         try:
             rsi_period = int(self.config.get('RSI_PERIOD', 14))
+            timeframe = int(self.config.get('RSI_TIMEFRAME', 60))  # Default 1 minute
             oversold = float(self.config.get('RSI_OVERSOLD', 30))
             overbought = float(self.config.get('RSI_OVERBOUGHT', 70))
             
-            if len(price_history) < rsi_period + 2:
+            if not price_history:
                 return None
+
+            # Resample data if timeframe > 1s
+            resampled_prices = []
+            history_list = list(price_history)
             
-            prices = [entry['price'] for entry in price_history if entry.get('price')]
+            if timeframe > 1:
+                current_bucket = None
+                last_price_in_bucket = None
+                
+                for entry in history_list:
+                    if not entry.get('price') or not entry.get('timestamp'):
+                        continue
+                        
+                    ts = entry['timestamp']
+                    bucket = int(ts // timeframe)
+                    
+                    if current_bucket is not None and bucket != current_bucket:
+                        resampled_prices.append(last_price_in_bucket)
+                    
+                    current_bucket = bucket
+                    last_price_in_bucket = entry['price']
+                
+                # Add the last partial bucket
+                if last_price_in_bucket is not None:
+                    resampled_prices.append(last_price_in_bucket)
+            else:
+                # Use raw data
+                resampled_prices = [entry['price'] for entry in history_list if entry.get('price')]
             
-            if len(prices) < rsi_period + 2:
+            if len(resampled_prices) < rsi_period + 2:
                 return None
             
             # Calculate current and previous RSI
-            current_rsi = self._calculate_rsi(prices, rsi_period)
-            prev_rsi = self._calculate_rsi(prices[:-1], rsi_period)
+            current_rsi = self._calculate_rsi(resampled_prices, rsi_period)
+            prev_rsi = self._calculate_rsi(resampled_prices[:-1], rsi_period)
             
             if current_rsi is None or prev_rsi is None:
                 return None

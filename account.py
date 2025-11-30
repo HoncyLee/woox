@@ -160,10 +160,13 @@ class Account:
             self.logger.error("Error fetching account info: %s", str(e))
             return None
     
-    def get_transaction_summary(self) -> Dict[str, Any]:
+    def get_transaction_summary(self, current_price: float = None) -> Dict[str, Any]:
         """
         Get transaction summary from database.
         
+        Args:
+            current_price: Current market price (optional) to calculate unrealized P&L
+            
         Returns:
             Dictionary with transaction statistics
         """
@@ -196,12 +199,47 @@ class Account:
             """)
             sell_summary = sell_cursor.fetchone()
             
-            # Net P&L from closed positions (paired trades)
+            # Net P&L (Cash Flow)
             pnl_cursor = self.db_conn.execute("""
                 SELECT SUM(proceeds) as net_pnl FROM trades
             """)
             pnl_row = pnl_cursor.fetchone()
-            net_pnl = pnl_row[0] if pnl_row else 0.0
+            cash_pnl = pnl_row[0] if pnl_row and pnl_row[0] is not None else 0.0
+            
+            # Net Quantity (Current Position)
+            qty_cursor = self.db_conn.execute("""
+                SELECT SUM(quantity) as net_qty FROM trades
+            """)
+            qty_row = qty_cursor.fetchone()
+            net_quantity = qty_row[0] if qty_row and qty_row[0] is not None else 0.0
+            
+            # Calculate Total P&L (Realized + Unrealized)
+            total_pnl = cash_pnl
+            unrealized_pnl = 0.0
+            
+            if current_price is not None and net_quantity != 0:
+                # Total Equity Change = Cash Change + Current Position Value
+                total_pnl = cash_pnl + (net_quantity * current_price)
+                unrealized_pnl = total_pnl - cash_pnl # This is approximate if we don't track realized separately
+                
+                # Better approximation for Unrealized:
+                # If we assume cash_pnl includes the cost of the open position (negative proceeds),
+                # then adding current value gives the total result.
+                # So total_pnl is the correct "Account P&L".
+            
+            # Winning trades (TAKE_PROFIT)
+            win_cursor = self.db_conn.execute("""
+                SELECT COUNT(*) FROM trades WHERE signal = 'TAKE_PROFIT'
+            """)
+            win_row = win_cursor.fetchone()
+            winning_trades = win_row[0] if win_row else 0
+            
+            # Losing trades (STOP_LOSS)
+            loss_cursor = self.db_conn.execute("""
+                SELECT COUNT(*) FROM trades WHERE signal = 'STOP_LOSS'
+            """)
+            loss_row = loss_cursor.fetchone()
+            losing_trades = loss_row[0] if loss_row else 0
             
             # Recent trades
             recent_trades = self.db_conn.execute("""
@@ -227,7 +265,12 @@ class Account:
                 'sell_count': sell_count or 0,
                 'sell_quantity': sell_qty or 0.0,
                 'sell_proceeds': sell_proc or 0.0,
-                'net_pnl': net_pnl or 0.0,
+                'net_pnl': total_pnl, # Return Total P&L as the main P&L metric
+                'cash_pnl': cash_pnl, # Raw cash flow
+                'unrealized_pnl': unrealized_pnl,
+                'net_quantity': net_quantity,
+                'winning_trades': winning_trades,
+                'losing_trades': losing_trades,
                 'recent_trades': recent_trades
             }
             
