@@ -145,3 +145,5 @@ config.ini
 *.swo
 *~
 *.db
+trade.log
+trade.log

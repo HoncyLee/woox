@@ -3,7 +3,7 @@ Interactive Dash Dashboard for WOOX Trading Bot
 Real-time monitoring, control, and analysis
 """
 import dash
-from dash import dcc, html, Input, Output, State, callback_context
+from dash import dcc, html, Input, Output, State, callback_context, ALL, MATCH
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
@@ -17,6 +17,7 @@ import logging
 from collections import deque
 import duckdb
 import psutil
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -378,7 +379,20 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.H3("Control Panel", style={'color': '#ffffff', 'margin': '0', 'display': 'inline-block'}),
-            html.Div(id='mode-indicator', style={'float': 'right'})
+            html.Div([
+                html.Div(id='mode-indicator', style={'marginBottom': '10px'}),
+                # CPU & Memory info below mode indicator
+                html.Div([
+                    html.Div([
+                        html.Div("CPU", style={'fontSize': '10px', 'color': '#888', 'marginBottom': '2px'}),
+                        html.Div(id='cpu-usage-metric', style={'fontSize': '12px', 'color': '#00ff00', 'fontWeight': 'bold'}),
+                    ], style={'display': 'inline-block', 'marginRight': '15px'}),
+                    html.Div([
+                        html.Div("MEM", style={'fontSize': '10px', 'color': '#888', 'marginBottom': '2px'}),
+                        html.Div(id='memory-usage-metric', style={'fontSize': '12px', 'color': '#00ff00', 'fontWeight': 'bold'}),
+                    ], style={'display': 'inline-block'}),
+                ], style={'textAlign': 'right'}),
+            ], style={'float': 'right', 'textAlign': 'right'})
         ], style={'marginBottom': '15px'}),
         
         html.Div([
@@ -386,6 +400,7 @@ app.layout = html.Div([
             html.Button("⏸ Stop Bot", id='stop-btn', n_clicks=0, className='control-button stop-btn'),
             html.Button("❌ Close Position", id='close-btn', n_clicks=0, className='control-button close-btn'),
             html.Button("⚙️ Config", id='config-btn', n_clicks=0, className='control-button', style={'backgroundColor': '#607d8b', 'color': 'white'}),
+            # html.Button("🔄 Sync Orders", id='sync-orders-btn', n_clicks=0, className='control-button', style={'backgroundColor': '#2196f3', 'color': 'white'}),
             html.Button("🖨️ Print Report", id='print-btn', n_clicks=0, className='control-button print-btn'),
             html.Div(id='control-feedback', style={'color': '#ffffff', 'marginTop': '10px', 'fontSize': '14px'})
         ]),
@@ -456,23 +471,6 @@ app.layout = html.Div([
         ], className='metric-card', style={'flex': '1'}),
     ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
 
-    # System Monitor Row
-    html.Div([
-        # CPU Usage
-        html.Div([
-            html.Div("CPU Usage", className='metric-label'),
-            html.Div(id='cpu-usage-metric', className='metric-value'),
-            dcc.Graph(id='cpu-gauge', config={'displayModeBar': False}, style={'height': '100px', 'marginTop': '-20px'}),
-        ], className='metric-card', style={'flex': '1'}),
-        
-        # Memory Usage
-        html.Div([
-            html.Div("Memory Usage", className='metric-label'),
-            html.Div(id='memory-usage-metric', className='metric-value'),
-            dcc.Graph(id='memory-gauge', config={'displayModeBar': False}, style={'height': '100px', 'marginTop': '-20px'}),
-        ], className='metric-card', style={'flex': '1'}),
-    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
-
     # Performance & P&L Row
     html.Div([
         html.Div([
@@ -482,7 +480,12 @@ app.layout = html.Div([
         
         html.Div([
             dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'flex': '2'}),
+        ], className='chart-card', style={'flex': '1'}),
+
+        html.Div([
+            html.H3("Position Balance", style={'color': '#ffffff', 'marginBottom': '15px'}),
+            html.Div(id='balance-table', style={'color': '#e0e0e0'}),
+        ], style={'flex': '1', 'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px'}),
     ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
 
     # Main Charts Row
@@ -499,33 +502,43 @@ app.layout = html.Div([
     # Technical Analysis Charts Row
     html.Div([
         html.Div([
-            dcc.Graph(id='rsi-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'width': '33%', 'display': 'inline-block'}),
+            dcc.Graph(id='rsi-chart', config={'displayModeBar': False}, style={'height': '100%'}),
+        ], className='chart-card', style={'flex': '1', 'height': '400px'}),
         
         html.Div([
-            dcc.Graph(id='ma-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'width': '33%', 'display': 'inline-block'}),
+            dcc.Graph(id='ma-chart', config={'displayModeBar': False}, style={'height': '100%'}),
+        ], className='chart-card', style={'flex': '1', 'height': '400px'}),
         
         html.Div([
-            dcc.Graph(id='spread-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'width': '33%', 'display': 'inline-block'}),
-    ], className='no-print', style={'marginBottom': '20px'}),
+            html.H3("Manual Trade", style={'color': '#ffffff', 'marginBottom': '10px', 'textAlign': 'center'}),
+            html.Div(id='manual-pos-size-display', style={'color': '#b0b0b0', 'fontSize': '12px', 'textAlign': 'center', 'marginBottom': '15px'}),
+            html.Div([
+                html.Button("LONG", id='manual-long-btn', className='control-button', 
+                           style={'backgroundColor': '#00c853', 'width': '100%', 'marginBottom': '10px', 'height': '50px', 'fontSize': '18px'}),
+                html.Button("SHORT", id='manual-short-btn', className='control-button', 
+                           style={'backgroundColor': '#ff1744', 'width': '100%', 'marginBottom': '10px', 'height': '50px', 'fontSize': '18px'}),
+                html.Button("CLOSE", id='manual-close-btn', className='control-button', 
+                           style={'backgroundColor': '#757575', 'width': '100%', 'height': '50px', 'fontSize': '18px'}),
+            ], style={'display': 'flex', 'flexDirection': 'column', 'justifyContent': 'center', 'flex': '1'}),
+            html.Div(id='manual-trade-feedback', style={'marginTop': '15px', 'textAlign': 'center', 'color': '#fff'})
+        ], className='chart-card', style={'flex': '0.5', 'height': '400px', 'backgroundColor': '#1e2130', 'padding': '20px', 'display': 'flex', 'flexDirection': 'column'}),
+    ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
     
     # Trade Analytics Row
     html.Div([
         html.Div([
             dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'width': '50%', 'display': 'inline-block'}),
+        ], className='chart-card', style={'width': '100%', 'display': 'inline-block'}),
         
-        html.Div([
-            dcc.Graph(id='cumulative-return-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'width': '50%', 'display': 'inline-block'}),
+        # html.Div([
+        #     dcc.Graph(id='cumulative-return-chart', config={'displayModeBar': False}),
+        # ], className='chart-card', style={'width': '50%', 'display': 'inline-block'}),
     ], className='no-print', style={'marginBottom': '20px'}),
 
     # Trading Record Row
     html.Div([
         html.Div([
-            html.H3("Trading Record", style={'color': '#ffffff', 'marginBottom': '15px'}),
+            html.H3("Order History", style={'color': '#ffffff', 'marginBottom': '15px'}),
             html.Div(id='trading-record-table', style={'overflowX': 'auto', 'maxHeight': '300px', 'overflowY': 'auto'}),
         ], style={'width': '100%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
                   'padding': '20px', 'borderRadius': '10px', 'verticalAlign': 'top'}),
@@ -562,9 +575,18 @@ app.layout = html.Div([
     
     # Auto-refresh interval
     dcc.Interval(id='interval-component', interval=1000, n_intervals=0),  # Update every second
+    # Sync interval loaded from config (default 60s)
+    dcc.Interval(id='sync-interval', 
+                 interval=int(config_loader.load_config().get('POSITION_REFRESH_RATE', 60)) * 1000, 
+                 n_intervals=0),
+    
+    # Interval to clear feedback messages after 10 seconds
+    dcc.Interval(id='feedback-interval', interval=10000, disabled=True),
     
     # Hidden div to store logs
     html.Div(id='log-store', style={'display': 'none'}),
+    dcc.Store(id='sync-status-store'),  # Store for sync status
+    dcc.Store(id='last-trade-timestamp', data=0),  # Store to trigger updates after manual trades
     
     # Store to track config loading state
     dcc.Store(id='config-loaded-flag', data=False),
@@ -631,6 +653,16 @@ app.layout = html.Div([
                     html.Div(className='form-group', children=[
                         html.Label("Max Open Position", className='form-label'),
                         dcc.Input(id='conf-max-pos', type='number', min=1, step=1, className='form-input')
+                    ]),
+
+                    html.Div(className='form-group', children=[
+                        html.Label("Position Refresh Rate (sec)", className='form-label'),
+                        dcc.Input(id='conf-pos-refresh', type='number', min=5, step=1, className='form-input')
+                    ]),
+
+                    html.Div(className='form-group', children=[
+                        html.Label("Order History (Hours)", className='form-label'),
+                        dcc.Input(id='conf-order-history', type='number', min=1, step=1, className='form-input')
                     ]),
                 ]),
 
@@ -744,6 +776,138 @@ app.layout = html.Div([
 ], className='container', style={'backgroundColor': '#0e1117', 'minHeight': '100vh', 'padding': '20px'})
 
 
+# Callback: Manual Trade Buttons
+@app.callback(
+    Output('manual-trade-feedback', 'children'),
+    Output('last-trade-timestamp', 'data'),
+    Output('feedback-interval', 'disabled', allow_duplicate=True),
+    Output('feedback-interval', 'n_intervals', allow_duplicate=True),
+    Input('manual-long-btn', 'n_clicks'),
+    Input('manual-short-btn', 'n_clicks'),
+    Input('manual-close-btn', 'n_clicks'),
+    prevent_initial_call=True
+)
+def manual_trade(long_clicks, short_clicks, close_clicks):
+    global trader
+    
+    ctx = callback_context
+    if not ctx.triggered:
+        return "", dash.no_update, dash.no_update, dash.no_update
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    if not trader or not is_running:
+        return html.Span("⚠️ Bot must be running to place trades", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+        
+    try:
+        # Success style for alert
+        success_style = {
+            'position': 'fixed',
+            'bottom': '20px',
+            'right': '20px',
+            'backgroundColor': 'rgba(0, 200, 83, 0.5)', 
+            'color': '#ffffff', 
+            'border': '1px solid #00c853',
+            'borderRadius': '5px',
+            'padding': '15px 25px',
+            'textAlign': 'center',
+            'fontWeight': 'bold',
+            'zIndex': '2000',
+            'boxShadow': '0 4px 6px rgba(0,0,0,0.1)',
+            'backdropFilter': 'blur(5px)'
+        }
+
+        # Handle Close Button
+        if button_id == 'manual-close-btn':
+            if trader.current_position:
+                success = trader.closePosition(trader.current_price)
+                if success:
+                    return html.Div("✅ Position closed successfully", style=success_style), time.time(), False, 0
+                else:
+                    error_msg = getattr(trader, 'last_error', 'Unknown error')
+                    return html.Span(f"❌ Failed to close: {error_msg}", style={'color': '#ff1744'}), dash.no_update, dash.no_update, dash.no_update
+            else:
+                return html.Span("⚠️ No open position to close", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+
+        # Determine side
+        side = 'BUY' if button_id == 'manual-long-btn' else 'SELL'
+        
+        # Execute trade
+        # Use market order for manual execution
+        # Quantity will be determined by position sizing logic in openPosition
+        # Wait, openPosition requires quantity. We need to calculate it here or update openPosition to handle it.
+        # Let's calculate it here based on config
+        
+        config = config_loader.load_config()
+        pos_size_type = config.get('MAX_POS_SIZE_TYPE', 'value')
+        pos_size_value = float(config.get('MAX_POS_SIZE_VALUE', 10.0))
+        
+        quantity = 0.0
+        
+        if pos_size_type == 'value':
+            # Fixed value (USDT)
+            quantity = pos_size_value / trader.current_price
+        elif pos_size_type == 'quantity':
+            # Fixed quantity
+            quantity = pos_size_value
+        elif pos_size_type == 'percentage':
+            # Percentage of balance
+            try:
+                with Account(trade_mode=trader.trade_mode) as account:
+                    total_asset = 0.0
+                    if trader.trade_mode == 'live':
+                        acct_info = account.get_account_info()
+                        if acct_info and 'totalCollateral' in acct_info:
+                            total_asset = float(acct_info['totalCollateral'])
+                    else:
+                        summary = account.get_transaction_summary()
+                        net_pnl = summary.get('net_pnl', 0.0)
+                        total_asset = 100000.0 + net_pnl
+                    
+                    trade_amount_usd = total_asset * (pos_size_value / 100.0)
+                    quantity = trade_amount_usd / trader.current_price
+            except Exception as e:
+                logger.error(f"Error calculating manual trade quantity: {e}")
+                return html.Span(f"❌ Error calculating quantity: {str(e)}", style={'color': '#ff1744'}), dash.no_update, dash.no_update, dash.no_update
+        
+        # Round quantity to 5 decimal places (WOO X requirement for BTC is 1e-05)
+        # This prevents "order size doesn't meet requirement" errors
+        quantity = float(f"{quantity:.5f}")
+        
+        # Determine side string for openPosition ('long' or 'short')
+        trade_side = 'long' if side == 'BUY' else 'short'
+        
+        # Pre-checks before attempting to open position
+        if trader.current_position:
+            curr_side = trader.current_position.get('side', 'unknown')
+            return html.Span(f"⚠️ Cannot open {trade_side}: Already holding {curr_side} position. Close it first.", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+            
+        if trade_side == 'short' and hasattr(trader, 'symbol') and trader.symbol.startswith('SPOT_'):
+            return html.Span("⚠️ Cannot short on SPOT market.", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+            
+        if not trader.current_price:
+            return html.Span("⚠️ Price data not available yet. Wait a moment.", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+            
+        if quantity < 0.00001:
+            return html.Span(f"⚠️ Quantity {quantity:.6f} too small (min 0.00001). Increase position size.", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+        
+        success = trader.openPosition(trade_side, trader.current_price, quantity)
+        
+        if success:
+            action = "LONG" if side == 'BUY' else "SHORT"
+            # Return current timestamp to trigger other callbacks
+            return html.Div(f"✅ Manual {action} order placed successfully ({quantity:.4f})", style=success_style), time.time(), False, 0
+        else:
+            # If we get here, it returned False but passed our pre-checks. 
+            # Could be API error or other internal check.
+            error_msg = getattr(trader, 'last_error', 'Unknown error')
+            return html.Span(f"❌ Failed: {error_msg}", style={'color': '#ff1744'}), dash.no_update, dash.no_update, dash.no_update
+            
+    except Exception as e:
+        logger.error(f"Manual trade error: {e}")
+        return html.Span(f"❌ Error: {str(e)}", style={'color': '#ff1744'}), dash.no_update, dash.no_update, dash.no_update
+
+
 # Callback: Control buttons
 @app.callback(
     Output('control-feedback', 'children'),
@@ -751,6 +915,7 @@ app.layout = html.Div([
     Input('start-btn', 'n_clicks'),
     Input('stop-btn', 'n_clicks'),
     Input('close-btn', 'n_clicks'),
+    # Input('sync-orders-btn', 'n_clicks'),
     Input('print-btn', 'n_clicks'),
     prevent_initial_call=True
 )
@@ -797,6 +962,24 @@ def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
                     return "❌ Failed to close position", {'color': '#ff1744'}
             else:
                 return "⚠️ No open position", {'color': '#ffd600'}
+        
+        # elif button_id == 'sync-orders-btn':
+        #     # Sync order history from WOO X API
+        #     try:
+        #         from sync_order_history import OrderHistorySync
+        #         config = config_loader.load_config()
+        #         trade_mode = config.get('TRADE_MODE', 'paper')
+        #         
+        #         if trade_mode != 'live':
+        #             return "⚠️ Order sync only available in LIVE mode", {'color': '#ffd600'}
+        #         
+        #         syncer = OrderHistorySync()
+        #         # Sync all symbols to ensure we get both SPOT and PERP history
+        #         total = syncer.sync_all(symbol=None, days_back=30)
+        #         return f"✅ Synced {total} orders from WOO X API", {'color': '#00c853'}
+        #     except Exception as e:
+        #         logger.error(f"Sync error: {str(e)}")
+        #         return f"❌ Sync failed: {str(e)}", {'color': '#ff1744'}
         
         elif button_id == 'print-btn':
             # Trigger browser print dialog using JavaScript
@@ -879,9 +1062,10 @@ def update_status(n):
     Output('win-rate', 'children'),
     Output('balance-metric', 'children'),
     Output('monthly-return', 'children'),
-    Input('interval-component', 'n_intervals')
+    Input('interval-component', 'n_intervals'),
+    Input('last-trade-timestamp', 'data')
 )
-def update_metrics(n):
+def update_metrics(n, last_trade_ts):
     global trader, chart_data, performance_metrics
     
     if not trader or not is_running:
@@ -968,35 +1152,35 @@ def update_metrics(n):
         win_rate_str = f"Win Rate: {win_rate:.1f}%"
         
         # Account Balance & Monthly Return
-        account = Account(trade_mode=trader.trade_mode)
         balance_val = "$0.00"
         return_val = "Return: 0.0%"
         
-        if trader.trade_mode == 'paper':
-            summary = account.get_transaction_summary()
-            net_pnl = summary.get('net_pnl', 0.0)
-            initial_balance = 100000.0
-            current_balance = initial_balance + net_pnl
-            balance_val = f"${current_balance:,.2f}"
-            roi = (net_pnl / initial_balance) * 100
-            return_val = f"Return: {roi:+.2f}%"
-        else:
-            # Live mode
-            acct_info = account.get_account_info()
-            if acct_info and 'totalCollateral' in acct_info:
-                 total = float(acct_info.get('totalCollateral', 0))
-                 balance_val = f"${total:,.2f}"
-                 return_val = "Live Balance"
+        with Account(trade_mode=trader.trade_mode) as account:
+            if trader.trade_mode == 'paper':
+                summary = account.get_transaction_summary()
+                net_pnl = summary.get('net_pnl', 0.0)
+                initial_balance = 100000.0
+                current_balance = initial_balance + net_pnl
+                balance_val = f"${current_balance:,.2f}"
+                roi = (net_pnl / initial_balance) * 100
+                return_val = f"Return: {roi:+.2f}%"
             else:
-                 # Fallback to balance check if account info fails
-                 api_bal = account.get_api_balance()
-                 if api_bal:
-                     # Try to sum up holdings if totalCollateral not available
-                     balance_val = "Check Logs"
-                     return_val = "Partial Data"
-                 else:
-                     balance_val = "N/A"
-                     return_val = "Check API"
+                # Live mode
+                acct_info = account.get_account_info()
+                if acct_info and 'totalCollateral' in acct_info:
+                    total = float(acct_info.get('totalCollateral', 0))
+                    balance_val = f"${total:,.2f}"
+                    return_val = "Live Balance"
+                else:
+                    # Fallback to balance check if account info fails
+                    api_bal = account.get_api_balance()
+                    if api_bal:
+                        # Try to sum up holdings if totalCollateral not available
+                        balance_val = "Check Logs"
+                        return_val = "Partial Data"
+                    else:
+                        balance_val = "N/A"
+                        return_val = "Check API"
         
         # Update chart data
         if price:
@@ -1055,9 +1239,7 @@ def update_strategy_info(n):
 # Callback: Update System Metrics
 @app.callback(
     Output('cpu-usage-metric', 'children'),
-    Output('cpu-gauge', 'figure'),
     Output('memory-usage-metric', 'children'),
-    Output('memory-gauge', 'figure'),
     Input('interval-component', 'n_intervals')
 )
 def update_system_metrics(n):
@@ -1069,69 +1251,13 @@ def update_system_metrics(n):
         memory = psutil.virtual_memory()
         memory_percent = memory.percent
         
-        # Create CPU Gauge
-        cpu_fig = go.Figure(go.Indicator(
-            mode = "gauge+number",
-            value = cpu_percent,
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            gauge = {
-                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "white"},
-                'bar': {'color': "#667eea"},
-                'bgcolor': "rgba(0,0,0,0)",
-                'borderwidth': 2,
-                'bordercolor': "#444",
-                'steps': [
-                    {'range': [0, 50], 'color': "rgba(0, 200, 83, 0.3)"},
-                    {'range': [50, 80], 'color': "rgba(255, 214, 0, 0.3)"},
-                    {'range': [80, 100], 'color': "rgba(255, 23, 68, 0.3)"}
-                ],
-            }
-        ))
-        cpu_fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font={'color': "white"},
-            margin={'t': 0, 'b': 0, 'l': 20, 'r': 20},
-            height=100
-        )
-        
-        # Create Memory Gauge
-        mem_fig = go.Figure(go.Indicator(
-            mode = "gauge+number",
-            value = memory_percent,
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            gauge = {
-                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "white"},
-                'bar': {'color': "#764ba2"},
-                'bgcolor': "rgba(0,0,0,0)",
-                'borderwidth': 2,
-                'bordercolor': "#444",
-                'steps': [
-                    {'range': [0, 50], 'color': "rgba(0, 200, 83, 0.3)"},
-                    {'range': [50, 80], 'color': "rgba(255, 214, 0, 0.3)"},
-                    {'range': [80, 100], 'color': "rgba(255, 23, 68, 0.3)"}
-                ],
-            }
-        ))
-        mem_fig.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font={'color': "white"},
-            margin={'t': 0, 'b': 0, 'l': 20, 'r': 20},
-            height=100
-        )
-        
         return (
-            f"{cpu_percent}%",
-            cpu_fig,
-            f"{memory_percent}%",
-            mem_fig
+            f"{cpu_percent:.1f}%",
+            f"{memory_percent:.1f}%"
         )
     except Exception as e:
         # logger.error(f"Error updating system metrics: {str(e)}")
-        empty_fig = go.Figure()
-        empty_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
-        return ("--", empty_fig, "--", empty_fig)
+        return ("--", "--")
 
 
 # Callback: Update price chart
@@ -1155,9 +1281,9 @@ def update_price_chart(n):
     )
     
     if len(chart_data['timestamps']) > 0:
-        # Filter data for last 10 minutes
+        # Filter data for last 5 minutes
         now = datetime.now()
-        cutoff = now - timedelta(minutes=10)
+        cutoff = now - timedelta(minutes=5)
         
         timestamps = list(chart_data['timestamps'])
         prices = list(chart_data['prices'])
@@ -1518,7 +1644,7 @@ def update_rsi_chart(n):
         template='plotly_dark',
         paper_bgcolor='#1e2130',
         plot_bgcolor='#1e2130',
-        height=300,
+        height=400,  # Match container height
         margin=dict(l=50, r=20, t=40, b=40),
         hovermode='x unified',
         yaxis=dict(range=[0, 100])
@@ -1648,7 +1774,7 @@ def update_ma_chart(n):
         template='plotly_dark',
         paper_bgcolor='#1e2130',
         plot_bgcolor='#1e2130',
-        height=350,
+        height=400,  # Match container height
         margin=dict(l=50, r=20, t=40, b=40),
         hovermode='x unified',
         legend=dict(x=0.01, y=0.99)
@@ -1718,12 +1844,24 @@ def update_spread_chart(n):
     Input('interval-component', 'n_intervals')
 )
 def update_trade_distribution_chart(n):
-    global performance_metrics, trader
+    global trader
     
     fig = go.Figure()
     
-    winning = performance_metrics['winning_trades']
-    losing = performance_metrics['losing_trades']
+    winning = 0
+    losing = 0
+    
+    try:
+        config = config_loader.load_config()
+        trade_mode = config.get('TRADE_MODE', 'paper')
+        
+        with Account(trade_mode=trade_mode) as account:
+            summary = account.get_transaction_summary()
+            if summary:
+                winning = summary.get('winning_trades', 0)
+                losing = summary.get('losing_trades', 0)
+    except Exception as e:
+        logger.error(f"Error updating trade distribution chart: {e}")
     
     if winning > 0 or losing > 0:
         fig.add_trace(go.Pie(
@@ -1734,6 +1872,14 @@ def update_trade_distribution_chart(n):
             textinfo='label+percent+value',
             textfont=dict(size=14, color='white')
         ))
+    else:
+        # Add empty chart with message
+        fig.add_annotation(
+            text="No trades yet",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(size=16, color="#888")
+        )
     
     symbol_display = ""
     if trader and trader.symbol:
@@ -1754,10 +1900,10 @@ def update_trade_distribution_chart(n):
 
 
 # Callback: Update Cumulative Return chart
-@app.callback(
-    Output('cumulative-return-chart', 'figure'),
-    Input('interval-component', 'n_intervals')
-)
+# @app.callback(
+#     Output('cumulative-return-chart', 'figure'),
+#     Input('interval-component', 'n_intervals')
+# )
 def update_cumulative_return_chart(n):
     global trader, performance_metrics
     
@@ -1765,8 +1911,8 @@ def update_cumulative_return_chart(n):
     
     if trader:
         try:
-            account = Account(trade_mode=trader.trade_mode)
-            summary = account.get_transaction_summary()
+            with Account(trade_mode=trader.trade_mode) as account:
+                summary = account.get_transaction_summary()
             
             if summary:
                 # Get cumulative P&L over time (simplified)
@@ -1869,6 +2015,204 @@ def update_performance_table(n):
     return html.Table(table_rows, style={'width': '100%', 'borderCollapse': 'collapse'})
 
 
+# Callback: Update Balance Table
+@app.callback(
+    Output('balance-table', 'children'),
+    Input('interval-component', 'n_intervals')
+)
+def update_balance_table(n):
+    global trader
+    
+    try:
+        config = config_loader.load_config()
+        trade_mode = config.get('TRADE_MODE', 'paper')
+        
+        with Account(trade_mode=trade_mode) as account:
+            # Get Account Balance for % calc
+            total_balance = 1.0 # Avoid div by zero
+            
+            # Get current holdings
+            holdings = []
+            
+            if trade_mode == 'live':
+                # In live mode, fetch from API via Account class
+                try:
+                    info = account.get_account_info()
+                    
+                    # Get total collateral for balance calc
+                    if info and 'totalCollateral' in info:
+                        total_balance = float(info.get('totalCollateral', 1.0))
+                        
+                    # Parse info to extract holdings
+                    if info and 'holding' in info:
+                        for h in info['holding']:
+                            holdings.append({
+                                'asset': h.get('token', 'Unknown'),
+                                'holding': float(h.get('holding', 0)),
+                                'avg_price': float(h.get('averageOpenPrice', 0)),
+                                'mark_price': float(h.get('markPrice', 0)) # Or fetch current price
+                            })
+                    elif trader and trader.current_position:
+                         # Fallback to current position if API full holding not available
+                         pos = trader.current_position
+                         holdings.append({
+                             'asset': trader.symbol.replace('PERP_', '').replace('SPOT_', '').split('_')[0],
+                             'holding': pos.get('quantity', 0),
+                             'avg_price': pos.get('entry_price', 0),
+                             'mark_price': trader.current_price or 0,
+                             'side': pos.get('side', 'LONG').upper()
+                         })
+                except Exception as e:
+                    logger.error(f"Error fetching live holdings: {e}")
+            else:
+                # Paper mode - calculate from DB or memory
+                summary = account.get_transaction_summary()
+                total_balance = 100000.0 + summary.get('net_pnl', 0.0)
+                
+                # For simplicity, use current position from trader
+                if trader and trader.current_position:
+                     pos = trader.current_position
+                     holdings.append({
+                         'asset': trader.symbol.replace('PERP_', '').replace('SPOT_', '').split('_')[0],
+                         'holding': pos.get('quantity', 0),
+                         'avg_price': pos.get('entry_price', 0),
+                         'mark_price': trader.current_price or 0,
+                         'side': pos.get('side', 'LONG').upper()
+                     })
+            
+            if not holdings:
+                return html.Div("No assets held", style={'color': '#888', 'textAlign': 'center', 'padding': '20px'})
+                
+            # Create table
+            header = html.Tr([
+                html.Th("Asset", style={'textAlign': 'left', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("Side", style={'textAlign': 'center', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("Holding", style={'textAlign': 'right', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("Avg Price", style={'textAlign': 'right', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("Open Interest", style={'textAlign': 'right', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("Unrealized P&L", style={'textAlign': 'right', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("P&L % (Bal)", style={'textAlign': 'right', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+                html.Th("Action", style={'textAlign': 'center', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
+            ])
+            
+            rows = [header]
+            for h in holdings:
+                asset = h['asset']
+                amount = h['holding']
+                avg_price = h['avg_price']
+                mark_price = h['mark_price']
+                side = h.get('side', 'LONG' if amount >= 0 else 'SHORT')
+                mkt_value = amount * mark_price
+                
+                # Calculate PnL
+                u_pnl = 0.0
+                if side.upper() == 'LONG':
+                    u_pnl = (mark_price - avg_price) * amount
+                else:
+                    u_pnl = (avg_price - mark_price) * amount
+                
+                # PnL % of Balance
+                pnl_bal_pct = (u_pnl / total_balance) * 100 if total_balance > 0 else 0
+                
+                # Styles
+                side_style = {'color': '#00c853', 'fontWeight': 'bold'} if side.upper() == 'LONG' else {'color': '#ff1744', 'fontWeight': 'bold'}
+                pnl_style = {'color': '#00c853'} if u_pnl >= 0 else {'color': '#ff1744'}
+                
+                # Only show close button if amount is not 0
+                action_btn = html.Div()
+                if abs(amount) > 0:
+                    action_btn = html.Button("Close", 
+                                           id={'type': 'pos-close-btn', 'index': asset},
+                                           className='control-button',
+                                           style={'backgroundColor': '#ef5350', 'padding': '2px 8px', 'fontSize': '12px', 'height': '25px', 'lineHeight': '20px'})
+                
+                rows.append(html.Tr([
+                    html.Td(asset, style={'padding': '8px', 'color': '#fff'}),
+                    html.Td(side, style={'padding': '8px', 'textAlign': 'center', **side_style}),
+                    html.Td(f"{amount:.4f}", style={'padding': '8px', 'textAlign': 'right', 'color': '#fff'}),
+                    html.Td(f"${avg_price:,.2f}", style={'padding': '8px', 'textAlign': 'right', 'color': '#fff'}),
+                    html.Td(f"${mkt_value:,.2f}", style={'padding': '8px', 'textAlign': 'right', 'color': '#00e676'}),
+                    html.Td(f"${u_pnl:,.2f}", style={'padding': '8px', 'textAlign': 'right', **pnl_style}),
+                    html.Td(f"{pnl_bal_pct:+.2f}%", style={'padding': '8px', 'textAlign': 'right', **pnl_style}),
+                    html.Td(action_btn, style={'padding': '8px', 'textAlign': 'center'}),
+                ]))
+                
+            return html.Table(rows, style={'width': '100%', 'borderCollapse': 'collapse'})
+            
+    except Exception as e:
+        logger.error(f"Error updating balance table: {e}")
+        return html.Div("Error loading balance", style={'color': '#ff1744'})
+
+
+# Callback: Handle Close Button in Balance Table
+@app.callback(
+    Output('manual-trade-feedback', 'children', allow_duplicate=True),
+    Output('last-trade-timestamp', 'data', allow_duplicate=True),
+    Output('feedback-interval', 'disabled', allow_duplicate=True),
+    Output('feedback-interval', 'n_intervals', allow_duplicate=True),
+    Input({'type': 'pos-close-btn', 'index': ALL}, 'n_clicks'),
+    prevent_initial_call=True
+)
+def close_position_table(n_clicks):
+    global trader
+    
+    ctx = callback_context
+    if not ctx.triggered:
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        
+    # Check if any button was actually clicked
+    if not any(n for n in n_clicks if n):
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+    if not trader or not is_running:
+        return html.Span("⚠️ Bot must be running to close positions", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+        
+    try:
+        # Success style for alert
+        success_style = {
+            'position': 'fixed',
+            'bottom': '20px',
+            'right': '20px',
+            'backgroundColor': 'rgba(0, 200, 83, 0.5)', 
+            'color': '#ffffff', 
+            'border': '1px solid #00c853',
+            'borderRadius': '5px',
+            'padding': '15px 25px',
+            'textAlign': 'center',
+            'fontWeight': 'bold',
+            'zIndex': '2000',
+            'boxShadow': '0 4px 6px rgba(0,0,0,0.1)',
+            'backdropFilter': 'blur(5px)'
+        }
+
+        if trader.current_position:
+            success = trader.closePosition(trader.current_price)
+            if success:
+                return html.Div("✅ Position closed successfully", style=success_style), time.time(), False, 0
+            else:
+                error_msg = getattr(trader, 'last_error', 'Unknown error')
+                return html.Span(f"❌ Failed to close: {error_msg}", style={'color': '#ff1744'}), dash.no_update, dash.no_update, dash.no_update
+        else:
+            return html.Span("⚠️ No open position to close", style={'color': '#ffd600'}), dash.no_update, dash.no_update, dash.no_update
+            
+    except Exception as e:
+        logger.error(f"Table close error: {e}")
+        return html.Span(f"❌ Error: {str(e)}", style={'color': '#ff1744'}), dash.no_update, dash.no_update, dash.no_update
+
+
+# Callback: Clear feedback message after interval
+@app.callback(
+    Output('manual-trade-feedback', 'children', allow_duplicate=True),
+    Output('feedback-interval', 'disabled', allow_duplicate=True),
+    Input('feedback-interval', 'n_intervals'),
+    prevent_initial_call=True
+)
+def clear_feedback(n):
+    if n and n > 0:
+        return "", True
+    return dash.no_update, dash.no_update
+
+
 # Callback: Update activity log
 @app.callback(
     Output('activity-log', 'children'),
@@ -1953,7 +2297,7 @@ def update_print_trading_records(n):
             ]))
         
         return html.Div([
-            html.H3("Trading Records", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
+            html.H3("Order History", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
             html.Table([
                 html.Thead(html.Tr([
                     html.Th("Time", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
@@ -1970,6 +2314,29 @@ def update_print_trading_records(n):
     except Exception as e:
         logger.error(f"Error generating print trading records: {str(e)}")
         return html.Div(f"Error: {str(e)}", style={'color': 'red'})
+
+
+# Callback: Update Manual Position Size Display
+@app.callback(
+    Output('manual-pos-size-display', 'children'),
+    Input('interval-component', 'n_intervals')
+)
+def update_manual_pos_size(n):
+    try:
+        config = config_loader.load_config()
+        size_type = config.get('MAX_POS_SIZE_TYPE', 'value')
+        size_value = float(config.get('MAX_POS_SIZE_VALUE', 10.0))
+        
+        if size_type == 'value':
+            return f"Size: ${size_value:,.2f}"
+        elif size_type == 'percentage':
+            return f"Size: {size_value}% of Balance"
+        elif size_type == 'quantity':
+            return f"Size: {size_value} Units"
+        else:
+            return f"Size: {size_value}"
+    except:
+        return "Size: --"
 
 
 # Callback: Update print report - Account Summary
@@ -2120,6 +2487,8 @@ def update_pos_size_ui(size_type, symbol, is_loading):
      Output('conf-pos-size-type', 'value'),
      Output('conf-pos-size-value', 'value'),
      Output('conf-max-pos', 'value'),
+     Output('conf-pos-refresh', 'value'),
+     Output('conf-order-history', 'value'),
      Output('conf-strategy', 'value'),
      Output('conf-short-ma', 'value'),
      Output('conf-long-ma', 'value'),
@@ -2139,7 +2508,7 @@ def update_pos_size_ui(size_type, symbol, is_loading):
 def toggle_config_modal(n1, n2, n3, n4, current_style):
     ctx = callback_context
     if not ctx.triggered:
-        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
@@ -2155,6 +2524,8 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
                 config.get('MAX_POS_SIZE_TYPE', 'value'),
                 float(config.get('MAX_POS_SIZE_VALUE', 10.0)),
                 int(config.get('MAX_OPEN_POSITIONS', 1)),
+                int(config.get('POSITION_REFRESH_RATE', 60)),
+                int(config.get('ORDER_HISTORY_HOURS', 72)),
                 config.get('ENTRY_STRATEGY', 'ma_crossover'),
                 int(config.get('SHORT_MA_PERIOD', 20)),
                 int(config.get('LONG_MA_PERIOD', 50)),
@@ -2168,12 +2539,12 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
             )
         except Exception as e:
             logger.error(f"Error loading config: {e}")
-            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 'ma_crossover', 20, 50, 60, 5.0, 60, 14, 3.0, 5.0, True
+            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 60, 72, 'ma_crossover', 20, 50, 60, 5.0, 60, 14, 3.0, 5.0, True
             
     elif button_id in ['close-config-btn', 'cancel-config-btn', 'save-config-btn']:
-        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
     
-    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
 
 # Callback: Save Config
 @app.callback(
@@ -2185,6 +2556,8 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
      State('conf-pos-size-type', 'value'),
      State('conf-pos-size-value', 'value'),
      State('conf-max-pos', 'value'),
+     State('conf-pos-refresh', 'value'),
+     State('conf-order-history', 'value'),
      State('conf-strategy', 'value'),
      State('conf-short-ma', 'value'),
      State('conf-long-ma', 'value'),
@@ -2196,7 +2569,7 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
      State('conf-tp', 'value')],
     prevent_initial_call=True
 )
-def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, strategy, ma_short, ma_long, ma_timeframe, ma_threshold, rsi_timeframe, rsi_period, sl, tp):
+def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, pos_refresh, order_history, strategy, ma_short, ma_long, ma_timeframe, ma_threshold, rsi_timeframe, rsi_period, sl, tp):
     try:
         # Read existing config to preserve comments
         with open('.config', 'r') as f:
@@ -2210,6 +2583,8 @@ def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_siz
             'MAX_POS_SIZE_TYPE': pos_size_type,
             'MAX_POS_SIZE_VALUE': str(pos_size_value),
             'MAX_OPEN_POSITIONS': str(max_pos),
+            'POSITION_REFRESH_RATE': str(pos_refresh),
+            'ORDER_HISTORY_HOURS': str(order_history),
             'ENTRY_STRATEGY': strategy,
             'EXIT_STRATEGY': strategy, # Assume same for now
             'SHORT_MA_PERIOD': str(ma_short),
@@ -2250,33 +2625,109 @@ def get_trading_records():
         trade_mode = config.get('TRADE_MODE', 'paper')
         db_file = 'live_transaction.db' if trade_mode == 'live' else 'paper_transaction.db'
         
-        # Use read_only=True to avoid locking issues if the bot is writing
-        conn = duckdb.connect(db_file, read_only=True)
+        # Debug logging
+        # abs_db_path = os.path.abspath(db_file)
+        # print(f"DEBUG: Loading records from {abs_db_path} (Mode: {trade_mode})")
+        
+        if not os.path.exists(db_file):
+            # print(f"DEBUG: DB file not found at {abs_db_path}")
+            return []
+
+        # Use read_only=False to avoid "different configuration" errors if Account class has an open connection
+        # DuckDB requires all connections to the same file to have the same configuration
+        conn = duckdb.connect(db_file, read_only=False)
         
         # Check if table exists
         try:
             conn.execute("SELECT 1 FROM trades LIMIT 1")
-        except:
+        except Exception as e:
+            # print(f"DEBUG: Table check failed: {e}")
             conn.close()
             return []
             
         # Fetch records, latest first
-        records = conn.execute("SELECT * FROM trades ORDER BY trade_datetime DESC LIMIT 50").fetchall()
+        history_hours = int(config.get('ORDER_HISTORY_HOURS', 72))
+        cutoff_time = datetime.now() - timedelta(hours=history_hours)
+        
+        if trade_mode == 'live':
+            query = f"SELECT * FROM trades WHERE created_time >= '{cutoff_time}' ORDER BY created_time DESC"
+        else:
+            query = f"SELECT * FROM trades WHERE trade_datetime >= '{cutoff_time}' ORDER BY trade_datetime DESC"
+            
+        records = conn.execute(query).fetchall()
         columns = [desc[0] for desc in conn.description]
         conn.close()
         
-        return [dict(zip(columns, row)) for row in records]
+        # print(f"DEBUG: Found {len(records)} records in DB")
+        
+        raw_data = [dict(zip(columns, row)) for row in records]
+        
+        # Normalize data to expected format
+        normalized_data = []
+        for r in raw_data:
+            # Check if it's the new schema (has 'created_time')
+            if 'created_time' in r:
+                normalized_data.append({
+                    'trade_datetime': r.get('created_time'),
+                    'symbol': r.get('symbol'),
+                    'trade_type': r.get('side'), # BUY/SELL
+                    'code': r.get('status', 'FILLED'), # Map status to code/action
+                    'price': r.get('average_executed_price') or r.get('order_price'),
+                    'quantity': r.get('executed_quantity') or r.get('order_quantity'),
+                    'proceeds': r.get('realized_pnl', 0) # Or calculate
+                })
+            else:
+                # Old schema (Paper)
+                normalized_data.append(r)
+        
+        print(f"DEBUG: Returning {len(normalized_data)} normalized records")
+        return normalized_data
     except Exception as e:
-        # logger.error(f"Error fetching trading records: {e}") # Reduce noise if DB doesn't exist yet
+        print(f"DEBUG: Error fetching trading records: {e}")
+        logger.error(f"Error fetching trading records: {e}")
         return []
+
+
+# Callback: Auto-sync orders every 5 minutes
+@app.callback(
+    Output('sync-status-store', 'data'),
+    Input('sync-interval', 'n_intervals')
+)
+def auto_sync_orders(n):
+    if n is None or n == 0:
+        return None
+        
+    try:
+        # Only sync in LIVE mode
+        config = config_loader.load_config()
+        trade_mode = config.get('TRADE_MODE', 'paper')
+        
+        if trade_mode == 'live':
+            from sync_order_history import OrderHistorySync
+            syncer = OrderHistorySync()
+            # Sync all symbols (None) to capture both SPOT and PERP history
+            # Sync based on configured history hours
+            history_hours = int(config.get('ORDER_HISTORY_HOURS', 72))
+            days_back = (history_hours // 24) + 1
+            
+            total = syncer.sync_all(symbol=None, days_back=days_back)
+            logger.info(f"Auto-synced {total} orders from WOO X API (Last {days_back} days)")
+            return {'status': 'success', 'count': total, 'timestamp': time.time()}
+            
+    except Exception as e:
+        logger.error(f"Auto-sync error: {str(e)}")
+        return {'status': 'error', 'message': str(e)}
+    
+    return None
 
 
 # Callback: Update Trading Records
 @app.callback(
     Output('trading-record-table', 'children'),
-    Input('interval-component', 'n_intervals')
+    Input('interval-component', 'n_intervals'),
+    Input('last-trade-timestamp', 'data')
 )
-def update_trading_records(n):
+def update_trading_records(n, last_trade_ts):
     records = get_trading_records()
     
     if not records:
@@ -2332,6 +2783,19 @@ if __name__ == '__main__':
     print("\n" + "="*70)
     print("🚀 WOOX Trading Bot Dashboard Starting...")
     print("="*70)
+    
+    # Perform initial sync if in LIVE mode
+    try:
+        config = config_loader.load_config()
+        if config.get('TRADE_MODE') == 'live':
+            print("🔄 Performing initial order history sync...")
+            from sync_order_history import OrderHistorySync
+            # Sync all symbols
+            OrderHistorySync().sync_all(symbol=None, days_back=1)
+            print("✅ Initial sync complete")
+    except Exception as e:
+        print(f"⚠️ Initial sync failed: {e}")
+        
     print("\n📊 Dashboard URL: http://127.0.0.1:8050")
     print("\n💡 Features:")
     print("   - Real-time price monitoring")
@@ -2339,7 +2803,15 @@ if __name__ == '__main__':
     print("   - Live orderbook visualization")
     print("   - P&L tracking and performance metrics")
     print("   - Activity log monitoring")
-    print("\n⚠️  Note: The bot will start in PAPER mode by default")
+    
+    # Display current mode
+    try:
+        config = config_loader.load_config()
+        mode = config.get('TRADE_MODE', 'paper').upper()
+        print(f"\nℹ️  Bot configured to start in {mode} MODE")
+    except:
+        print("\nℹ️  Bot configured to start in PAPER MODE (Default)")
+        
     print("="*70 + "\n")
     
     # Note: debug=False to avoid signal module conflict with signal.py

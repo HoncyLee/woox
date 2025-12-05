@@ -131,8 +131,17 @@ class Trade:
         
         self.logger = logging.getLogger('Trade')
         self.base_url = fresh_config.get('BASE_URL', 'https://api.woox.io')
-        self.api_key = api_key if api_key else fresh_config.get('WOOX_API_KEY')
-        self.api_secret = api_secret if api_secret else fresh_config.get('WOOX_API_SECRET')
+        
+        # Try arguments first, then config, then environment variables
+        self.api_key = api_key if api_key else (fresh_config.get('WOOX_API_KEY') or os.environ.get('WOOX_API_KEY'))
+        self.api_secret = api_secret if api_secret else (fresh_config.get('WOOX_API_SECRET') or os.environ.get('WOOX_API_SECRET'))
+        
+        # Clean credentials
+        if self.api_key:
+            self.api_key = self.api_key.strip()
+        if self.api_secret:
+            self.api_secret = self.api_secret.strip()
+            
         self.trade_mode = trade_mode if trade_mode else fresh_config.get('TRADE_MODE', 'paper')
         self.symbol = fresh_config.get('SYMBOL', 'PERP_BTC_USDT')
         
@@ -181,6 +190,7 @@ class Trade:
         
         # Position tracking
         self.current_position = None  # {'side': 'long'/'short', 'quantity': float, 'entry_price': float}
+        self.last_error = None  # Store last error message for UI feedback
         
         # Initialize trading strategies
         entry_strategy_name = fresh_config.get('ENTRY_STRATEGY', 'ma_crossover')
@@ -202,6 +212,11 @@ class Trade:
         # Initialize database connection based on trade mode
         self.db_file = 'live_transaction.db' if self.trade_mode == 'live' else 'paper_transaction.db'
         self._init_database()
+        
+        # Perform initial sync if in LIVE mode
+        if self.trade_mode == 'live':
+            self.logger.info("Performing initial order history sync...")
+            self._trigger_sync()
         
         self.logger.info("Trade class initialized for symbol: %s in %s mode", self.symbol, self.trade_mode.upper())
     
@@ -231,7 +246,8 @@ class Trade:
             self.logger.error("Error initializing database: %s", str(e))
     
     def _record_transaction(self, trade_type: str, quantity: float, price: float, 
-                           signal: str = "MA_CROSS", order_type: str = "LMT", code: str = "O") -> None:
+                           signal: str = "MA_CROSS", order_type: str = "LMT", code: str = "O",
+                           order_data: Optional[Dict] = None, pnl: float = 0.0) -> None:
         """Record a transaction to the database.
         
         Args:
@@ -241,6 +257,8 @@ class Trade:
             signal: Trading signal that triggered the trade
             order_type: Order type (LMT, MKT, etc.)
             code: Transaction code (O=Open, C=Close)
+            order_data: Optional dictionary with API order details
+            pnl: Realized PnL for closing trades
         """
         try:
             from datetime import datetime
@@ -256,13 +274,21 @@ class Trade:
             # This is useful if the user changes the config while the bot is running
             current_config = load_config()
             current_mode = current_config.get('TRADE_MODE', 'paper')
-            db_file = 'live_transaction.db' if current_mode == 'live' else 'paper_transaction.db'
+            
+            # In LIVE mode, we skip local recording and rely on the sync mechanism
+            # This ensures we don't have duplicate or conflicting records
+            if current_mode == 'live':
+                self.logger.info("Skipping local DB write in LIVE mode - relying on API sync")
+                return
+
+            db_file = 'paper_transaction.db'
             
             with duckdb.connect(db_file) as conn:
+                # Paper Mode Schema
                 conn.execute("""
                 INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                    CONFIG.get('USER', 'TRADER'),  # acct_id
+                CONFIG.get('USER', 'TRADER'),  # acct_id
                     self.symbol,  # symbol
                     datetime.fromtimestamp(time.time()),  # trade_datetime as TIMESTAMP
                     'woox',  # exchange
@@ -629,6 +655,7 @@ class Trade:
             return self.exit_strategy.generate_exit_signal(
                 self.current_position,
                 self.current_price,
+                self.trade_px_list,
                 self.orderbook
             )
         except Exception as e:
@@ -769,6 +796,19 @@ class Trade:
             self.logger.error("Error checking position: %s", str(e))
             return None
     
+    def _trigger_sync(self):
+        """Trigger order history sync after a trade."""
+        if self.trade_mode == 'live':
+            try:
+                # Import here to avoid potential circular imports if any
+                from sync_order_history import OrderHistorySync
+                self.logger.info("Triggering order history sync...")
+                # Sync all symbols
+                OrderHistorySync().sync_all(symbol=None, days_back=1)
+                self.logger.info("Order history sync completed")
+            except Exception as e:
+                self.logger.error(f"Failed to sync order history: {e}")
+
     def openPosition(self, side: str, price: float, quantity: float) -> bool:
         """
         Open a position at a specific limit price and quantity.
@@ -781,28 +821,37 @@ class Trade:
         Returns:
             True if position opened successfully, False otherwise
         """
+        self.last_error = None
         try:
             if self.current_position:
+                self.last_error = "Already holding a position"
                 self.logger.warning("Cannot open position - already holding a position")
                 return False
             
             # Validate side
             if side not in ['long', 'short']:
+                self.last_error = f"Invalid side: {side}"
                 self.logger.error("Invalid side: %s. Must be 'long' or 'short'", side)
                 return False
             
             # Check if symbol supports short positions (PERP allows short, SPOT doesn't)
             if side == 'short' and self.symbol.startswith('SPOT_'):
+                self.last_error = "Short not supported on SPOT"
                 self.logger.warning("Short positions not supported for spot trading. Use perpetual futures (PERP_).")
                 return False
             
             # Use V3 API to place order if in live mode and credentials are provided
+            order_data = None
             if self.trade_mode == 'live' and self.api_key and self.api_secret:
                 # Determine order side based on position type
                 order_side = "BUY" if side == "long" else "SELL"
                 
+                # Generate client_order_id (using microsecond timestamp)
+                client_order_id = int(time.time() * 1000000)
+                
                 order_body = {
                     "symbol": self.symbol,
+                    "client_order_id": client_order_id,
                     "side": order_side,
                     "type": "LIMIT",
                     "price": str(price),
@@ -829,6 +878,7 @@ class Trade:
                         order_data.get('orderId'), order_data.get('side'), price, quantity
                     )
                 else:
+                    self.last_error = f"API Error: {result.get('message', result)}"
                     self.logger.error("[LIVE] Failed to place order: %s", result)
                     return False
             else:
@@ -855,13 +905,19 @@ class Trade:
                 price=price,
                 signal='MA_CROSS',
                 order_type='LMT',
-                code='O'  # O = Open position
+                code='O',  # O = Open position
+                order_data=order_data
             )
             
             self.logger.info("Position opened successfully: %s", self.current_position)
+            
+            # Trigger sync to update dashboard history
+            self._trigger_sync()
+            
             return True
             
         except Exception as e:
+            self.last_error = f"Exception: {str(e)}"
             self.logger.error("Error opening position: %s", str(e))
             return False
     
@@ -893,12 +949,17 @@ class Trade:
                 pnl_pct = ((entry_price - price) / entry_price) * 100
             
             # Use V3 API to place closing order if in live mode and credentials are provided
+            order_data = None
             if self.trade_mode == 'live' and self.api_key and self.api_secret:
                 # Determine closing order side (opposite of position)
                 close_side = "SELL" if side == "long" else "BUY"
                 
+                # Generate client_order_id (using microsecond timestamp)
+                client_order_id = int(time.time() * 1000000)
+                
                 order_body = {
                     "symbol": self.symbol,
+                    "client_order_id": client_order_id,
                     "side": close_side,
                     "type": "LIMIT",
                     "price": str(price),
@@ -946,7 +1007,9 @@ class Trade:
                 price=price,
                 signal=signal,
                 order_type='LMT',
-                code='C'  # C = Close position
+                code='C',  # C = Close position
+                order_data=order_data,
+                pnl=pnl
             )
             
             self.logger.info(
@@ -958,6 +1021,10 @@ class Trade:
             self.current_position = None
             
             self.logger.info("Position closed successfully")
+            
+            # Trigger sync to update dashboard history
+            self._trigger_sync()
+            
             return True
             
         except Exception as e:
@@ -1163,13 +1230,20 @@ class Trade:
                                 trade_amount_usd = pos_size_value
                                 quantity = trade_amount_usd / self.current_price
                             
+                            # Round quantity to 5 decimal places to meet API requirements
+                            quantity = float(f"{quantity:.5f}")
+                            
+                            # Check minimum quantity requirement
+                            if quantity < 0.00001:
+                                self.logger.warning(f"Calculated quantity {quantity:.6f} is too small (min 0.00001). Skipping trade.")
+                                continue
+                            
                             # Use current ask/bid for limit price
                             if signal == 'long' and self.current_ask:
                                 self.openPosition('long', self.current_ask, quantity)
                             elif signal == 'short' and self.current_bid:
                                 self.openPosition('short', self.current_bid, quantity)
                     
-                    last_trade_check_time = current_time
                     last_trade_check_time = current_time
                 
                 # Display current price and entries count

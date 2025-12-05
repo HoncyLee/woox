@@ -33,7 +33,7 @@ class BaseStrategy:
         """
         raise NotImplementedError("Subclasses must implement generate_entry_signal")
     
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, price_history: deque = None, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
         Generate exit signal for closing a position.
         Subclasses should implement strategy-specific exit logic.
@@ -41,6 +41,7 @@ class BaseStrategy:
         Args:
             position: Dictionary with position details (side, entry_price, quantity)
             current_price: Current market price
+            price_history: Deque of price data dictionaries (optional, for strategy-based exit)
             orderbook: Optional orderbook data for advanced exit strategies
             
         Returns:
@@ -164,13 +165,14 @@ class MovingAverageCrossover(BaseStrategy):
             self.logger.error("Error generating entry signal: %s", str(e))
             return None
     
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, price_history: deque = None, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Generate exit signal using stop-loss and take-profit.
+        Generate exit signal using stop-loss, take-profit, and strategy reversal.
         
         Args:
             position: Current position details
             current_price: Current market price
+            price_history: Deque of price data dictionaries (optional)
             orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
@@ -180,6 +182,7 @@ class MovingAverageCrossover(BaseStrategy):
             if not position or not current_price:
                 return False
             
+            # 1. Check Stop Loss / Take Profit
             stop_loss_pct = float(self.config.get('STOP_LOSS_PCT', 2.0))
             take_profit_pct = float(self.config.get('TAKE_PROFIT_PCT', 3.0))
             
@@ -192,23 +195,30 @@ class MovingAverageCrossover(BaseStrategy):
             else:  # short
                 pnl_pct = ((entry_price - current_price) / entry_price) * 100
             
-            should_close = False
-            reason = ""
-            
             if pnl_pct <= -stop_loss_pct:
-                should_close = True
-                reason = f"Stop loss triggered (PnL: {pnl_pct:.2f}%)"
+                self.logger.info("Exit signal - Stop loss triggered (PnL: %.2f%%)", pnl_pct)
+                return True
             elif pnl_pct >= take_profit_pct:
-                should_close = True
-                reason = f"Take profit triggered (PnL: {pnl_pct:.2f}%)"
+                self.logger.info("Exit signal - Take profit triggered (PnL: %.2f%%)", pnl_pct)
+                return True
             
-            if should_close:
-                self.logger.info(
-                    "Exit signal - %s | Side: %s, Entry: %.2f, Current: %.2f, PnL: %.2f%%",
-                    reason, side, entry_price, current_price, pnl_pct
-                )
+            # 2. Check Strategy Reversal (Opposite Signal)
+            if price_history:
+                # Reuse generate_entry_signal logic to detect opposite signal
+                # If we are LONG, a 'short' signal means reversal -> Close
+                # If we are SHORT, a 'long' signal means reversal -> Close
+                
+                # Note: generate_entry_signal uses the same config parameters
+                opposite_signal = self.generate_entry_signal(price_history, orderbook)
+                
+                if side == 'long' and opposite_signal == 'short':
+                    self.logger.info("Exit signal - Strategy Reversal (Short signal while Long)")
+                    return True
+                elif side == 'short' and opposite_signal == 'long':
+                    self.logger.info("Exit signal - Strategy Reversal (Long signal while Short)")
+                    return True
             
-            return should_close
+            return False
             
         except Exception as e:
             self.logger.error("Error generating exit signal: %s", str(e))
@@ -326,13 +336,14 @@ class RSIStrategy(BaseStrategy):
             self.logger.error("Error generating RSI entry signal: %s", str(e))
             return None
     
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, price_history: deque = None, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Generate exit signal using stop-loss and take-profit.
+        Generate exit signal using stop-loss, take-profit, and strategy reversal.
         
         Args:
             position: Current position details
             current_price: Current market price
+            price_history: Deque of price data dictionaries (optional)
             orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
@@ -354,23 +365,25 @@ class RSIStrategy(BaseStrategy):
             else:
                 pnl_pct = ((entry_price - current_price) / entry_price) * 100
             
-            should_close = False
-            reason = ""
-            
             if pnl_pct <= -stop_loss_pct:
-                should_close = True
-                reason = f"Stop loss triggered (PnL: {pnl_pct:.2f}%)"
+                self.logger.info("Exit signal - Stop loss triggered (PnL: %.2f%%)", pnl_pct)
+                return True
             elif pnl_pct >= take_profit_pct:
-                should_close = True
-                reason = f"Take profit triggered (PnL: {pnl_pct:.2f}%)"
+                self.logger.info("Exit signal - Take profit triggered (PnL: %.2f%%)", pnl_pct)
+                return True
             
-            if should_close:
-                self.logger.info(
-                    "Exit signal - %s | Side: %s, Entry: %.2f, Current: %.2f, PnL: %.2f%%",
-                    reason, side, entry_price, current_price, pnl_pct
-                )
+            # Check Strategy Reversal (Opposite Signal)
+            if price_history:
+                opposite_signal = self.generate_entry_signal(price_history, orderbook)
+                
+                if side == 'long' and opposite_signal == 'short':
+                    self.logger.info("Exit signal - Strategy Reversal (Short signal while Long)")
+                    return True
+                elif side == 'short' and opposite_signal == 'long':
+                    self.logger.info("Exit signal - Strategy Reversal (Long signal while Short)")
+                    return True
             
-            return should_close
+            return False
             
         except Exception as e:
             self.logger.error("Error generating exit signal: %s", str(e))
@@ -468,13 +481,14 @@ class BollingerBandsStrategy(BaseStrategy):
             self.logger.error("Error generating Bollinger Bands entry signal: %s", str(e))
             return None
 
-    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, orderbook: Optional[Dict[str, Any]] = None) -> bool:
+    def generate_exit_signal(self, position: Dict[str, Any], current_price: float, price_history: deque = None, orderbook: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Generate exit signal using stop-loss and take-profit.
+        Generate exit signal using stop-loss, take-profit, and strategy reversal.
         
         Args:
             position: Current position details
             current_price: Current market price
+            price_history: Deque of price data dictionaries (optional)
             orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
@@ -496,23 +510,25 @@ class BollingerBandsStrategy(BaseStrategy):
             else:
                 pnl_pct = ((entry_price - current_price) / entry_price) * 100
             
-            should_close = False
-            reason = ""
-            
             if pnl_pct <= -stop_loss_pct:
-                should_close = True
-                reason = f"Stop loss triggered (PnL: {pnl_pct:.2f}%)"
+                self.logger.info("Exit signal - Stop loss triggered (PnL: %.2f%%)", pnl_pct)
+                return True
             elif pnl_pct >= take_profit_pct:
-                should_close = True
-                reason = f"Take profit triggered (PnL: {pnl_pct:.2f}%)"
+                self.logger.info("Exit signal - Take profit triggered (PnL: %.2f%%)", pnl_pct)
+                return True
             
-            if should_close:
-                self.logger.info(
-                    "Exit signal - %s | Side: %s, Entry: %.2f, Current: %.2f, PnL: %.2f%%",
-                    reason, side, entry_price, current_price, pnl_pct
-                )
+            # Check Strategy Reversal (Opposite Signal)
+            if price_history:
+                opposite_signal = self.generate_entry_signal(price_history, orderbook)
+                
+                if side == 'long' and opposite_signal == 'short':
+                    self.logger.info("Exit signal - Strategy Reversal (Short signal while Long)")
+                    return True
+                elif side == 'short' and opposite_signal == 'long':
+                    self.logger.info("Exit signal - Strategy Reversal (Long signal while Short)")
+                    return True
             
-            return should_close
+            return False
             
         except Exception as e:
             self.logger.error("Error generating exit signal: %s", str(e))

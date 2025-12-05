@@ -163,6 +163,7 @@ class Account:
     def get_transaction_summary(self, current_price: float = None) -> Dict[str, Any]:
         """
         Get transaction summary from database.
+        Handles both old schema (paper mode) and new schema (live mode from API).
         
         Args:
             current_price: Current market price (optional) to calculate unrealized P&L
@@ -170,6 +171,147 @@ class Account:
         Returns:
             Dictionary with transaction statistics
         """
+        try:
+            # Check which schema we're using
+            schema_check = self.db_conn.execute("""
+                SELECT COUNT(*) FROM information_schema.columns 
+                WHERE table_name = 'trades' AND column_name = 'order_id'
+            """).fetchone()
+            
+            is_new_schema = schema_check[0] > 0 if schema_check else False
+            
+            if is_new_schema:
+                # New schema from WOO X API (live mode)
+                return self._get_summary_new_schema(current_price)
+            else:
+                # Old schema (paper mode)
+                return self._get_summary_old_schema(current_price)
+                
+        except Exception as e:
+            self.logger.error("Error getting transaction summary: %s", str(e))
+            return {}
+    
+    def _get_summary_new_schema(self, current_price: float = None) -> Dict[str, Any]:
+        """Get summary from new WOO X API schema."""
+        try:
+            # Total transactions
+            count_cursor = self.db_conn.execute("""
+                SELECT COUNT(*) as count FROM trades WHERE status = 'FILLED'
+            """)
+            count_row = count_cursor.fetchone()
+            total_trades = count_row[0] if count_row else 0
+            
+            # Buy orders
+            buy_cursor = self.db_conn.execute("""
+                SELECT 
+                    COUNT(*) as count,
+                    SUM(executed_quantity) as total_quantity,
+                    SUM(executed_quantity * average_executed_price) as total_value
+                FROM trades 
+                WHERE side = 'BUY' AND status = 'FILLED'
+            """)
+            buy_summary = buy_cursor.fetchone()
+            
+            # Sell orders
+            sell_cursor = self.db_conn.execute("""
+                SELECT 
+                    COUNT(*) as count,
+                    SUM(executed_quantity) as total_quantity,
+                    SUM(executed_quantity * average_executed_price) as total_value
+                FROM trades 
+                WHERE side = 'SELL' AND status = 'FILLED'
+            """)
+            sell_summary = sell_cursor.fetchone()
+            
+            # Calculate P&L from realized_pnl field
+            pnl_cursor = self.db_conn.execute("""
+                SELECT SUM(realized_pnl) as total_pnl FROM trades WHERE status = 'FILLED'
+            """)
+            pnl_row = pnl_cursor.fetchone()
+            realized_pnl = pnl_row[0] if pnl_row and pnl_row[0] is not None else 0.0
+            
+            # Get net position
+            qty_cursor = self.db_conn.execute("""
+                SELECT 
+                    SUM(CASE WHEN side = 'BUY' THEN executed_quantity ELSE -executed_quantity END) as net_qty
+                FROM trades WHERE status = 'FILLED'
+            """)
+            qty_row = qty_cursor.fetchone()
+            net_quantity = qty_row[0] if qty_row and qty_row[0] is not None else 0.0
+            
+            # Calculate unrealized P&L
+            unrealized_pnl = 0.0
+            total_pnl = realized_pnl
+            
+            if current_price and net_quantity != 0:
+                # Get average entry price for open position
+                avg_cursor = self.db_conn.execute("""
+                    SELECT 
+                        SUM(CASE WHEN side = 'BUY' THEN executed_quantity * average_executed_price 
+                                 ELSE -executed_quantity * average_executed_price END) / 
+                        SUM(CASE WHEN side = 'BUY' THEN executed_quantity ELSE -executed_quantity END) as avg_price
+                    FROM trades WHERE status = 'FILLED'
+                """)
+                avg_row = avg_cursor.fetchone()
+                avg_entry = avg_row[0] if avg_row and avg_row[0] else 0
+                
+                if avg_entry > 0:
+                    unrealized_pnl = (current_price - avg_entry) * net_quantity
+                    total_pnl = realized_pnl + unrealized_pnl
+            
+            # Winning/losing trades not directly available in new schema
+            # We'll estimate from realized_pnl
+            win_cursor = self.db_conn.execute("""
+                SELECT COUNT(*) FROM trades WHERE status = 'FILLED' AND realized_pnl > 0
+            """)
+            win_row = win_cursor.fetchone()
+            winning_trades = win_row[0] if win_row else 0
+            
+            loss_cursor = self.db_conn.execute("""
+                SELECT COUNT(*) FROM trades WHERE status = 'FILLED' AND realized_pnl < 0
+            """)
+            loss_row = loss_cursor.fetchone()
+            losing_trades = loss_row[0] if loss_row else 0
+            
+            # Recent trades
+            recent_trades = self.db_conn.execute("""
+                SELECT * FROM trades 
+                WHERE status = 'FILLED'
+                ORDER BY updated_time DESC 
+                LIMIT 10
+            """).fetchall()
+            
+            buy_count = buy_summary[0] if buy_summary else 0
+            buy_qty = buy_summary[1] if buy_summary and len(buy_summary) > 1 else 0.0
+            buy_value = buy_summary[2] if buy_summary and len(buy_summary) > 2 else 0.0
+            
+            sell_count = sell_summary[0] if sell_summary else 0
+            sell_qty = sell_summary[1] if sell_summary and len(sell_summary) > 1 else 0.0
+            sell_value = sell_summary[2] if sell_summary and len(sell_summary) > 2 else 0.0
+            
+            return {
+                'total_trades': total_trades,
+                'buy_count': buy_count or 0,
+                'buy_quantity': buy_qty or 0.0,
+                'buy_proceeds': -(buy_value or 0.0),  # Negative for buy cost
+                'sell_count': sell_count or 0,
+                'sell_quantity': sell_qty or 0.0,
+                'sell_proceeds': sell_value or 0.0,
+                'net_pnl': total_pnl,
+                'cash_pnl': realized_pnl,
+                'unrealized_pnl': unrealized_pnl,
+                'net_quantity': net_quantity,
+                'winning_trades': winning_trades,
+                'losing_trades': losing_trades,
+                'recent_trades': recent_trades
+            }
+            
+        except Exception as e:
+            self.logger.error("Error in new schema summary: %s", str(e))
+            return {}
+    
+    def _get_summary_old_schema(self, current_price: float = None) -> Dict[str, Any]:
+        """Get summary from old paper trading schema."""
         try:
             # Total transactions
             count_cursor = self.db_conn.execute("""
