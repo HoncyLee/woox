@@ -6,6 +6,8 @@ import hashlib
 import requests
 import duckdb
 import logging
+import statistics
+import math
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
 from config_loader import CONFIG
@@ -192,88 +194,131 @@ class Account:
             return {}
     
     def _get_summary_new_schema(self, current_price: float = None) -> Dict[str, Any]:
-        """Get summary from new WOO X API schema."""
+        """Get summary from new WOO X API schema with manual PnL calculation."""
         try:
-            # Total transactions
-            count_cursor = self.db_conn.execute("""
-                SELECT COUNT(*) as count FROM trades WHERE status = 'FILLED'
-            """)
-            count_row = count_cursor.fetchone()
-            total_trades = count_row[0] if count_row else 0
+            # Fetch all filled trades sorted by time for FIFO calculation
+            trades = self.db_conn.execute("""
+                SELECT * FROM trades 
+                WHERE status = 'FILLED' 
+                ORDER BY created_time ASC
+            """).fetchall()
             
-            # Buy orders
-            buy_cursor = self.db_conn.execute("""
-                SELECT 
-                    COUNT(*) as count,
-                    SUM(executed_quantity) as total_quantity,
-                    SUM(executed_quantity * average_executed_price) as total_value
-                FROM trades 
-                WHERE side = 'BUY' AND status = 'FILLED'
-            """)
-            buy_summary = buy_cursor.fetchone()
+            # Get column names
+            columns = [desc[0] for desc in self.db_conn.description]
+            trades_data = [dict(zip(columns, row)) for row in trades]
             
-            # Sell orders
-            sell_cursor = self.db_conn.execute("""
-                SELECT 
-                    COUNT(*) as count,
-                    SUM(executed_quantity) as total_quantity,
-                    SUM(executed_quantity * average_executed_price) as total_value
-                FROM trades 
-                WHERE side = 'SELL' AND status = 'FILLED'
-            """)
-            sell_summary = sell_cursor.fetchone()
+            total_trades = len(trades_data)
+            buy_count = 0
+            sell_count = 0
+            buy_qty = 0.0
+            sell_qty = 0.0
+            buy_value = 0.0
+            sell_value = 0.0
             
-            # Calculate P&L from realized_pnl field
-            pnl_cursor = self.db_conn.execute("""
-                SELECT SUM(realized_pnl) as total_pnl FROM trades WHERE status = 'FILLED'
-            """)
-            pnl_row = pnl_cursor.fetchone()
-            realized_pnl = pnl_row[0] if pnl_row and pnl_row[0] is not None else 0.0
+            realized_pnl = 0.0
+            winning_trades = 0
+            losing_trades = 0
             
-            # Get net position
-            qty_cursor = self.db_conn.execute("""
-                SELECT 
-                    SUM(CASE WHEN side = 'BUY' THEN executed_quantity ELSE -executed_quantity END) as net_qty
-                FROM trades WHERE status = 'FILLED'
-            """)
-            qty_row = qty_cursor.fetchone()
-            net_quantity = qty_row[0] if qty_row and qty_row[0] is not None else 0.0
+            # Metrics tracking
+            trade_pnls = []
+            equity_curve = [0.0] # Start at 0 PnL
             
-            # Calculate unrealized P&L
-            unrealized_pnl = 0.0
-            total_pnl = realized_pnl
+            # Position tracking for FIFO
+            position = {'quantity': 0.0, 'avg_price': 0.0, 'side': None}
             
-            if current_price and net_quantity != 0:
-                # Get average entry price for open position
-                avg_cursor = self.db_conn.execute("""
-                    SELECT 
-                        SUM(CASE WHEN side = 'BUY' THEN executed_quantity * average_executed_price 
-                                 ELSE -executed_quantity * average_executed_price END) / 
-                        SUM(CASE WHEN side = 'BUY' THEN executed_quantity ELSE -executed_quantity END) as avg_price
-                    FROM trades WHERE status = 'FILLED'
-                """)
-                avg_row = avg_cursor.fetchone()
-                avg_entry = avg_row[0] if avg_row and avg_row[0] else 0
+            for t in trades_data:
+                side = t.get('side')
+                qty = float(t.get('executed_quantity') or 0)
+                price = float(t.get('average_executed_price') or t.get('order_price') or 0)
+                value = qty * price
                 
-                if avg_entry > 0:
-                    unrealized_pnl = (current_price - avg_entry) * net_quantity
-                    total_pnl = realized_pnl + unrealized_pnl
+                if side == 'BUY':
+                    buy_count += 1
+                    buy_qty += qty
+                    buy_value += value
+                else:
+                    sell_count += 1
+                    sell_qty += qty
+                    sell_value += value
+                
+                if qty == 0:
+                    continue
+                    
+                trade_pnl = 0.0
+                
+                if position['quantity'] == 0:
+                    # Opening new position
+                    position['quantity'] = qty
+                    position['avg_price'] = price
+                    position['side'] = 'LONG' if side == 'BUY' else 'SHORT'
+                    
+                elif (side == 'BUY' and position['side'] == 'LONG') or (side == 'SELL' and position['side'] == 'SHORT'):
+                    # Increasing position
+                    total_cost = (position['quantity'] * position['avg_price']) + (qty * price)
+                    position['quantity'] += qty
+                    position['avg_price'] = total_cost / position['quantity']
+                    
+                elif (side == 'BUY' and position['side'] == 'SHORT') or (side == 'SELL' and position['side'] == 'LONG'):
+                    # Closing position
+                    close_qty = min(qty, position['quantity'])
+                    
+                    if position['side'] == 'LONG': # Selling to close Long
+                        trade_pnl = (price - position['avg_price']) * close_qty
+                    else: # Buying to close Short
+                        trade_pnl = (position['avg_price'] - price) * close_qty
+                        
+                    realized_pnl += trade_pnl
+                    
+                    # Track metrics
+                    trade_pnls.append(trade_pnl)
+                    equity_curve.append(realized_pnl)
+                    
+                    # Count win/loss
+                    if trade_pnl > 0:
+                        winning_trades += 1
+                    elif trade_pnl < 0:
+                        losing_trades += 1
+                        
+                    position['quantity'] -= close_qty
+                    
+                    # If flipping position
+                    remaining_qty = qty - close_qty
+                    if remaining_qty > 0:
+                        position['quantity'] = remaining_qty
+                        position['avg_price'] = price
+                        position['side'] = 'LONG' if side == 'BUY' else 'SHORT'
             
-            # Winning/losing trades not directly available in new schema
-            # We'll estimate from realized_pnl
-            win_cursor = self.db_conn.execute("""
-                SELECT COUNT(*) FROM trades WHERE status = 'FILLED' AND realized_pnl > 0
-            """)
-            win_row = win_cursor.fetchone()
-            winning_trades = win_row[0] if win_row else 0
+            # Calculate unrealized P&L based on remaining position
+            unrealized_pnl = 0.0
+            net_quantity = position['quantity'] if position['side'] == 'LONG' else -position['quantity']
             
-            loss_cursor = self.db_conn.execute("""
-                SELECT COUNT(*) FROM trades WHERE status = 'FILLED' AND realized_pnl < 0
-            """)
-            loss_row = loss_cursor.fetchone()
-            losing_trades = loss_row[0] if loss_row else 0
+            if current_price and position['quantity'] > 0:
+                if position['side'] == 'LONG':
+                    unrealized_pnl = (current_price - position['avg_price']) * position['quantity']
+                else:
+                    unrealized_pnl = (position['avg_price'] - current_price) * position['quantity']
             
-            # Recent trades
+            total_pnl = realized_pnl + unrealized_pnl
+            
+            # Calculate Sharpe Ratio
+            sharpe_ratio = 0.0
+            if len(trade_pnls) > 1:
+                avg_pnl = statistics.mean(trade_pnls)
+                stdev_pnl = statistics.stdev(trade_pnls)
+                if stdev_pnl > 0:
+                    sharpe_ratio = avg_pnl / stdev_pnl
+            
+            # Calculate Max Drawdown (Absolute)
+            max_drawdown = 0.0
+            peak = -float('inf')
+            for equity in equity_curve:
+                if equity > peak:
+                    peak = equity
+                drawdown = peak - equity
+                if drawdown > max_drawdown:
+                    max_drawdown = drawdown
+            
+            # Recent trades (last 10)
             recent_trades = self.db_conn.execute("""
                 SELECT * FROM trades 
                 WHERE status = 'FILLED'
@@ -281,29 +326,24 @@ class Account:
                 LIMIT 10
             """).fetchall()
             
-            buy_count = buy_summary[0] if buy_summary else 0
-            buy_qty = buy_summary[1] if buy_summary and len(buy_summary) > 1 else 0.0
-            buy_value = buy_summary[2] if buy_summary and len(buy_summary) > 2 else 0.0
-            
-            sell_count = sell_summary[0] if sell_summary else 0
-            sell_qty = sell_summary[1] if sell_summary and len(sell_summary) > 1 else 0.0
-            sell_value = sell_summary[2] if sell_summary and len(sell_summary) > 2 else 0.0
-            
             return {
                 'total_trades': total_trades,
-                'buy_count': buy_count or 0,
-                'buy_quantity': buy_qty or 0.0,
-                'buy_proceeds': -(buy_value or 0.0),  # Negative for buy cost
-                'sell_count': sell_count or 0,
-                'sell_quantity': sell_qty or 0.0,
-                'sell_proceeds': sell_value or 0.0,
-                'net_pnl': total_pnl,
-                'cash_pnl': realized_pnl,
-                'unrealized_pnl': unrealized_pnl,
+                'buy_count': buy_count,
+                'buy_quantity': buy_qty,
+                'buy_proceeds': -buy_value,  # Negative for buy cost
+                'sell_count': sell_count,
+                'sell_quantity': sell_qty,
+                'sell_proceeds': sell_value,
+                'net_pnl': round(total_pnl, 2),
+                'cash_pnl': round(realized_pnl, 2),
+                'unrealized_pnl': round(unrealized_pnl, 2),
                 'net_quantity': net_quantity,
                 'winning_trades': winning_trades,
                 'losing_trades': losing_trades,
-                'recent_trades': recent_trades
+                'recent_trades': recent_trades,
+                'sharpe_ratio': round(sharpe_ratio, 2),
+                'max_drawdown': round(max_drawdown, 2),
+                'peak_pnl': round(peak, 2)
             }
             
         except Exception as e:
@@ -369,17 +409,31 @@ class Account:
                 # then adding current value gives the total result.
                 # So total_pnl is the correct "Account P&L".
             
-            # Winning trades (TAKE_PROFIT)
-            win_cursor = self.db_conn.execute("""
-                SELECT COUNT(*) FROM trades WHERE signal = 'TAKE_PROFIT'
-            """)
+            # Winning trades (Positive PnL or TAKE_PROFIT for legacy)
+            # Now using realized_pnl column if available
+            try:
+                win_cursor = self.db_conn.execute("""
+                    SELECT COUNT(*) FROM trades 
+                    WHERE realized_pnl > 0 OR (realized_pnl = 0 AND signal = 'TAKE_PROFIT')
+                """)
+            except:
+                # Fallback if column doesn't exist (shouldn't happen after migration)
+                win_cursor = self.db_conn.execute("""
+                    SELECT COUNT(*) FROM trades WHERE signal = 'TAKE_PROFIT'
+                """)
             win_row = win_cursor.fetchone()
             winning_trades = win_row[0] if win_row else 0
             
-            # Losing trades (STOP_LOSS)
-            loss_cursor = self.db_conn.execute("""
-                SELECT COUNT(*) FROM trades WHERE signal = 'STOP_LOSS'
-            """)
+            # Losing trades (Negative PnL or STOP_LOSS for legacy)
+            try:
+                loss_cursor = self.db_conn.execute("""
+                    SELECT COUNT(*) FROM trades 
+                    WHERE realized_pnl < 0 OR (realized_pnl = 0 AND signal = 'STOP_LOSS')
+                """)
+            except:
+                loss_cursor = self.db_conn.execute("""
+                    SELECT COUNT(*) FROM trades WHERE signal = 'STOP_LOSS'
+                """)
             loss_row = loss_cursor.fetchone()
             losing_trades = loss_row[0] if loss_row else 0
             
@@ -407,9 +461,9 @@ class Account:
                 'sell_count': sell_count or 0,
                 'sell_quantity': sell_qty or 0.0,
                 'sell_proceeds': sell_proc or 0.0,
-                'net_pnl': total_pnl, # Return Total P&L as the main P&L metric
-                'cash_pnl': cash_pnl, # Raw cash flow
-                'unrealized_pnl': unrealized_pnl,
+                'net_pnl': round(total_pnl, 2), # Return Total P&L as the main P&L metric
+                'cash_pnl': round(cash_pnl, 2), # Raw cash flow
+                'unrealized_pnl': round(unrealized_pnl, 2),
                 'net_quantity': net_quantity,
                 'winning_trades': winning_trades,
                 'losing_trades': losing_trades,

@@ -42,7 +42,10 @@ performance_metrics = {
     'losing_trades': 0,
     'total_pnl': 0.0,
     'win_rate': 0.0,
-    'sharpe_ratio': 0.0
+    'sharpe_ratio': 0.0,
+    'max_drawdown': 0.0,
+    'max_drawdown_pct': 0.0,
+    'unrealized_pnl': 0.0
 }
 
 # Store recent data for charts
@@ -353,6 +356,27 @@ app.index_string = '''
                 border: 1px solid #ff9900;
                 animation: neon-orange 2s infinite alternate;
             }
+            /* Robot Animation */
+            @keyframes robot-move {
+                0% { transform: translateY(0) rotate(0deg); }
+                25% { transform: translateY(-2px) rotate(-5deg); }
+                50% { transform: translateY(0) rotate(0deg); }
+                75% { transform: translateY(-2px) rotate(5deg); }
+                100% { transform: translateY(0) rotate(0deg); }
+            }
+            .robot-working {
+                display: inline-block;
+                font-size: 24px;
+                margin-right: 10px;
+                animation: robot-move 1s infinite ease-in-out;
+            }
+            .robot-sleeping {
+                display: inline-block;
+                font-size: 24px;
+                margin-right: 10px;
+                opacity: 0.5;
+                filter: grayscale(100%);
+            }
         </style>
     </head>
     <body>
@@ -374,14 +398,17 @@ app.layout = html.Div([
                 style={'color': 'white', 'margin': '0', 'display': 'inline-block'}),
         html.Div(id='status-indicator', 
                  style={'float': 'right', 'color': 'white', 'fontSize': '18px'}),
-    ], className='header'),
+    ], className='header no-print'),
     
     # Control Panel
     html.Div([
         html.Div([
             html.H3("Control Panel", style={'color': '#ffffff', 'margin': '0', 'display': 'inline-block'}),
             html.Div([
-                html.Div(id='mode-indicator', style={'marginBottom': '10px'}),
+                html.Div([
+                    html.Div(id='robot-icon', className='robot-sleeping', children='🤖', style={'verticalAlign': 'middle'}),
+                    html.Div(id='mode-indicator', style={'marginBottom': '10px', 'display': 'inline-block'}),
+                ]),
                 # CPU & Memory info below mode indicator
                 html.Div([
                     html.Div([
@@ -443,7 +470,7 @@ app.layout = html.Div([
             html.Div(id='balance-metric', className='metric-value'),
             html.Div(id='monthly-return', className='metric-change'),
         ], className='metric-card', style={'flex': '1'}),
-    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
+    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}, className='no-print'),
     
     # Strategy Info Row
     html.Div([
@@ -470,7 +497,7 @@ app.layout = html.Div([
             html.Div("Stop Loss", className='metric-label'),
             html.Div(id='stop-loss-metric', className='metric-value', style={'color': '#ff1744'}),
         ], className='metric-card', style={'flex': '1'}),
-    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}),
+    ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}, className='no-print'),
 
     # Performance & P&L Row
     html.Div([
@@ -481,6 +508,10 @@ app.layout = html.Div([
         
         html.Div([
             dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
+        ], className='chart-card', style={'flex': '1'}),
+
+        html.Div([
+            dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
         ], className='chart-card', style={'flex': '1'}),
 
         html.Div([
@@ -525,16 +556,12 @@ app.layout = html.Div([
         ], className='chart-card', style={'flex': '0.5', 'height': '400px', 'backgroundColor': '#1e2130', 'padding': '20px', 'display': 'flex', 'flexDirection': 'column'}),
     ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
     
-    # Trade Analytics Row
-    html.Div([
-        html.Div([
-            dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'width': '100%', 'display': 'inline-block'}),
-        
-        # html.Div([
-        #     dcc.Graph(id='cumulative-return-chart', config={'displayModeBar': False}),
-        # ], className='chart-card', style={'width': '50%', 'display': 'inline-block'}),
-    ], className='no-print', style={'marginBottom': '20px'}),
+    # Trade Analytics Row (Removed and moved to Performance Row)
+    # html.Div([
+    #     html.Div([
+    #         dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
+    #     ], className='chart-card', style={'width': '100%', 'display': 'inline-block'}),
+    # ], className='no-print', style={'marginBottom': '20px'}),
 
     # Trading Record Row
     html.Div([
@@ -565,11 +592,11 @@ app.layout = html.Div([
             html.P(f"Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}", 
                    style={'textAlign': 'center', 'color': '#666', 'fontSize': '14px', 'marginBottom': '30px'}),
             
-            # Trading Records Section
-            html.Div(id='print-trading-records'),
-            
             # Account Summary Section
             html.Div(id='print-account-summary'),
+            
+            # Trading Records Section
+            html.Div(id='print-trading-records'),
             
         ], style={'backgroundColor': 'white', 'padding': '40px', 'maxWidth': '1200px', 'margin': '0 auto'})
     ], style={'display': 'none'}, className='print-only'),
@@ -1004,6 +1031,7 @@ def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
     Output('status-indicator', 'children'),
     Output('mode-indicator', 'children'),
     Output('mode-indicator', 'className'),
+    Output('robot-icon', 'className'),
     Output('alert-dialog', 'displayed'),
     Input('interval-component', 'n_intervals')
 )
@@ -1024,11 +1052,13 @@ def update_status(n):
             html.Span(className='status-indicator status-running'),
             "Running"
         ])
+        robot_class = "robot-working"
     else:
         status_child = html.Span([
             html.Span(className='status-indicator status-stopped'),
             "Stopped"
         ])
+        robot_class = "robot-sleeping"
         
     # Mode indicator logic
     mode = 'paper'
@@ -1048,7 +1078,7 @@ def update_status(n):
         mode_text = "PAPER MODE"
         mode_class = "mode-indicator mode-paper"
         
-    return status_child, mode_text, mode_class, show_alert
+    return status_child, mode_text, mode_class, robot_class, show_alert
 
 
 # Callback: Update metrics
@@ -1869,11 +1899,11 @@ def update_trade_distribution_chart(n):
     
     if winning > 0 or losing > 0:
         fig.add_trace(go.Pie(
-            labels=['Winning Trades', 'Losing Trades'],
+            labels=['Win', 'Lose'],
             values=[winning, losing],
             marker=dict(colors=['#00c853', '#ff1744']),
             hole=0.4,
-            textinfo='label+percent+value',
+            texttemplate='%{label}<br>%{value} times<br>%{percent}',
             textfont=dict(size=14, color='white')
         ))
     else:
@@ -1885,12 +1915,8 @@ def update_trade_distribution_chart(n):
             font=dict(size=16, color="#888")
         )
     
-    symbol_display = ""
-    if trader and trader.symbol:
-        symbol_display = trader.symbol.replace('PERP_', '').replace('SPOT_', '').replace('_', '/') + " "
-
     fig.update_layout(
-        title=f'{symbol_display}Trade Distribution',
+        title='Win Lose Ratio',
         template='plotly_dark',
         paper_bgcolor='#1e2130',
         plot_bgcolor='#1e2130',
@@ -1989,6 +2015,9 @@ def update_performance_table(n):
                 performance_metrics['winning_trades'] = summary.get('winning_trades', 0)
                 performance_metrics['losing_trades'] = summary.get('losing_trades', 0)
                 performance_metrics['unrealized_pnl'] = summary.get('unrealized_pnl', 0.0)
+                performance_metrics['sharpe_ratio'] = summary.get('sharpe_ratio', 0.0)
+                performance_metrics['max_drawdown'] = summary.get('max_drawdown', 0.0)
+                peak_pnl = summary.get('peak_pnl', 0.0)
                 
                 # Calculate win rate
                 total_closed = performance_metrics['winning_trades'] + performance_metrics['losing_trades']
@@ -1996,6 +2025,28 @@ def update_performance_table(n):
                     performance_metrics['win_rate'] = (performance_metrics['winning_trades'] / total_closed) * 100
                 else:
                     performance_metrics['win_rate'] = 0.0
+                
+                # Calculate Max Drawdown %
+                total_equity = 10000.0 # Default for paper
+                if trade_mode == 'live':
+                     try:
+                         info = account.get_account_info()
+                         if info and 'totalCollateral' in info:
+                             total_equity = float(info.get('totalCollateral', 1.0))
+                     except:
+                         pass
+                
+                # Estimate Initial Capital = Current Equity - Total PnL
+                initial_capital = total_equity - performance_metrics['total_pnl']
+                # Peak Equity (Realized Basis) = Initial Capital + Peak Realized PnL
+                # Note: peak_pnl from account.py is based on realized pnl
+                peak_equity = initial_capital + peak_pnl
+                
+                if peak_equity > 0:
+                    performance_metrics['max_drawdown_pct'] = (performance_metrics['max_drawdown'] / peak_equity) * 100
+                else:
+                    performance_metrics['max_drawdown_pct'] = 0.0
+
     except Exception as e:
         logger.error(f"Error getting account summary: {str(e)}")
     
@@ -2006,7 +2057,8 @@ def update_performance_table(n):
         ("Win Rate", f"{performance_metrics['win_rate']:.1f}%"),
         ("Total P&L", f"${performance_metrics['total_pnl']:.2f}"),
         ("Unrealized P&L", f"${performance_metrics.get('unrealized_pnl', 0.0):.2f}"),
-        ("Sharpe Ratio", f"{performance_metrics['sharpe_ratio']:.2f}"),
+        ("Sharpe Ratio", f"{performance_metrics.get('sharpe_ratio', 0.0):.2f}"),
+        ("Max Drawdown", f"{performance_metrics.get('max_drawdown_pct', 0.0):.2f}% (${performance_metrics.get('max_drawdown', 0.0):.2f})"),
     ]
     
     table_rows = []
@@ -2278,9 +2330,9 @@ def update_print_trading_records(n):
 
             if trader.current_price:
                 if side_upper in ['BUY', 'LONG']:
-                    unrealized_pnl = (trader.current_price - pos['entry_price']) * pos['quantity']
+                    unrealized_pnl = round((trader.current_price - pos['entry_price']) * pos['quantity'], 2)
                 else:
-                    unrealized_pnl = (pos['entry_price'] - trader.current_price) * pos['quantity']
+                    unrealized_pnl = round((pos['entry_price'] - trader.current_price) * pos['quantity'], 2)
             
             pnl_str = f"+${unrealized_pnl:.2f}" if unrealized_pnl >= 0 else f"-${abs(unrealized_pnl):.2f}"
             pnl_style = {'color': '#00c853', 'fontWeight': 'bold'} if unrealized_pnl >= 0 else {'color': '#ff1744', 'fontWeight': 'bold'}
@@ -2296,8 +2348,13 @@ def update_print_trading_records(n):
         # Get actual order history from DB
         records = get_trading_records()
         
-        # Limit to last 50 records
-        for r in records[:50]:
+        # Take last 50 records (most recent)
+        recent_records = records[:50]
+        
+        # Re-order to chronological order (Oldest -> Newest) for the report
+        recent_records.reverse()
+        
+        for r in recent_records:
             # Format values
             dt = r.get('trade_datetime', '')
             if isinstance(dt, str):
@@ -2363,16 +2420,16 @@ def update_print_trading_records(n):
             ]))
         
         return html.Div([
-            html.H3("Order History", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
+            html.H3("Order History", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px', 'fontSize': '14px'}),
             html.Table([
                 html.Thead(html.Tr([
-                    html.Th("Date/Time(UTC)", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
-                    html.Th("Side", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
-                    html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
-                    html.Th("Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
-                    html.Th("Proceeds", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
+                    html.Th("Date/Time(UTC)", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap', 'fontSize': '12px'}),
+                    html.Th("Side", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap', 'fontSize': '12px'}),
+                    html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap', 'fontSize': '12px'}),
+                    html.Th("Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap', 'fontSize': '12px'}),
+                    html.Th("PnL", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap', 'fontSize': '12px'}),
                 ])),
-                html.Tbody(rows)
+                html.Tbody(rows, style={'fontSize': '12px'})
             ], style={'width': '100%', 'borderCollapse': 'collapse', 'marginBottom': '30px', 'border': '1px solid #ddd'})
         ])
         
@@ -2415,49 +2472,70 @@ def update_print_account_summary(n):
     try:
         summary_items = []
         
+        # Get Account Balance
+        account_balance = "N/A"
+        try:
+            config = config_loader.load_config()
+            trade_mode = config.get('TRADE_MODE', 'paper')
+            with Account(trade_mode=trade_mode) as account:
+                if trade_mode == 'live':
+                    info = account.get_account_info()
+                    if info and 'totalCollateral' in info:
+                        account_balance = f"${float(info.get('totalCollateral', 0)):,.2f}"
+                else:
+                    # For paper, maybe calculate from initial + pnl? 
+                    # Or just show Total PnL as balance change
+                    # Let's use a default or calculated value if possible
+                    # Assuming 10000 start for paper
+                    account_balance = f"${10000 + performance_metrics['total_pnl']:,.2f}"
+        except:
+            pass
+
         # Performance metrics
         metrics_data = [
+            ("Account Balance", account_balance),
             ("Total Trades", str(performance_metrics['total_trades'])),
             ("Winning Trades", str(performance_metrics['winning_trades'])),
             ("Losing Trades", str(performance_metrics['losing_trades'])),
             ("Win Rate", f"{performance_metrics['win_rate']:.1f}%"),
             ("Total P&L", f"${performance_metrics['total_pnl']:.2f}"),
-            ("Sharpe Ratio", f"{performance_metrics['sharpe_ratio']:.2f}"),
+            ("Sharpe Ratio", f"{performance_metrics.get('sharpe_ratio', 0.0):.2f}"),
+            ("Max Drawdown", f"{performance_metrics.get('max_drawdown_pct', 0.0):.2f}% (${performance_metrics.get('max_drawdown', 0.0):.2f})"),
         ]
         
-        # Current bot status
-        if trader:
-            summary_items.append(html.Div([
-                html.H4("Current Status", style={'color': '#333', 'marginTop': '0'}),
-                html.Table([
-                    html.Tr([
-                        html.Td("Bot Status:", style={'fontWeight': 'bold', 'padding': '8px', 'width': '200px'}),
-                        html.Td("Running" if is_running else "Stopped", style={'padding': '8px'})
-                    ]),
-                    html.Tr([
-                        html.Td("Current Price:", style={'fontWeight': 'bold', 'padding': '8px'}),
-                        html.Td(f"${trader.current_price:.2f}" if trader.current_price else "N/A", style={'padding': '8px'})
-                    ]),
-                    html.Tr([
-                        html.Td("Data Points:", style={'fontWeight': 'bold', 'padding': '8px'}),
-                        html.Td(f"{len(trader.trade_px_list)}/1440", style={'padding': '8px'})
-                    ]),
-                ], style={'width': '100%', 'border': '1px solid #ddd', 'marginBottom': '20px'})
-            ]))
+        # Current bot status (Removed for print report)
+        # if trader:
+        #     summary_items.append(html.Div([
+        #         html.H4("Current Status", style={'color': '#333', 'marginTop': '0'}),
+        #         html.Table([
+        #             html.Tr([
+        #                 html.Td("Bot Status:", style={'fontWeight': 'bold', 'padding': '8px', 'width': '200px'}),
+        #                 html.Td("Running" if is_running else "Stopped", style={'padding': '8px'})
+        #             ]),
+        #             html.Tr([
+        #                 html.Td("Current Price:", style={'fontWeight': 'bold', 'padding': '8px'}),
+        #                 html.Td(f"${trader.current_price:.2f}" if trader.current_price else "N/A", style={'padding': '8px'})
+        #             ]),
+        #             html.Tr([
+        #                 html.Td("Data Points:", style={'fontWeight': 'bold', 'padding': '8px'}),
+        #                 html.Td(f"{len(trader.trade_px_list)}/1440", style={'padding': '8px'})
+        #             ]),
+        #         ], style={'width': '100%', 'border': '1px solid #ddd', 'marginBottom': '20px'})
+        #     ]))
         
         # Performance summary
         summary_items.append(html.Div([
-            html.H4("Performance Summary", style={'color': '#333'}),
+            html.H4("Performance Summary", style={'color': '#333', 'fontSize': '14px'}),
             html.Table([
                 html.Tr([
-                    html.Td(label + ":", style={'fontWeight': 'bold', 'padding': '8px', 'width': '200px', 'borderBottom': '1px solid #ddd'}),
-                    html.Td(value, style={'padding': '8px', 'borderBottom': '1px solid #ddd'})
+                    html.Td(label + ":", style={'fontWeight': 'bold', 'padding': '8px', 'width': '200px', 'borderBottom': '1px solid #ddd', 'fontSize': '12px'}),
+                    html.Td(value, style={'padding': '8px', 'borderBottom': '1px solid #ddd', 'fontSize': '12px'})
                 ]) for label, value in metrics_data
             ], style={'width': '100%', 'border': '1px solid #ddd'})
         ]))
         
         return html.Div([
-            html.H3("Account Summary", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
+            html.H3("Account Summary", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px', 'fontSize': '14px'}),
             html.Div(summary_items)
         ])
         
@@ -2715,39 +2793,109 @@ def get_trading_records():
         cutoff_time = datetime.now(timezone.utc) - timedelta(hours=history_hours)
         
         if trade_mode == 'live':
-            query = f"SELECT * FROM trades WHERE created_time >= '{cutoff_time}' ORDER BY created_time DESC"
-        else:
-            query = f"SELECT * FROM trades WHERE trade_datetime >= '{cutoff_time}' ORDER BY trade_datetime DESC"
+            # Fetch ALL trades for PnL calculation, sorted ASC
+            query = "SELECT * FROM trades ORDER BY created_time ASC"
+            records = conn.execute(query).fetchall()
+            columns = [desc[0] for desc in conn.description]
+            conn.close()
             
-        records = conn.execute(query).fetchall()
-        columns = [desc[0] for desc in conn.description]
-        conn.close()
-        
-        # print(f"DEBUG: Found {len(records)} records in DB")
-        
-        raw_data = [dict(zip(columns, row)) for row in records]
-        
-        # Normalize data to expected format
-        normalized_data = []
-        for r in raw_data:
-            # Check if it's the new schema (has 'created_time')
-            if 'created_time' in r:
+            raw_data = [dict(zip(columns, row)) for row in records]
+            
+            # Calculate PnL
+            position = {'quantity': 0.0, 'avg_price': 0.0, 'side': None} # side: 'LONG' or 'SHORT'
+            
+            for r in raw_data:
+                side = r.get('side') # BUY or SELL
+                qty = float(r.get('executed_quantity') or 0)
+                price = float(r.get('average_executed_price') or r.get('order_price') or 0)
+                
+                if qty == 0:
+                    r['calculated_pnl'] = 0.0
+                    continue
+                
+                realized_pnl = 0.0
+                
+                if position['quantity'] == 0:
+                    # Opening new position
+                    position['quantity'] = qty
+                    position['avg_price'] = price
+                    position['side'] = 'LONG' if side == 'BUY' else 'SHORT'
+                    
+                elif (side == 'BUY' and position['side'] == 'LONG') or (side == 'SELL' and position['side'] == 'SHORT'):
+                    # Increasing position
+                    total_cost = (position['quantity'] * position['avg_price']) + (qty * price)
+                    position['quantity'] += qty
+                    position['avg_price'] = total_cost / position['quantity']
+                    
+                elif (side == 'BUY' and position['side'] == 'SHORT') or (side == 'SELL' and position['side'] == 'LONG'):
+                    # Closing position
+                    close_qty = min(qty, position['quantity'])
+                    
+                    if position['side'] == 'LONG': # Selling to close Long
+                        realized_pnl += (price - position['avg_price']) * close_qty
+                    else: # Buying to close Short
+                        realized_pnl += (position['avg_price'] - price) * close_qty
+                        
+                    position['quantity'] -= close_qty
+                    
+                    # If flipping position
+                    remaining_qty = qty - close_qty
+                    if remaining_qty > 0:
+                        position['quantity'] = remaining_qty
+                        position['avg_price'] = price
+                        position['side'] = 'LONG' if side == 'BUY' else 'SHORT'
+                
+                r['calculated_pnl'] = realized_pnl
+            
+            # Filter for display (cutoff_time) and reverse sort
+            filtered_data = []
+            for r in raw_data:
+                created_time = r.get('created_time')
+                # Ensure created_time is timezone-aware (UTC)
+                if created_time and created_time.tzinfo is None:
+                    created_time = created_time.replace(tzinfo=timezone.utc)
+                
+                if created_time >= cutoff_time:
+                    filtered_data.append(r)
+            
+            filtered_data.sort(key=lambda x: x['created_time'], reverse=True)
+            
+            # Normalize
+            normalized_data = []
+            for r in filtered_data:
                 normalized_data.append({
                     'trade_datetime': r.get('created_time'),
                     'symbol': r.get('symbol'),
-                    'trade_type': r.get('side'), # BUY/SELL
-                    'code': r.get('status', 'FILLED'), # Map status to code/action
+                    'trade_type': r.get('side'),
+                    'code': r.get('status', 'FILLED'),
                     'price': r.get('average_executed_price') or r.get('order_price'),
                     'quantity': r.get('executed_quantity') or r.get('order_quantity'),
-                    'proceeds': r.get('realized_pnl', 0), # Or calculate
+                    'proceeds': r.get('calculated_pnl', 0), # Use calculated PnL
                     'reduce_only': r.get('reduce_only')
                 })
-            else:
+            
+            print(f"DEBUG: Returning {len(normalized_data)} normalized records with calculated PnL")
+            return normalized_data
+
+        else:
+            query = f"SELECT * FROM trades WHERE trade_datetime >= '{cutoff_time}' ORDER BY trade_datetime DESC"
+            
+            records = conn.execute(query).fetchall()
+            columns = [desc[0] for desc in conn.description]
+            conn.close()
+            
+            # print(f"DEBUG: Found {len(records)} records in DB")
+            
+            raw_data = [dict(zip(columns, row)) for row in records]
+            
+            # Normalize data to expected format
+            normalized_data = []
+            for r in raw_data:
                 # Old schema (Paper)
                 normalized_data.append(r)
-        
-        print(f"DEBUG: Returning {len(normalized_data)} normalized records")
-        return normalized_data
+            
+            print(f"DEBUG: Returning {len(normalized_data)} normalized records")
+            return normalized_data
     except Exception as e:
         print(f"DEBUG: Error fetching trading records: {e}")
         logger.error(f"Error fetching trading records: {e}")
@@ -2807,7 +2955,7 @@ def update_trading_records(n, last_trade_ts):
         html.Th("Action", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
         html.Th("Price", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
         html.Th("Quantity", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
-        html.Th("Proceeds", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("PnL", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
     ])
     
     rows = []

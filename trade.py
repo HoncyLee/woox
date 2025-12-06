@@ -286,7 +286,7 @@ class Trade:
             with duckdb.connect(db_file) as conn:
                 # Paper Mode Schema
                 conn.execute("""
-                INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                 CONFIG.get('USER', 'TRADER'),  # acct_id
                     self.symbol,  # symbol
@@ -300,7 +300,8 @@ class Trade:
                     commission,  # commission
                     fee,  # fee
                     order_type,  # order_type
-                    code  # code (O=Open, C=Close)
+                    code,  # code (O=Open, C=Close)
+                    pnl  # realized_pnl
                 ))
             
             self.logger.info(
