@@ -2256,57 +2256,60 @@ def update_activity_log(n):
     Input('interval-component', 'n_intervals')
 )
 def update_print_trading_records(n):
-    global trader, chart_data
-    
     try:
-        # Collect trading data
+        records = get_trading_records()
+        
+        if not records:
+            return html.Div([
+                html.H3("Order History", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
+                html.Div("No trading records found.", style={'color': '#666', 'textAlign': 'center', 'padding': '20px'})
+            ])
+        
+        # Create table header
+        header = html.Tr([
+            html.Th("Time", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'left'}),
+            html.Th("Symbol", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'left'}),
+            html.Th("Type", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'left'}),
+            html.Th("Action", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'left'}),
+            html.Th("Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'right'}),
+            html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'right'}),
+            html.Th("Proceeds", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'textAlign': 'right'}),
+        ])
+        
         rows = []
-        
-        # Add current position if exists
-        if trader and trader.current_position:
-            pos = trader.current_position
+        for r in records:
+            # Format values
+            dt = r.get('trade_datetime', '')
+            symbol = r.get('symbol', '').replace('PERP_', '').replace('SPOT_', '').replace('_', '/')
+            trade_type = r.get('trade_type', '')
+            code = r.get('code', '') # O=Open, C=Close
+            
+            action_map = {'O': 'OPEN', 'C': 'CLOSE'}
+            action = action_map.get(code, code)
+            
+            price = f"${r.get('price', 0):,.2f}"
+            qty = f"{abs(r.get('quantity', 0)):.4f}"
+            proceeds = f"${r.get('proceeds', 0):,.2f}"
+            
+            if trade_type == 'BUY':
+                type_style = {'color': '#00c853', 'fontWeight': 'bold'}
+            else:
+                type_style = {'color': '#ff1744', 'fontWeight': 'bold'}
+                
             rows.append(html.Tr([
-                html.Td("CURRENT", style={'fontWeight': 'bold', 'color': '#2196F3'}),
-                html.Td(pos['side'].upper()),
-                html.Td(f"{pos['quantity']:.6f}"),
-                html.Td(f"${pos['entry_price']:.2f}"),
-                html.Td(f"${trader.current_price:.2f}" if trader.current_price else "N/A"),
-                html.Td("OPEN", style={'color': '#00c853', 'fontWeight': 'bold'}),
+                html.Td(str(dt), style={'padding': '10px', 'borderBottom': '1px solid #eee'}),
+                html.Td(symbol, style={'padding': '10px', 'borderBottom': '1px solid #eee'}),
+                html.Td(trade_type, style={'padding': '10px', 'borderBottom': '1px solid #eee', **type_style}),
+                html.Td(action, style={'padding': '10px', 'borderBottom': '1px solid #eee'}),
+                html.Td(price, style={'padding': '10px', 'borderBottom': '1px solid #eee', 'textAlign': 'right'}),
+                html.Td(qty, style={'padding': '10px', 'borderBottom': '1px solid #eee', 'textAlign': 'right'}),
+                html.Td(proceeds, style={'padding': '10px', 'borderBottom': '1px solid #eee', 'textAlign': 'right'}),
             ]))
-        
-        # Add price history data
-        if len(chart_data['timestamps']) > 0:
-            for i, (ts, price, vol) in enumerate(zip(
-                list(chart_data['timestamps'])[-50:], 
-                list(chart_data['prices'])[-50:],
-                list(chart_data['volumes'])[-50:]
-            )):
-                if i % 5 == 0:  # Sample every 5th entry to avoid too much data
-                    rows.append(html.Tr([
-                        html.Td(ts.strftime('%H:%M:%S')),
-                        html.Td("MONITOR"),
-                        html.Td("N/A"),
-                        html.Td("N/A"),
-                        html.Td(f"${price:.2f}"),
-                        html.Td(f"{vol:.2f}"),
-                    ]))
-        
-        if not rows:
-            rows.append(html.Tr([
-                html.Td("No trading data available", colSpan=6, style={'textAlign': 'center', 'color': '#666'})
-            ]))
-        
+            
         return html.Div([
             html.H3("Order History", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
             html.Table([
-                html.Thead(html.Tr([
-                    html.Th("Time", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Side", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Entry Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Current Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Status/Volume", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                ])),
+                html.Thead(header),
                 html.Tbody(rows)
             ], style={'width': '100%', 'borderCollapse': 'collapse', 'marginBottom': '30px', 'border': '1px solid #ddd'})
         ])
