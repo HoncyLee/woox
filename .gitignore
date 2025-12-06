@@ -1,8 +1,11 @@
 # Files in folder
 trade.log*
+trade.log
 dashboard.log
 *.db
 references/
+live_transaction.db
+*.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -145,5 +148,6 @@ config.ini
 *.swo
 *~
 *.db
-trade.log
-trade.log
+
+*.db
+*.log
