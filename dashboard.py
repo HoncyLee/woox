@@ -97,6 +97,16 @@ app.index_string = '''
             }, 2000);
         </script>
         <style>
+            @keyframes blink {
+                0% { opacity: 1; }
+                50% { opacity: 0; }
+                100% { opacity: 1; }
+            }
+            .blink-text {
+                animation: blink 1s linear infinite;
+                color: #2196F3;
+                font-weight: bold;
+            }
             body {
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                 background-color: #0e1117;
@@ -424,7 +434,11 @@ app.layout = html.Div([
         ], style={'marginBottom': '15px'}),
         
         html.Div([
-            html.Button("▶ Start Bot", id='start-btn', n_clicks=0, className='control-button start-btn'),
+            html.Div([
+                html.Button("▶ Start Bot", id='start-btn', n_clicks=0, className='control-button start-btn'),
+                html.Div(id='start-bot-alert', style={'fontSize': '16px', 'marginTop': '5px', 'textAlign': 'center'}),
+            ], style={'display': 'inline-block', 'verticalAlign': 'top', 'marginRight': '10px'}),
+            
             html.Button("⏸ Stop Bot", id='stop-btn', n_clicks=0, className='control-button stop-btn'),
             html.Button("❌ Close Position", id='close-btn', n_clicks=0, className='control-button close-btn'),
             html.Button("⚙️ Config", id='config-btn', n_clicks=0, className='control-button', style={'backgroundColor': '#607d8b', 'color': 'white'}),
@@ -499,25 +513,32 @@ app.layout = html.Div([
         ], className='metric-card', style={'flex': '1'}),
     ], style={'display': 'flex', 'gap': '10px', 'marginBottom': '20px'}, className='no-print'),
 
-    # Performance & P&L Row
+    # Row 1: Performance Metrics & Position Balance
     html.Div([
+        # Performance Metrics
         html.Div([
             html.H3("Performance Metrics", style={'color': '#ffffff', 'marginBottom': '15px'}),
             html.Div(id='performance-table', style={'color': '#e0e0e0'}),
-        ], style={'flex': '1', 'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px'}),
+        ], style={'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px', 'flex': '1'}),
         
-        html.Div([
-            dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'flex': '1'}),
-
-        html.Div([
-            dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
-        ], className='chart-card', style={'flex': '1'}),
-
+        # Position Balance
         html.Div([
             html.H3("Position Balance", style={'color': '#ffffff', 'marginBottom': '15px'}),
             html.Div(id='balance-table', style={'color': '#e0e0e0'}),
-        ], style={'flex': '1', 'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px'}),
+        ], style={'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px', 'flex': '1'}),
+    ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
+
+    # Row 2: P&L Chart & Win/Lose Ratio
+    html.Div([
+        # P&L Chart
+        html.Div([
+            dcc.Graph(id='pnl-chart', config={'displayModeBar': False}),
+        ], className='chart-card', style={'flex': '1', 'minHeight': '300px'}),
+
+        # Win/Lose Ratio Chart
+        html.Div([
+            dcc.Graph(id='trade-distribution-chart', config={'displayModeBar': False}),
+        ], className='chart-card', style={'flex': '1', 'minHeight': '300px'}),
     ], className='no-print', style={'display': 'flex', 'gap': '20px', 'marginBottom': '20px'}),
 
     # Main Charts Row
@@ -568,8 +589,7 @@ app.layout = html.Div([
         html.Div([
             html.H3("Order History", style={'color': '#ffffff', 'marginBottom': '15px'}),
             html.Div(id='trading-record-table', style={'overflowX': 'auto', 'maxHeight': '300px', 'overflowY': 'auto'}),
-        ], style={'width': '100%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
-                  'padding': '20px', 'borderRadius': '10px', 'verticalAlign': 'top'}),
+        ], style={'width': '100%', 'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px', 'boxSizing': 'border-box'}),
     ], className='no-print', style={'marginBottom': '20px'}),
 
     # Activity Log Row
@@ -580,8 +600,7 @@ app.layout = html.Div([
                                                 'backgroundColor': '#0e1117', 'padding': '10px',
                                                 'borderRadius': '5px', 'fontFamily': 'monospace',
                                                 'fontSize': '12px', 'color': '#a0a0a0'}),
-        ], style={'width': '100%', 'display': 'inline-block', 'backgroundColor': '#1e2130', 
-                  'padding': '20px', 'borderRadius': '10px', 'verticalAlign': 'top'}),
+        ], style={'width': '100%', 'backgroundColor': '#1e2130', 'padding': '20px', 'borderRadius': '10px', 'boxSizing': 'border-box'}),
     ], className='no-print', style={'marginBottom': '20px'}),
     
     # Detailed Report Section (visible only when printing)
@@ -608,8 +627,8 @@ app.layout = html.Div([
                  interval=int(config_loader.load_config().get('POSITION_REFRESH_RATE', 60)) * 1000, 
                  n_intervals=0),
     
-    # Interval to clear feedback messages after 10 seconds
-    dcc.Interval(id='feedback-interval', interval=10000, disabled=True),
+    # Interval to clear feedback messages after 5 seconds
+    dcc.Interval(id='feedback-interval', interval=5000, disabled=True),
     
     # Hidden div to store logs
     html.Div(id='log-store', style={'display': 'none'}),
@@ -707,10 +726,18 @@ app.layout = html.Div([
                             id='conf-strategy',
                             options=[
                                 {'label': 'MA Crossover', 'value': 'ma_crossover'},
-                                {'label': 'RSI', 'value': 'rsi'},
                                 {'label': 'Bollinger Bands', 'value': 'bollinger_bands'}
                             ],
                             className='form-input',
+                        )
+                    ]),
+
+                    html.Div(className='form-group', style={'marginTop': '10px'}, children=[
+                         dcc.Checklist(
+                            id='conf-entry-confirm',
+                            options=[{'label': ' Enable Entry Confirm Conditions', 'value': 'on'}],
+                            value=[],
+                            style={'color': '#e0e0e0'}
                         )
                     ]),
                     
@@ -751,6 +778,15 @@ app.layout = html.Div([
                     html.Div(style={'border': '1px solid #444', 'padding': '10px', 'borderRadius': '5px', 'marginTop': '10px'}, children=[
                         html.H4("RSI Settings", style={'marginTop': '0', 'color': '#b0b0b0', 'fontSize': '12px'}),
                         
+                        html.Div(className='form-group', style={'marginTop': '5px', 'marginBottom': '10px'}, children=[
+                             dcc.Checklist(
+                                id='conf-rsi-confirm',
+                                options=[{'label': ' Use as Entry Confirmation', 'value': 'on'}],
+                                value=[],
+                                style={'color': '#e0e0e0', 'fontSize': '12px'}
+                            )
+                        ]),
+                        
                         html.Div(className='form-group', children=[
                             html.Label("Timeframe", className='form-label'),
                             dcc.Dropdown(
@@ -769,6 +805,28 @@ app.layout = html.Div([
                         html.Div(className='form-group', children=[
                             html.Label("Period", className='form-label'),
                             dcc.Input(id='conf-rsi-period', type='number', className='form-input')
+                        ]),
+
+                        html.Div(style={'display': 'flex', 'gap': '10px'}, children=[
+                            html.Div(className='form-group', style={'flex': '1'}, children=[
+                                html.Label("Long Min", className='form-label'),
+                                dcc.Input(id='conf-rsi-long-min', type='number', className='form-input')
+                            ]),
+                            html.Div(className='form-group', style={'flex': '1'}, children=[
+                                html.Label("Long Max", className='form-label'),
+                                dcc.Input(id='conf-rsi-long-max', type='number', className='form-input')
+                            ]),
+                        ]),
+
+                        html.Div(style={'display': 'flex', 'gap': '10px'}, children=[
+                            html.Div(className='form-group', style={'flex': '1'}, children=[
+                                html.Label("Short Min", className='form-label'),
+                                dcc.Input(id='conf-rsi-short-min', type='number', className='form-input')
+                            ]),
+                            html.Div(className='form-group', style={'flex': '1'}, children=[
+                                html.Label("Short Max", className='form-label'),
+                                dcc.Input(id='conf-rsi-short-max', type='number', className='form-input')
+                            ]),
                         ]),
                     ]),
                 ]),
@@ -943,21 +1001,41 @@ def manual_trade(long_clicks, short_clicks, close_clicks):
 @app.callback(
     Output('control-feedback', 'children'),
     Output('control-feedback', 'style'),
+    Output('start-bot-alert', 'children'),
+    Output('start-bot-alert', 'className'),
+    Output('feedback-interval', 'disabled', allow_duplicate=True),
+    Output('feedback-interval', 'n_intervals', allow_duplicate=True),
     Input('start-btn', 'n_clicks'),
     Input('stop-btn', 'n_clicks'),
     Input('close-btn', 'n_clicks'),
     # Input('sync-orders-btn', 'n_clicks'),
     Input('print-btn', 'n_clicks'),
-    prevent_initial_call=True
+    Input('interval-component', 'n_intervals'),
+    prevent_initial_call='initial_duplicate'
 )
-def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
+def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks, n_intervals):
     global trader, trader_thread, is_running
     
     ctx = callback_context
+    
+    # Default alert state
+    alert_content = ""
+    alert_class = ""
+    
+    # Check if bot is running for alert logic
+    if not is_running:
+        alert_content = "☝️ ⚠️ Start Bot"
+        alert_class = "blink-text" # We will add CSS for this
+    
     if not ctx.triggered:
-        return "", {}
+        # Initial load or interval update
+        return dash.no_update, dash.no_update, alert_content, alert_class, dash.no_update, dash.no_update
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    # If triggered by interval, just update the alert
+    if button_id == 'interval-component':
+        return dash.no_update, dash.no_update, alert_content, alert_class, dash.no_update, dash.no_update
     
     try:
         if button_id == 'start-btn':
@@ -971,59 +1049,44 @@ def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
                 trader_thread = threading.Thread(target=trader.run, daemon=True)
                 trader_thread.start()
                 logger.info(f"Trading bot started in {trade_mode} mode")
-                return f"✅ Bot started successfully ({trade_mode})", {'color': '#00c853'}
+                return f"✅ Bot started successfully ({trade_mode})", {'color': '#00c853'}, "", "", False, 0
             else:
-                return "⚠️ Bot is already running", {'color': '#ffd600'}
+                return "⚠️ Bot is already running", {'color': '#ffd600'}, "", "", False, 0
         
         elif button_id == 'stop-btn':
             if is_running and trader:
-                trader.stop()
+                trader.running = False
                 is_running = False
+                if trader_thread:
+                    trader_thread.join(timeout=2.0)
                 logger.info("Trading bot stopped")
-                return "✅ Bot stopped successfully", {'color': '#00c853'}
+                return "🛑 Bot stopped", {'color': '#ff1744'}, "☝️ ⚠️ Start Bot", "blink-text", False, 0
             else:
-                return "⚠️ Bot is not running", {'color': '#ffd600'}
-        
+                return "⚠️ Bot is not running", {'color': '#ffd600'}, "☝️ ⚠️ Start Bot", "blink-text", False, 0
+                
         elif button_id == 'close-btn':
-            if trader and trader.current_position:
-                success = trader.closePosition(trader.current_price)
-                if success:
-                    return "✅ Position closed successfully", {'color': '#00c853'}
+            if is_running and trader:
+                if trader.current_position:
+                    success = trader.closePosition(trader.current_price)
+                    if success:
+                        return "✅ Position closed", {'color': '#00c853'}, dash.no_update, dash.no_update, False, 0
+                    else:
+                        error_msg = getattr(trader, 'last_error', 'Unknown error')
+                        return f"❌ Failed to close: {error_msg}", {'color': '#ff1744'}, dash.no_update, dash.no_update, False, 0
                 else:
-                    return "❌ Failed to close position", {'color': '#ff1744'}
+                    return "⚠️ No open position", {'color': '#ffd600'}, dash.no_update, dash.no_update, False, 0
             else:
-                return "⚠️ No open position", {'color': '#ffd600'}
-        
-        # elif button_id == 'sync-orders-btn':
-        #     # Sync order history from WOO X API
-        #     try:
-        #         from sync_order_history import OrderHistorySync
-        #         config = config_loader.load_config()
-        #         trade_mode = config.get('TRADE_MODE', 'paper')
-        #         
-        #         if trade_mode != 'live':
-        #             return "⚠️ Order sync only available in LIVE mode", {'color': '#ffd600'}
-        #         
-        #         syncer = OrderHistorySync()
-        #         # Sync all symbols to ensure we get both SPOT and PERP history
-        #         total = syncer.sync_all(symbol=None, days_back=30)
-        #         return f"✅ Synced {total} orders from WOO X API", {'color': '#00c853'}
-        #     except Exception as e:
-        #         logger.error(f"Sync error: {str(e)}")
-        #         return f"❌ Sync failed: {str(e)}", {'color': '#ff1744'}
-        
+                return "⚠️ Bot must be running to close position", {'color': '#ffd600'}, "☝️ ⚠️ Start Bot", "blink-text", False, 0
+                
         elif button_id == 'print-btn':
-            # Trigger browser print dialog using JavaScript
-            return html.Div([
-                "📄 Preparing report... Please use Ctrl+P (Cmd+P on Mac) or browser print to print the report.",
-                dcc.Store(id='trigger-print', data={'print': True})
-            ]), {'color': '#2196F3'}
-    
+            # This is handled by clientside callback, but we need to return something
+            return "🖨️ Printing report...", {'color': '#2196f3'}, dash.no_update, dash.no_update, False, 0
+            
     except Exception as e:
-        logger.error(f"Control error: {str(e)}")
-        return f"❌ Error: {str(e)}", {'color': '#ff1744'}
-    
-    return "", {}
+        logger.error(f"Control error: {e}")
+        return f"❌ Error: {str(e)}", {'color': '#ff1744'}, dash.no_update, dash.no_update, False, 0
+        
+    return dash.no_update, dash.no_update, alert_content, alert_class, dash.no_update, dash.no_update
 
 
 # Callback: Update status indicator
@@ -1033,6 +1096,8 @@ def control_bot(start_clicks, stop_clicks, close_clicks, print_clicks):
     Output('mode-indicator', 'className'),
     Output('robot-icon', 'className'),
     Output('alert-dialog', 'displayed'),
+    Output('start-btn', 'style'),
+    Output('stop-btn', 'style'),
     Input('interval-component', 'n_intervals')
 )
 def update_status(n):
@@ -1053,12 +1118,18 @@ def update_status(n):
             "Running"
         ])
         robot_class = "robot-working"
+        # Bot is running: Dim Start button, Enable Stop button
+        start_style = {'opacity': '0.5', 'cursor': 'not-allowed'}
+        stop_style = {}
     else:
         status_child = html.Span([
             html.Span(className='status-indicator status-stopped'),
             "Stopped"
         ])
         robot_class = "robot-sleeping"
+        # Bot is stopped: Enable Start button, Dim Stop button
+        start_style = {}
+        stop_style = {'opacity': '0.5', 'cursor': 'not-allowed'}
         
     # Mode indicator logic
     mode = 'paper'
@@ -1078,7 +1149,7 @@ def update_status(n):
         mode_text = "PAPER MODE"
         mode_class = "mode-indicator mode-paper"
         
-    return status_child, mode_text, mode_class, robot_class, show_alert
+    return status_child, mode_text, mode_class, robot_class, show_alert, start_style, stop_style
 
 
 # Callback: Update metrics
@@ -1530,17 +1601,48 @@ def update_pnl_chart(n):
                 timestamps.append(entry.get('timestamp', time.time()))
         
         if pnl_data:
-            colors = ['#00c853' if p >= 0 else '#ff1744' for p in pnl_data]
+            x_axis = [datetime.fromtimestamp(t, timezone.utc) for t in timestamps]
             
+            # Separate data for color filling
+            profit_data = [p if p > 0 else 0 for p in pnl_data]
+            loss_data = [p if p < 0 else 0 for p in pnl_data]
+            
+            # 1. Profit Area (Green)
             fig.add_trace(go.Scatter(
-                x=[datetime.fromtimestamp(t, timezone.utc) for t in timestamps],
+                x=x_axis,
+                y=profit_data,
+                mode='none',
+                fill='tozeroy',
+                fillcolor='rgba(0, 200, 83, 0.2)', # Light Green
+                hoverinfo='skip',
+                showlegend=False
+            ))
+            
+            # 2. Loss Area (Red)
+            fig.add_trace(go.Scatter(
+                x=x_axis,
+                y=loss_data,
+                mode='none',
+                fill='tozeroy',
+                fillcolor='rgba(255, 23, 68, 0.2)', # Light Red
+                hoverinfo='skip',
+                showlegend=False
+            ))
+            
+            # 3. Main Line
+            fig.add_trace(go.Scatter(
+                x=x_axis,
                 y=pnl_data,
                 mode='lines',
                 name='P&L',
                 line=dict(color='#ffd600', width=2),
-                fill='tozeroy',
-                fillcolor='rgba(255, 214, 0, 0.1)'
             ))
+
+            # Stabilize Y-Axis
+            max_val = max([abs(x) for x in pnl_data]) if pnl_data else 0
+            if max_val == 0: max_val = 10
+            limit = max_val * 1.1
+            fig.update_layout(yaxis=dict(range=[-limit, limit], automargin=False))
     
     fig.update_layout(
         title='Profit & Loss',
@@ -1549,11 +1651,12 @@ def update_pnl_chart(n):
         plot_bgcolor='#1e2130',
         font=dict(color='#ffffff'),
         height=300,
-        margin=dict(l=50, r=20, t=40, b=40),
+        margin=dict(l=60, r=20, t=40, b=40),
         xaxis_title='Time',
         yaxis_title='P&L ($)',
         showlegend=False,
-        hovermode='x unified'
+        hovermode='x unified',
+        uirevision='pnl_chart'
     )
     
     # Add zero line
@@ -2136,9 +2239,6 @@ def update_balance_table(n):
                          'side': pos.get('side', 'LONG').upper()
                      })
             
-            if not holdings:
-                return html.Div("No assets held", style={'color': '#888', 'textAlign': 'center', 'padding': '20px'})
-                
             # Create table
             header = html.Tr([
                 html.Th("Asset", style={'textAlign': 'left', 'padding': '8px', 'color': '#888', 'borderBottom': '1px solid #444'}),
@@ -2152,6 +2252,10 @@ def update_balance_table(n):
             ])
             
             rows = [header]
+            
+            if not holdings:
+                 rows.append(html.Tr([html.Td("No assets held", colSpan=8, style={'textAlign': 'center', 'padding': '20px', 'color': '#888'})]))
+            
             for h in holdings:
                 asset = h['asset']
                 amount = h['holding']
@@ -2259,14 +2363,15 @@ def close_position_table(n_clicks):
 # Callback: Clear feedback message after interval
 @app.callback(
     Output('manual-trade-feedback', 'children', allow_duplicate=True),
+    Output('control-feedback', 'children', allow_duplicate=True),
     Output('feedback-interval', 'disabled', allow_duplicate=True),
     Input('feedback-interval', 'n_intervals'),
     prevent_initial_call=True
 )
 def clear_feedback(n):
     if n and n > 0:
-        return "", True
-    return dash.no_update, dash.no_update
+        return "", "", True
+    return dash.no_update, dash.no_update, dash.no_update
 
 
 # Callback: Update activity log
@@ -2373,34 +2478,34 @@ def update_print_trading_records(n):
                 dt_str = str(dt)
                 
             symbol = r.get('symbol', '')
-            side = r.get('trade_type', '').upper()
+            trade_type = r.get('trade_type', '').upper() # BUY/SELL
             qty = float(r.get('quantity', 0))
             price = float(r.get('price', 0))
             status = r.get('code', 'FILLED')
             proceeds = float(r.get('proceeds', 0))
+            code = r.get('code', '')
+            reduce_only = r.get('reduce_only')
             
-            # Determine Side Label (Long / Short)
-            side_label = side
-            
-            if 'reduce_only' in r and r['reduce_only'] is not None:
-                 # Live Mode Logic
-                is_reduce = r.get('reduce_only')
-                if side == 'BUY':
-                    side_label = "Short" if is_reduce else "Long"
-                elif side == 'SELL':
-                    side_label = "Long" if is_reduce else "Short"
+            # Determine if Open or Close
+            is_open = True
+            if code == 'C':
+                is_open = False
+            elif reduce_only is True:
+                is_open = False
+                
+            # Determine Side (Long/Short)
+            side_label = 'LONG'
+            if is_open:
+                side_label = 'LONG' if trade_type == 'BUY' else 'SHORT'
             else:
-                # Paper Mode Logic
-                # Check if code is O (Open) or C (Close)
-                code_val = r.get('code', '')
-                if code_val in ['O', 'C']:
-                    if side == 'BUY':
-                        side_label = "Short" if code_val == 'C' else "Long"
-                    elif side == 'SELL':
-                        side_label = "Long" if code_val == 'C' else "Short"
+                side_label = 'SHORT' if trade_type == 'BUY' else 'LONG'
+                
+            # Construct Action Label
+            action_label = "OPEN" if is_open else "CLOSE"
+            full_action_label = f"{action_label} {side_label}"
             
             # Determine colors
-            side_color = '#00c853' if side == 'BUY' else '#ff1744'
+            side_color = '#00c853' if side_label == 'LONG' else '#ff1744'
             
             # Format Proceeds (P&L)
             pnl_str = f"+${proceeds:.2f}" if proceeds >= 0 else f"-${abs(proceeds):.2f}"
@@ -2633,12 +2738,18 @@ def update_pos_size_ui(size_type, symbol, is_loading):
      Output('conf-pos-refresh', 'value'),
      Output('conf-order-history', 'value'),
      Output('conf-strategy', 'value'),
+     Output('conf-entry-confirm', 'value'),
      Output('conf-short-ma', 'value'),
      Output('conf-long-ma', 'value'),
      Output('conf-ma-timeframe', 'value'),
      Output('conf-ma-threshold', 'value'),
      Output('conf-rsi-timeframe', 'value'),
      Output('conf-rsi-period', 'value'),
+     Output('conf-rsi-long-min', 'value'),
+     Output('conf-rsi-long-max', 'value'),
+     Output('conf-rsi-short-min', 'value'),
+     Output('conf-rsi-short-max', 'value'),
+     Output('conf-rsi-confirm', 'value'),
      Output('conf-sl', 'value'),
      Output('conf-tp', 'value'),
      Output('config-loaded-flag', 'data')],
@@ -2651,7 +2762,7 @@ def update_pos_size_ui(size_type, symbol, is_loading):
 def toggle_config_modal(n1, n2, n3, n4, current_style):
     ctx = callback_context
     if not ctx.triggered:
-        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     
@@ -2659,6 +2770,8 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
         # Open modal and load config
         try:
             config = config_loader.load_config()
+            entry_confirm = ['on'] if config.get('ENTRY_CONFIRM_CONDITIONS', 'false').lower() == 'true' else []
+            rsi_confirm = ['on'] if config.get('RSI_CONFIRM_ENABLED', 'false').lower() == 'true' else []
             return (
                 {'display': 'block'},
                 config.get('TRADE_MODE', 'paper'),
@@ -2670,24 +2783,30 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
                 int(config.get('POSITION_REFRESH_RATE', 60)),
                 int(config.get('ORDER_HISTORY_HOURS', 72)),
                 config.get('ENTRY_STRATEGY', 'ma_crossover'),
+                entry_confirm,
                 int(config.get('SHORT_MA_PERIOD', 20)),
                 int(config.get('LONG_MA_PERIOD', 50)),
                 int(config.get('MA_TIMEFRAME', 60)),
                 float(config.get('MA_THRESHOLD', 5.0)),
                 int(config.get('RSI_TIMEFRAME', 60)),
                 int(config.get('RSI_PERIOD', 14)),
+                int(config.get('RSI_LONG_MIN', 50)),
+                int(config.get('RSI_LONG_MAX', 70)),
+                int(config.get('RSI_SHORT_MIN', 30)),
+                int(config.get('RSI_SHORT_MAX', 50)),
+                rsi_confirm,
                 float(config.get('STOP_LOSS_PCT', 3.0)),
                 float(config.get('TAKE_PROFIT_PCT', 5.0)),
                 True # Set flag to True indicating config just loaded
             )
         except Exception as e:
             logger.error(f"Error loading config: {e}")
-            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 60, 72, 'ma_crossover', 20, 50, 60, 5.0, 60, 14, 3.0, 5.0, True
+            return {'display': 'block'}, 'paper', 'future', 'PERP_BTC_USDT', 'value', 10.0, 1, 60, 72, 'ma_crossover', [], 20, 50, 60, 5.0, 60, 14, 50, 70, 30, 50, [], 3.0, 5.0, True
             
     elif button_id in ['close-config-btn', 'cancel-config-btn', 'save-config-btn']:
-        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+        return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
     
-    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
+    return {'display': 'none'}, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, False
 
 # Callback: Save Config
 @app.callback(
@@ -2702,17 +2821,23 @@ def toggle_config_modal(n1, n2, n3, n4, current_style):
      State('conf-pos-refresh', 'value'),
      State('conf-order-history', 'value'),
      State('conf-strategy', 'value'),
+     State('conf-entry-confirm', 'value'),
      State('conf-short-ma', 'value'),
      State('conf-long-ma', 'value'),
      State('conf-ma-timeframe', 'value'),
      State('conf-ma-threshold', 'value'),
      State('conf-rsi-timeframe', 'value'),
      State('conf-rsi-period', 'value'),
+     State('conf-rsi-long-min', 'value'),
+     State('conf-rsi-long-max', 'value'),
+     State('conf-rsi-short-min', 'value'),
+     State('conf-rsi-short-max', 'value'),
+     State('conf-rsi-confirm', 'value'),
      State('conf-sl', 'value'),
      State('conf-tp', 'value')],
     prevent_initial_call=True
 )
-def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, pos_refresh, order_history, strategy, ma_short, ma_long, ma_timeframe, ma_threshold, rsi_timeframe, rsi_period, sl, tp):
+def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_size_value, max_pos, pos_refresh, order_history, strategy, entry_confirm, ma_short, ma_long, ma_timeframe, ma_threshold, rsi_timeframe, rsi_period, rsi_long_min, rsi_long_max, rsi_short_min, rsi_short_max, rsi_confirm, sl, tp):
     try:
         # Read existing config to preserve comments
         with open('.config', 'r') as f:
@@ -2729,6 +2854,8 @@ def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_siz
             'POSITION_REFRESH_RATE': str(pos_refresh),
             'ORDER_HISTORY_HOURS': str(order_history),
             'ENTRY_STRATEGY': strategy,
+            'ENTRY_CONFIRM_CONDITIONS': 'true' if entry_confirm and 'on' in entry_confirm else 'false',
+            'RSI_CONFIRM_ENABLED': 'true' if rsi_confirm and 'on' in rsi_confirm else 'false',
             'EXIT_STRATEGY': strategy, # Assume same for now
             'SHORT_MA_PERIOD': str(ma_short),
             'LONG_MA_PERIOD': str(ma_long),
@@ -2736,6 +2863,10 @@ def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_siz
             'MA_THRESHOLD': str(ma_threshold),
             'RSI_TIMEFRAME': str(rsi_timeframe),
             'RSI_PERIOD': str(rsi_period),
+            'RSI_LONG_MIN': str(rsi_long_min),
+            'RSI_LONG_MAX': str(rsi_long_max),
+            'RSI_SHORT_MIN': str(rsi_short_min),
+            'RSI_SHORT_MAX': str(rsi_short_max),
             'STOP_LOSS_PCT': str(sl),
             'TAKE_PROFIT_PCT': str(tp)
         }
@@ -2759,8 +2890,6 @@ def save_config(n_clicks, trade_mode, trade_type, symbol, pos_size_type, pos_siz
     except Exception as e:
         logger.error(f"Error saving config: {e}")
         return html.Span(f"❌ Error saving settings: {str(e)}", style={'color': '#ff1744'})
-
-
 def get_trading_records():
     try:
         # Determine DB file based on config
@@ -2951,8 +3080,7 @@ def update_trading_records(n, last_trade_ts):
     header = html.Tr([
         html.Th("Time", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
         html.Th("Symbol", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
-        html.Th("Type", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
-        html.Th("Action", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
+        html.Th("Side", style={'textAlign': 'left', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
         html.Th("Price", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
         html.Th("Quantity", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
         html.Th("PnL", style={'textAlign': 'right', 'padding': '12px', 'borderBottom': '1px solid #444', 'color': '#888'}),
@@ -2963,19 +3091,40 @@ def update_trading_records(n, last_trade_ts):
         # Format values
         dt = r.get('trade_datetime', '')
         symbol = r.get('symbol', '').replace('PERP_', '').replace('SPOT_', '').replace('_', '/')
-        trade_type = r.get('trade_type', '')
+        trade_type = r.get('trade_type', '') # BUY/SELL
         code = r.get('code', '') # O=Open, C=Close
+        reduce_only = r.get('reduce_only') # True/False/None
         
-        action_map = {'O': 'OPEN', 'C': 'CLOSE'}
-        action = action_map.get(code, code)
+        # Determine if Open or Close
+        is_open = True
+        if code == 'C':
+            is_open = False
+        elif reduce_only is True:
+            is_open = False
+            
+        # Determine Side (Long/Short)
+        # If Open: Buy=Long, Sell=Short
+        # If Close: Buy=Short, Sell=Long
+        side_label = 'LONG'
+        if is_open:
+            side_label = 'LONG' if trade_type == 'BUY' else 'SHORT'
+        else:
+            side_label = 'SHORT' if trade_type == 'BUY' else 'LONG'
+            
+        # Construct Action Label
+        action_label = "OPEN" if is_open else "CLOSE"
         
+        # Combine for clarity as requested
+        # e.g. "OPEN LONG", "CLOSE SHORT"
+        full_action_label = f"{action_label} {side_label}"
+
         price = f"${r.get('price', 0):,.2f}"
         qty = f"{abs(r.get('quantity', 0)):.4f}"
         proceeds = f"${r.get('proceeds', 0):,.2f}"
         
         row_style = {'borderBottom': '1px solid #2e3241', 'color': '#e0e0e0', 'fontSize': '13px'}
         
-        if trade_type == 'BUY':
+        if side_label == 'LONG':
             type_style = {'color': '#00c853', 'fontWeight': 'bold'}
         else:
             type_style = {'color': '#ff1744', 'fontWeight': 'bold'}
@@ -2983,8 +3132,7 @@ def update_trading_records(n, last_trade_ts):
         rows.append(html.Tr([
             html.Td(str(dt), style={'padding': '10px'}),
             html.Td(symbol, style={'padding': '10px'}),
-            html.Td(trade_type, style={'padding': '10px', **type_style}),
-            html.Td(action, style={'padding': '10px'}),
+            html.Td(side_label, style={'padding': '10px', **type_style}),
             html.Td(price, style={'padding': '10px', 'textAlign': 'right'}),
             html.Td(qty, style={'padding': '10px', 'textAlign': 'right'}),
             html.Td(proceeds, style={'padding': '10px', 'textAlign': 'right'}),

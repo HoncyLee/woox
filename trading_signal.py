@@ -19,6 +19,35 @@ class BaseStrategy:
         """
         self.config = config
         self.logger = logging.getLogger(self.__class__.__name__)
+
+    def _calculate_rsi(self, prices: List[float], period: int = 14) -> Optional[float]:
+        """Calculate RSI indicator."""
+        try:
+            if len(prices) < period + 1:
+                return None
+            
+            # Calculate price changes
+            deltas = [prices[i] - prices[i-1] for i in range(1, len(prices))]
+            
+            # Separate gains and losses
+            gains = [d if d > 0 else 0 for d in deltas]
+            losses = [-d if d < 0 else 0 for d in deltas]
+            
+            # Calculate average gains and losses
+            avg_gain = sum(gains[-period:]) / period
+            avg_loss = sum(losses[-period:]) / period
+            
+            if avg_loss == 0:
+                return 100
+            
+            rs = avg_gain / avg_loss
+            rsi = 100 - (100 / (1 + rs))
+            
+            return rsi
+            
+        except Exception as e:
+            self.logger.error("Error calculating RSI: %s", str(e))
+            return None
     
     def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
@@ -157,6 +186,41 @@ class MovingAverageCrossover(BaseStrategy):
                     "SHORT signal - Short MA: %.2f, Long MA: %.2f, Threshold: %.1f%%",
                     short_ma, long_ma, threshold_pct
                 )
+            
+            # RSI Confirmation Logic
+            if signal:
+                entry_confirm = self.config.get('ENTRY_CONFIRM_CONDITIONS', 'false').lower() == 'true'
+                rsi_confirm = self.config.get('RSI_CONFIRM_ENABLED', 'false').lower() == 'true'
+                
+                if entry_confirm and rsi_confirm:
+                    rsi_period = int(self.config.get('RSI_PERIOD', 14))
+                    current_rsi = self._calculate_rsi(resampled_prices, rsi_period)
+                    
+                    if current_rsi is not None:
+                        rsi_long_min = float(self.config.get('RSI_LONG_MIN', 50))
+                        rsi_long_max = float(self.config.get('RSI_LONG_MAX', 70))
+                        rsi_short_min = float(self.config.get('RSI_SHORT_MIN', 30))
+                        rsi_short_max = float(self.config.get('RSI_SHORT_MAX', 50))
+                        
+                        confirmed = False
+                        if signal == 'long':
+                            if rsi_long_min <= current_rsi <= rsi_long_max:
+                                confirmed = True
+                                self.logger.info("Entry confirmed by RSI: %.2f", current_rsi)
+                            else:
+                                self.logger.info("Entry rejected by RSI: %.2f (Required: %.2f-%.2f)", current_rsi, rsi_long_min, rsi_long_max)
+                        elif signal == 'short':
+                            if rsi_short_min <= current_rsi <= rsi_short_max:
+                                confirmed = True
+                                self.logger.info("Entry confirmed by RSI: %.2f", current_rsi)
+                            else:
+                                self.logger.info("Entry rejected by RSI: %.2f (Required: %.2f-%.2f)", current_rsi, rsi_short_min, rsi_short_max)
+                        
+                        if not confirmed:
+                            signal = None
+                    else:
+                        self.logger.warning("Could not calculate RSI for confirmation. Skipping trade.")
+                        signal = None
                 
             return signal
         except Exception as e:
@@ -233,35 +297,6 @@ class RSIStrategy(BaseStrategy):
     Exit: When RSI reverses or hits stop-loss/take-profit
     """
     
-    def _calculate_rsi(self, prices: List[float], period: int = 14) -> Optional[float]:
-        """Calculate RSI indicator."""
-        try:
-            if len(prices) < period + 1:
-                return None
-            
-            # Calculate price changes
-            deltas = [prices[i] - prices[i-1] for i in range(1, len(prices))]
-            
-            # Separate gains and losses
-            gains = [d if d > 0 else 0 for d in deltas]
-            losses = [-d if d < 0 else 0 for d in deltas]
-            
-            # Calculate average gains and losses
-            avg_gain = sum(gains[-period:]) / period
-            avg_loss = sum(losses[-period:]) / period
-            
-            if avg_loss == 0:
-                return 100
-            
-            rs = avg_gain / avg_loss
-            rsi = 100 - (100 / (1 + rs))
-            
-            return rsi
-            
-        except Exception as e:
-            self.logger.error("Error calculating RSI: %s", str(e))
-            return None
-    
     def generate_entry_signal(self, price_history: deque, orderbook: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """
         Generate entry signal using RSI with configurable timeframe and period.
@@ -271,15 +306,19 @@ class RSIStrategy(BaseStrategy):
             orderbook: Optional orderbook data (unused in this strategy)
             
         Returns:
-            'long' when RSI crosses above oversold threshold (30)
-            'short' when RSI crosses below overbought threshold (70)
+            'long' when RSI is between RSI_LONG_MIN and RSI_LONG_MAX
+            'short' when RSI is between RSI_SHORT_MIN and RSI_SHORT_MAX
             None otherwise
         """
         try:
             rsi_period = int(self.config.get('RSI_PERIOD', 14))
             timeframe = int(self.config.get('RSI_TIMEFRAME', 60))  # Default 1 minute
-            oversold = float(self.config.get('RSI_OVERSOLD', 30))
-            overbought = float(self.config.get('RSI_OVERBOUGHT', 70))
+            
+            # New RSI thresholds
+            rsi_long_min = float(self.config.get('RSI_LONG_MIN', 50))
+            rsi_long_max = float(self.config.get('RSI_LONG_MAX', 70))
+            rsi_short_min = float(self.config.get('RSI_SHORT_MIN', 30))
+            rsi_short_max = float(self.config.get('RSI_SHORT_MAX', 50))
             
             if not price_history:
                 return None
@@ -312,23 +351,26 @@ class RSIStrategy(BaseStrategy):
                 # Use raw data
                 resampled_prices = [entry['price'] for entry in history_list if entry.get('price')]
             
-            if len(resampled_prices) < rsi_period + 2:
+            if len(resampled_prices) < rsi_period + 1:
                 return None
             
-            # Calculate current and previous RSI
+            # Calculate current RSI
             current_rsi = self._calculate_rsi(resampled_prices, rsi_period)
-            prev_rsi = self._calculate_rsi(resampled_prices[:-1], rsi_period)
             
-            if current_rsi is None or prev_rsi is None:
+            if current_rsi is None:
                 return None
             
             signal = None
-            if prev_rsi <= oversold and current_rsi > oversold:
+            
+            # Check Long Condition
+            if rsi_long_min <= current_rsi <= rsi_long_max:
                 signal = 'long'
-                self.logger.info("LONG signal - RSI crossed above oversold: %.2f", current_rsi)
-            elif prev_rsi >= overbought and current_rsi < overbought:
+                self.logger.info("LONG signal - RSI (%.2f) in range [%.2f, %.2f]", current_rsi, rsi_long_min, rsi_long_max)
+            
+            # Check Short Condition
+            elif rsi_short_min <= current_rsi <= rsi_short_max:
                 signal = 'short'
-                self.logger.info("SHORT signal - RSI crossed below overbought: %.2f", current_rsi)
+                self.logger.info("SHORT signal - RSI (%.2f) in range [%.2f, %.2f]", current_rsi, rsi_short_min, rsi_short_max)
             
             return signal
             
@@ -475,8 +517,42 @@ class BollingerBandsStrategy(BaseStrategy):
                     current_price, bands['upper']
                 )
             
+            # RSI Confirmation Logic
+            if signal:
+                entry_confirm = self.config.get('ENTRY_CONFIRM_CONDITIONS', 'false').lower() == 'true'
+                rsi_confirm = self.config.get('RSI_CONFIRM_ENABLED', 'false').lower() == 'true'
+                
+                if entry_confirm and rsi_confirm:
+                    rsi_period = int(self.config.get('RSI_PERIOD', 14))
+                    current_rsi = self._calculate_rsi(prices, rsi_period)
+                    
+                    if current_rsi is not None:
+                        rsi_long_min = float(self.config.get('RSI_LONG_MIN', 50))
+                        rsi_long_max = float(self.config.get('RSI_LONG_MAX', 70))
+                        rsi_short_min = float(self.config.get('RSI_SHORT_MIN', 30))
+                        rsi_short_max = float(self.config.get('RSI_SHORT_MAX', 50))
+                        
+                        confirmed = False
+                        if signal == 'long':
+                            if rsi_long_min <= current_rsi <= rsi_long_max:
+                                confirmed = True
+                                self.logger.info("Entry confirmed by RSI: %.2f", current_rsi)
+                            else:
+                                self.logger.info("Entry rejected by RSI: %.2f (Required: %.2f-%.2f)", current_rsi, rsi_long_min, rsi_long_max)
+                        elif signal == 'short':
+                            if rsi_short_min <= current_rsi <= rsi_short_max:
+                                confirmed = True
+                                self.logger.info("Entry confirmed by RSI: %.2f", current_rsi)
+                            else:
+                                self.logger.info("Entry rejected by RSI: %.2f (Required: %.2f-%.2f)", current_rsi, rsi_short_min, rsi_short_max)
+                        
+                        if not confirmed:
+                            signal = None
+                    else:
+                        self.logger.warning("Could not calculate RSI for confirmation. Skipping trade.")
+                        signal = None
+
             return signal
-            
         except Exception as e:
             self.logger.error("Error generating Bollinger Bands entry signal: %s", str(e))
             return None

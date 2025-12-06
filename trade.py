@@ -624,6 +624,61 @@ class Trade:
             self.logger.error("Error calculating support/resistance: %s", str(e))
             return {}
     
+    def _check_confirmation(self, signal: str) -> bool:
+        """
+        Check extra conditions to confirm the entry signal.
+        Reads configuration dynamically to allow runtime updates.
+        """
+        try:
+            # Reload config to check if confirmation is enabled
+            current_config = load_config()
+            confirm_enabled = str(current_config.get('ENTRY_CONFIRM_CONDITIONS', 'false')).lower() == 'true'
+            
+            if not confirm_enabled:
+                return True
+                
+            if not self.orderbook:
+                self.logger.warning("Orderbook data missing for confirmation check.")
+                return False
+                
+            # Simple Orderbook Imbalance Check
+            bids = self.orderbook.get('bids', [])
+            asks = self.orderbook.get('asks', [])
+            
+            if not bids or not asks:
+                return False
+                
+            # Calculate volume of top 5 levels
+            total_bid_vol = sum(b['quantity'] for b in bids[:5])
+            total_ask_vol = sum(a['quantity'] for a in asks[:5])
+            
+            if total_bid_vol + total_ask_vol == 0:
+                return False
+                
+            imbalance = (total_bid_vol - total_ask_vol) / (total_bid_vol + total_ask_vol)
+            
+            # If Long, we want buying pressure (positive imbalance) or at least not strong selling pressure
+            if signal == 'long':
+                if imbalance > -0.2: # Allow slight negative but not too much
+                    self.logger.info(f"Signal LONG confirmed. Imbalance: {imbalance:.2f}")
+                    return True
+                else:
+                    self.logger.info(f"Signal LONG rejected. Imbalance: {imbalance:.2f} (Too much selling pressure)")
+            
+            # If Short, we want selling pressure (negative imbalance)
+            elif signal == 'short':
+                if imbalance < 0.2:
+                    self.logger.info(f"Signal SHORT confirmed. Imbalance: {imbalance:.2f}")
+                    return True
+                else:
+                    self.logger.info(f"Signal SHORT rejected. Imbalance: {imbalance:.2f} (Too much buying pressure)")
+                    
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error in confirmation check: {e}")
+            return False
+
     def determineOpenTrade(self) -> Optional[str]:
         """
         Determine the logic to open a position (long or short).
@@ -633,10 +688,18 @@ class Trade:
             'long', 'short', or None
         """
         try:
-            return self.entry_strategy.generate_entry_signal(
+            signal = self.entry_strategy.generate_entry_signal(
                 self.trade_px_list,
                 self.orderbook
             )
+            
+            if signal:
+                if self._check_confirmation(signal):
+                    return signal
+                else:
+                    return None
+            
+            return None
         except Exception as e:
             self.logger.error("Error determining open trade: %s", str(e))
             return None
@@ -1261,11 +1324,6 @@ class Trade:
             self.logger.error("Critical error in main loop: %s", str(e))
             self.running = False
         finally:
-            # Clean up any open positions
-            if self.current_position and self.current_price:
-                self.logger.info("Closing position before shutdown...")
-                self.closePosition(self.current_price)
-            
             # Close database connection
             if hasattr(self, 'db_conn'):
                 self.db_conn.close()
