@@ -39,6 +39,15 @@ The control panel provides buttons for:
 * **Close Position**: Emergency position close (if position is open)
 * **Print Report**: Generate a printable report with all trading records
 
+Manual Trading
+~~~~~~~~~~~~~~
+
+A dedicated manual trading section allows direct intervention:
+
+* **LONG/SHORT Buttons**: Open positions manually with one click.
+* **CLOSE Button**: Close any open position immediately.
+* **Visual Alerts**: Green/Red "toast" notifications appear in the bottom-right corner to confirm actions (10s duration).
+
 Real-time Metrics
 ~~~~~~~~~~~~~~~~~
 

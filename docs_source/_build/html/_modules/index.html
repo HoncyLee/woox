@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dashboard.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dashboard.html#dashboard-features">Dashboard Features</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#control-panel">Control Panel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dashboard.html#manual-trading">Manual Trading</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#real-time-metrics">Real-time Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#interactive-charts">Interactive Charts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#performance-metrics">Performance Metrics</a></li>
@@ -216,17 +217,12 @@
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trade-class">Trade Class</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-signal">signal</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.signal"><code class="docutils literal notranslate"><span class="pre">signal()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.getsignal"><code class="docutils literal notranslate"><span class="pre">getsignal()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.pthread_sigmask"><code class="docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.sigpending"><code class="docutils literal notranslate"><span class="pre">sigpending()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.sigwait"><code class="docutils literal notranslate"><span class="pre">sigwait()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.valid_signals"><code class="docutils literal notranslate"><span class="pre">valid_signals()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.Handlers"><code class="docutils literal notranslate"><span class="pre">Handlers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.ItimerError"><code class="docutils literal notranslate"><span class="pre">ItimerError</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.Sigmasks"><code class="docutils literal notranslate"><span class="pre">Sigmasks</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#signal.Signals"><code class="docutils literal notranslate"><span class="pre">Signals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api_reference.html#module-trading_signal">trading_signal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trading_signal.BaseStrategy"><code class="docutils literal notranslate"><span class="pre">BaseStrategy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trading_signal.MovingAverageCrossover"><code class="docutils literal notranslate"><span class="pre">MovingAverageCrossover</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trading_signal.RSIStrategy"><code class="docutils literal notranslate"><span class="pre">RSIStrategy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trading_signal.BollingerBandsStrategy"><code class="docutils literal notranslate"><span class="pre">BollingerBandsStrategy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#trading_signal.get_strategy"><code class="docutils literal notranslate"><span class="pre">get_strategy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#basestrategy">BaseStrategy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#movingaveragecrossover">MovingAverageCrossover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api_reference.html#rsistrategy">RSIStrategy</a></li>
@@ -340,7 +336,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api_reference.html#decorators">Decorators</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../api_reference.html#cron">cron</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#id51"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api_reference.html#id65"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -522,11 +518,11 @@
 <li><a href="config_loader.html">config_loader</a></li>
 <li><a href="examples_best_practices.html">examples_best_practices</a></li>
 <li><a href="order_helper.html">order_helper</a></li>
-<li><a href="signal.html">signal</a></li>
 <li><a href="test_api.html">test_api</a></li>
 <li><a href="test_orderbook.html">test_orderbook</a></li>
 <li><a href="test_trade_workflow.html">test_trade_workflow</a></li>
 <li><a href="trade.html">trade</a></li>
+<li><a href="trading_signal.html">trading_signal</a></li>
 <li><a href="verify_signals.html">verify_signals</a></li>
 <li><a href="woox_errors.html">woox_errors</a></li>
 </ul>

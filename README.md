@@ -13,6 +13,7 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Modular Signal System**: Separate `signal.py` module for easy strategy development and testing
 - **Advanced Market Analysis**: Orderbook imbalance detection, support/resistance identification from depth
 - **Risk Management**: Built-in stop-loss and take-profit mechanisms (configurable)
+- **Strategy Reversal Logic**: Automatically closes positions if a counter-signal is received (e.g., Short signal while Long)
 - **Position Management**: Tracks open positions and manages entries/exits (long and short for PERP)
 - **Paper/Live Trading**: Switch between simulation (paper) and real (live) trading modes
 - **Transaction Database**: Records all trades in DuckDB (separate databases for paper/live)
@@ -26,7 +27,9 @@ A Python trading bot for the WOOX exchange that monitors BTC_USDT spot market an
 - **Precision Management**: Proper number formatting for API requests using Decimal class
 - **Order Validation**: Pre-flight validation against symbol's price/quantity filters
 - **📊 Interactive Dashboard**: Web-based real-time monitoring and control (Dash + Plotly)
-- **Print Report**: Generate a white-background report for printing or PDF export.
+  - **Visual Alerts**: Pop-up notifications for manual trade actions (Green/Red toast messages).
+  - **Enhanced Tables**: Color-coded 'Side' column in Position Balance for quick status checks.
+- **Print Report**: Generate a white-background report for printing or PDF export with optimized Order History view.
 - **Technical Analysis**:
   - **RSI (Relative Strength Index)**: Configurable period momentum indicator with timeframe resampling.
   - **Moving Averages**: Configurable periods with threshold-based crossover and timeframe resampling.

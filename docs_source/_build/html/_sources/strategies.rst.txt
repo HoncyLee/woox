@@ -9,7 +9,7 @@ Strategy Architecture
 All strategies inherit from ``BaseStrategy`` and implement two methods:
 
 * ``generate_entry_signal(price_history, orderbook)`` - Determines when to open positions
-* ``generate_exit_signal(position, current_price, orderbook)`` - Determines when to close positions
+* ``generate_exit_signal(position, current_price, price_history, orderbook)`` - Determines when to close positions
 
 Built-in Strategies
 -------------------
@@ -254,6 +254,7 @@ Basic Template
        
        def generate_exit_signal(self, position: Dict[str, Any], 
                                current_price: float,
+                               price_history: deque = None,
                                orderbook: Optional[Dict[str, Any]] = None) -> bool:
            """
            Generate exit signal.
@@ -262,7 +263,7 @@ Basic Template
                True to close position, False to hold
            """
            # Usually use default stop-loss/take-profit
-           return super().generate_exit_signal(position, current_price, orderbook)
+           return super().generate_exit_signal(position, current_price, price_history, orderbook)
 
 Register Your Strategy
 ~~~~~~~~~~~~~~~~~~~~~~

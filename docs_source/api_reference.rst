@@ -26,10 +26,10 @@ Trade Class
    :show-inheritance:
    :special-members: __init__
 
-signal
-~~~~~~
+trading_signal
+~~~~~~~~~~~~~~
 
-.. automodule:: signal
+.. automodule:: trading_signal
    :members:
    :undoc-members:
    :show-inheritance:
@@ -37,7 +37,7 @@ signal
 BaseStrategy
 ^^^^^^^^^^^^
 
-.. autoclass:: signal.BaseStrategy
+.. autoclass:: trading_signal.BaseStrategy
    :members:
    :undoc-members:
    :show-inheritance:
@@ -46,7 +46,7 @@ BaseStrategy
 MovingAverageCrossover
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: signal.MovingAverageCrossover
+.. autoclass:: trading_signal.MovingAverageCrossover
    :members:
    :undoc-members:
    :show-inheritance:
@@ -54,7 +54,7 @@ MovingAverageCrossover
 RSIStrategy
 ^^^^^^^^^^^
 
-.. autoclass:: signal.RSIStrategy
+.. autoclass:: trading_signal.RSIStrategy
    :members:
    :undoc-members:
    :show-inheritance:
@@ -62,7 +62,7 @@ RSIStrategy
 BollingerBandsStrategy
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: signal.BollingerBandsStrategy
+.. autoclass:: trading_signal.BollingerBandsStrategy
    :members:
    :undoc-members:
    :show-inheritance:
@@ -70,7 +70,7 @@ BollingerBandsStrategy
 Strategy Registry
 ^^^^^^^^^^^^^^^^^
 
-.. autofunction:: signal.get_strategy
+.. autofunction:: trading_signal.get_strategy
 
 account
 ~~~~~~~

@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="dashboard.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dashboard.html#dashboard-features">Dashboard Features</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#control-panel">Control Panel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html#manual-trading">Manual Trading</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#real-time-metrics">Real-time Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#interactive-charts">Interactive Charts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#performance-metrics">Performance Metrics</a></li>
@@ -216,17 +217,12 @@
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-signal">signal</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.signal"><code class="docutils literal notranslate"><span class="pre">signal()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.getsignal"><code class="docutils literal notranslate"><span class="pre">getsignal()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.pthread_sigmask"><code class="docutils literal notranslate"><span class="pre">pthread_sigmask()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigpending"><code class="docutils literal notranslate"><span class="pre">sigpending()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.sigwait"><code class="docutils literal notranslate"><span class="pre">sigwait()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.valid_signals"><code class="docutils literal notranslate"><span class="pre">valid_signals()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Handlers"><code class="docutils literal notranslate"><span class="pre">Handlers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.ItimerError"><code class="docutils literal notranslate"><span class="pre">ItimerError</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Sigmasks"><code class="docutils literal notranslate"><span class="pre">Sigmasks</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#signal.Signals"><code class="docutils literal notranslate"><span class="pre">Signals</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-trading_signal">trading_signal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trading_signal.BaseStrategy"><code class="docutils literal notranslate"><span class="pre">BaseStrategy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trading_signal.MovingAverageCrossover"><code class="docutils literal notranslate"><span class="pre">MovingAverageCrossover</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trading_signal.RSIStrategy"><code class="docutils literal notranslate"><span class="pre">RSIStrategy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trading_signal.BollingerBandsStrategy"><code class="docutils literal notranslate"><span class="pre">BollingerBandsStrategy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trading_signal.get_strategy"><code class="docutils literal notranslate"><span class="pre">get_strategy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#basestrategy">BaseStrategy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#movingaveragecrossover">MovingAverageCrossover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#rsistrategy">RSIStrategy</a></li>
@@ -340,7 +336,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api_reference.html#id51"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#id65"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -545,14 +541,16 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#account.Account.__init__">__init__() (account.Account method)</a>, <a href="api_reference.html#id16">[1]</a>
+      <li><a href="api_reference.html#account.Account.__init__">__init__() (account.Account method)</a>, <a href="api_reference.html#id30">[1]</a>
 
       <ul>
-        <li><a href="api_reference.html#id40">(order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.__init__">[1]</a>
+        <li><a href="api_reference.html#id54">(order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.__init__">[1]</a>
 </li>
         <li><a href="api_reference.html#id1">(trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.__init__">[1]</a>
 </li>
-        <li><a href="api_reference.html#id27">(woox_errors.WooxError method)</a>, <a href="api_reference.html#woox_errors.WooxError.__init__">[1]</a>
+        <li><a href="api_reference.html#id16">(trading_signal.BaseStrategy method)</a>, <a href="api_reference.html#trading_signal.BaseStrategy.__init__">[1]</a>
+</li>
+        <li><a href="api_reference.html#id41">(woox_errors.WooxError method)</a>, <a href="api_reference.html#woox_errors.WooxError.__init__">[1]</a>
 </li>
       </ul></li>
   </ul></td>
@@ -570,7 +568,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#account.Account">Account (class in account)</a>, <a href="api_reference.html#id15">[1]</a>
+      <li><a href="api_reference.html#account.Account">Account (class in account)</a>, <a href="api_reference.html#id29">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -586,16 +584,22 @@
 </li>
       </ul></li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_reference.html#id15">BaseStrategy (class in trading_signal)</a>, <a href="api_reference.html#trading_signal.BaseStrategy">[1]</a>
+</li>
+      <li><a href="api_reference.html#id25">BollingerBandsStrategy (class in trading_signal)</a>, <a href="api_reference.html#trading_signal.BollingerBandsStrategy">[1]</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#account.Account.calculate_unrealized_pnl">calculate_unrealized_pnl() (account.Account method)</a>, <a href="api_reference.html#id21">[1]</a>
+      <li><a href="api_reference.html#account.Account.calculate_unrealized_pnl">calculate_unrealized_pnl() (account.Account method)</a>, <a href="api_reference.html#id35">[1]</a>
 </li>
       <li><a href="api_reference.html#test_trade_workflow.check_database_transactions">check_database_transactions() (in module test_trade_workflow)</a>
 </li>
-      <li><a href="api_reference.html#account.Account.close">close() (account.Account method)</a>, <a href="api_reference.html#id23">[1]</a>
+      <li><a href="api_reference.html#account.Account.close">close() (account.Account method)</a>, <a href="api_reference.html#id37">[1]</a>
 </li>
       <li><a href="api_reference.html#id11">closePosition() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.closePosition">[1]</a>
 </li>
@@ -608,11 +612,11 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id47">create_limit_order() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.create_limit_order">[1]</a>
+      <li><a href="api_reference.html#id61">create_limit_order() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.create_limit_order">[1]</a>
 </li>
-      <li><a href="api_reference.html#id48">create_market_order() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.create_market_order">[1]</a>
+      <li><a href="api_reference.html#id62">create_market_order() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.create_market_order">[1]</a>
 </li>
-      <li><a href="api_reference.html#id49">create_post_only_order() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.create_post_only_order">[1]</a>
+      <li><a href="api_reference.html#id63">create_post_only_order() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.create_post_only_order">[1]</a>
 </li>
       <li>
     createDuckDB
@@ -621,7 +625,7 @@
         <li><a href="api_reference.html#module-createDuckDB">module</a>
 </li>
       </ul></li>
-      <li><a href="api_reference.html#id51">cron() (in module trade)</a>, <a href="api_reference.html#trade.cron">[1]</a>
+      <li><a href="api_reference.html#id65">cron() (in module trade)</a>, <a href="api_reference.html#trade.cron">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -633,7 +637,7 @@
 </li>
       <li><a href="api_reference.html#id7">determineStopTrade() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.determineStopTrade">[1]</a>
 </li>
-      <li><a href="api_reference.html#account.Account.display_account_summary">display_account_summary() (account.Account method)</a>, <a href="api_reference.html#id22">[1]</a>
+      <li><a href="api_reference.html#account.Account.display_account_summary">display_account_summary() (account.Account method)</a>, <a href="api_reference.html#id36">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -651,7 +655,7 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id36">ErrorFormatter (class in woox_errors)</a>, <a href="api_reference.html#woox_errors.ErrorFormatter">[1]</a>
+      <li><a href="api_reference.html#id50">ErrorFormatter (class in woox_errors)</a>, <a href="api_reference.html#woox_errors.ErrorFormatter">[1]</a>
 </li>
       <li><a href="api_reference.html#examples_best_practices.example_account_balance">example_account_balance() (in module examples_best_practices)</a>
 </li>
@@ -686,21 +690,21 @@
 </li>
       <li><a href="api_reference.html#balance_summary.format_currency">format_currency() (in module balance_summary)</a>
 </li>
-      <li><a href="api_reference.html#id37">format_error() (woox_errors.ErrorFormatter static method)</a>, <a href="api_reference.html#woox_errors.ErrorFormatter.format_error">[1]</a>
+      <li><a href="api_reference.html#id51">format_error() (woox_errors.ErrorFormatter static method)</a>, <a href="api_reference.html#woox_errors.ErrorFormatter.format_error">[1]</a>
 </li>
       <li><a href="api_reference.html#order_helper.format_order_for_display">format_order_for_display() (in module order_helper)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id42">format_price() (order_helper.OrderHelper static method)</a>, <a href="api_reference.html#order_helper.OrderHelper.format_price">[1]</a>
+      <li><a href="api_reference.html#id56">format_price() (order_helper.OrderHelper static method)</a>, <a href="api_reference.html#order_helper.OrderHelper.format_price">[1]</a>
 </li>
       <li><a href="api_reference.html#balance_summary.format_quantity">format_quantity() (in module balance_summary)</a>
 
       <ul>
-        <li><a href="api_reference.html#id43">(order_helper.OrderHelper static method)</a>, <a href="api_reference.html#order_helper.OrderHelper.format_quantity">[1]</a>
+        <li><a href="api_reference.html#id57">(order_helper.OrderHelper static method)</a>, <a href="api_reference.html#order_helper.OrderHelper.format_quantity">[1]</a>
 </li>
       </ul></li>
-      <li><a href="api_reference.html#id38">format_user_message() (woox_errors.ErrorFormatter static method)</a>, <a href="api_reference.html#woox_errors.ErrorFormatter.format_user_message">[1]</a>
+      <li><a href="api_reference.html#id52">format_user_message() (woox_errors.ErrorFormatter static method)</a>, <a href="api_reference.html#woox_errors.ErrorFormatter.format_user_message">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -708,33 +712,53 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id41">generate_client_order_id() (order_helper.OrderHelper static method)</a>, <a href="api_reference.html#order_helper.OrderHelper.generate_client_order_id">[1]</a>
+      <li><a href="api_reference.html#id55">generate_client_order_id() (order_helper.OrderHelper static method)</a>, <a href="api_reference.html#order_helper.OrderHelper.generate_client_order_id">[1]</a>
 </li>
-      <li><a href="api_reference.html#account.Account.get_account_info">get_account_info() (account.Account method)</a>, <a href="api_reference.html#id18">[1]</a>
+      <li><a href="api_reference.html#id17">generate_entry_signal() (trading_signal.BaseStrategy method)</a>, <a href="api_reference.html#trading_signal.BaseStrategy.generate_entry_signal">[1]</a>
+
+      <ul>
+        <li><a href="api_reference.html#id26">(trading_signal.BollingerBandsStrategy method)</a>, <a href="api_reference.html#trading_signal.BollingerBandsStrategy.generate_entry_signal">[1]</a>
 </li>
-      <li><a href="api_reference.html#account.Account.get_api_balance">get_api_balance() (account.Account method)</a>, <a href="api_reference.html#id17">[1]</a>
+        <li><a href="api_reference.html#id20">(trading_signal.MovingAverageCrossover method)</a>, <a href="api_reference.html#trading_signal.MovingAverageCrossover.generate_entry_signal">[1]</a>
 </li>
-      <li><a href="api_reference.html#config_loader.get_config_value">get_config_value() (in module config_loader)</a>, <a href="api_reference.html#id25">[1]</a>
+        <li><a href="api_reference.html#id23">(trading_signal.RSIStrategy method)</a>, <a href="api_reference.html#trading_signal.RSIStrategy.generate_entry_signal">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="api_reference.html#id18">generate_exit_signal() (trading_signal.BaseStrategy method)</a>, <a href="api_reference.html#trading_signal.BaseStrategy.generate_exit_signal">[1]</a>
+
+      <ul>
+        <li><a href="api_reference.html#id27">(trading_signal.BollingerBandsStrategy method)</a>, <a href="api_reference.html#trading_signal.BollingerBandsStrategy.generate_exit_signal">[1]</a>
+</li>
+        <li><a href="api_reference.html#id21">(trading_signal.MovingAverageCrossover method)</a>, <a href="api_reference.html#trading_signal.MovingAverageCrossover.generate_exit_signal">[1]</a>
+</li>
+        <li><a href="api_reference.html#id24">(trading_signal.RSIStrategy method)</a>, <a href="api_reference.html#trading_signal.RSIStrategy.generate_exit_signal">[1]</a>
+</li>
+      </ul></li>
+      <li><a href="api_reference.html#account.Account.get_account_info">get_account_info() (account.Account method)</a>, <a href="api_reference.html#id32">[1]</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_reference.html#account.Account.get_api_balance">get_api_balance() (account.Account method)</a>, <a href="api_reference.html#id31">[1]</a>
+</li>
+      <li><a href="api_reference.html#config_loader.get_config_value">get_config_value() (in module config_loader)</a>, <a href="api_reference.html#id39">[1]</a>
 </li>
       <li><a href="api_reference.html#balance_summary.get_current_price">get_current_price() (in module balance_summary)</a>
 </li>
       <li><a href="api_reference.html#woox_errors.get_error_info">get_error_info() (in module woox_errors)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#account.Account.get_open_positions">get_open_positions() (account.Account method)</a>, <a href="api_reference.html#id20">[1]</a>
+      <li><a href="api_reference.html#account.Account.get_open_positions">get_open_positions() (account.Account method)</a>, <a href="api_reference.html#id34">[1]</a>
 </li>
       <li><a href="api_reference.html#id4">get_orderbook_imbalance() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.get_orderbook_imbalance">[1]</a>
 </li>
       <li><a href="api_reference.html#id5">get_orderbook_support_resistance() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.get_orderbook_support_resistance">[1]</a>
 </li>
-      <li><a href="api_reference.html#id35">get_retry_delay() (in module woox_errors)</a>, <a href="api_reference.html#woox_errors.get_retry_delay">[1]</a>
+      <li><a href="api_reference.html#id49">get_retry_delay() (in module woox_errors)</a>, <a href="api_reference.html#woox_errors.get_retry_delay">[1]</a>
 </li>
-      <li><a href="api_reference.html#account.Account.get_transaction_summary">get_transaction_summary() (account.Account method)</a>, <a href="api_reference.html#id19">[1]</a>
+      <li><a href="api_reference.html#id28">get_strategy() (in module trading_signal)</a>, <a href="api_reference.html#trading_signal.get_strategy">[1]</a>
+</li>
+      <li><a href="api_reference.html#account.Account.get_transaction_summary">get_transaction_summary() (account.Account method)</a>, <a href="api_reference.html#id33">[1]</a>
 </li>
       <li><a href="api_reference.html#id8">getOpenPositionCount() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.getOpenPositionCount">[1]</a>
-</li>
-      <li><a href="api_reference.html#signal.getsignal">getsignal() (in module signal)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -742,12 +766,10 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id33">handle_api_error() (in module woox_errors)</a>, <a href="api_reference.html#woox_errors.handle_api_error">[1]</a>
+      <li><a href="api_reference.html#id47">handle_api_error() (in module woox_errors)</a>, <a href="api_reference.html#woox_errors.handle_api_error">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#signal.Handlers">Handlers (class in signal)</a>
-</li>
       <li><a href="api_reference.html#id9">hasPosition() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.hasPosition">[1]</a>
 </li>
   </ul></td>
@@ -756,11 +778,7 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id34">is_retryable_error() (in module woox_errors)</a>, <a href="api_reference.html#woox_errors.is_retryable_error">[1]</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#signal.ItimerError">ItimerError (in module signal)</a>
+      <li><a href="api_reference.html#id48">is_retryable_error() (in module woox_errors)</a>, <a href="api_reference.html#woox_errors.is_retryable_error">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -768,11 +786,11 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#config_loader.load_config">load_config() (in module config_loader)</a>, <a href="api_reference.html#id24">[1]</a>
+      <li><a href="api_reference.html#config_loader.load_config">load_config() (in module config_loader)</a>, <a href="api_reference.html#id38">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id50">log_order_details() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.log_order_details">[1]</a>
+      <li><a href="api_reference.html#id64">log_order_details() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.log_order_details">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -810,8 +828,6 @@
 </li>
         <li><a href="api_reference.html#module-order_helper">order_helper</a>
 </li>
-        <li><a href="api_reference.html#module-signal">signal</a>
-</li>
         <li><a href="api_reference.html#module-test_api">test_api</a>
 </li>
         <li><a href="api_reference.html#module-test_orderbook">test_orderbook</a>
@@ -822,11 +838,17 @@
 </li>
         <li><a href="api_reference.html#module-trade">trade</a>
 </li>
+        <li><a href="api_reference.html#module-trading_signal">trading_signal</a>
+</li>
         <li><a href="api_reference.html#module-verify_signals">verify_signals</a>
 </li>
         <li><a href="api_reference.html#module-woox_errors">woox_errors</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_reference.html#id19">MovingAverageCrossover (class in trading_signal)</a>, <a href="api_reference.html#trading_signal.MovingAverageCrossover">[1]</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -844,7 +866,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id39">OrderHelper (class in order_helper)</a>, <a href="api_reference.html#order_helper.OrderHelper">[1]</a>
+      <li><a href="api_reference.html#id53">OrderHelper (class in order_helper)</a>, <a href="api_reference.html#order_helper.OrderHelper">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -858,13 +880,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference.html#balance_summary.print_separator">print_separator() (in module balance_summary)</a>
 </li>
-      <li><a href="api_reference.html#signal.pthread_sigmask">pthread_sigmask() (in module signal)</a>
-</li>
   </ul></td>
 </tr></table>
 
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api_reference.html#id22">RSIStrategy (class in trading_signal)</a>, <a href="api_reference.html#trading_signal.RSIStrategy">[1]</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api_reference.html#id13">run() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.run">[1]</a>
 </li>
@@ -874,99 +898,6 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#signal.Sigmasks.SIG_BLOCK">SIG_BLOCK (signal.Sigmasks attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Handlers.SIG_DFL">SIG_DFL (signal.Handlers attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Handlers.SIG_IGN">SIG_IGN (signal.Handlers attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Sigmasks.SIG_SETMASK">SIG_SETMASK (signal.Sigmasks attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Sigmasks.SIG_UNBLOCK">SIG_UNBLOCK (signal.Sigmasks attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGABRT">SIGABRT (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGALRM">SIGALRM (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGBUS">SIGBUS (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGCHLD">SIGCHLD (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGCONT">SIGCONT (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGEMT">SIGEMT (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGFPE">SIGFPE (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGHUP">SIGHUP (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGILL">SIGILL (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGINFO">SIGINFO (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGINT">SIGINT (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGIO">SIGIO (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGIOT">SIGIOT (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGKILL">SIGKILL (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Sigmasks">Sigmasks (class in signal)</a>
-</li>
-      <li>
-    signal
-
-      <ul>
-        <li><a href="api_reference.html#module-signal">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#signal.signal">signal() (in module signal)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals">Signals (class in signal)</a>
-</li>
-      <li><a href="api_reference.html#signal.sigpending">sigpending() (in module signal)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGPIPE">SIGPIPE (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGPROF">SIGPROF (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGQUIT">SIGQUIT (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGSEGV">SIGSEGV (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGSTOP">SIGSTOP (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGSYS">SIGSYS (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGTERM">SIGTERM (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGTRAP">SIGTRAP (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGTSTP">SIGTSTP (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGTTIN">SIGTTIN (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGTTOU">SIGTTOU (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGURG">SIGURG (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGUSR1">SIGUSR1 (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGUSR2">SIGUSR2 (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGVTALRM">SIGVTALRM (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.sigwait">sigwait() (in module signal)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGWINCH">SIGWINCH (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGXCPU">SIGXCPU (signal.Signals attribute)</a>
-</li>
-      <li><a href="api_reference.html#signal.Signals.SIGXFSZ">SIGXFSZ (signal.Signals attribute)</a>
-</li>
       <li><a href="api_reference.html#id14">stop() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.stop">[1]</a>
 </li>
   </ul></td>
@@ -1038,6 +969,13 @@
 </li>
       <li><a href="api_reference.html#id2">trade_update() (trade.Trade method)</a>, <a href="api_reference.html#trade.Trade.trade_update">[1]</a>
 </li>
+      <li>
+    trading_signal
+
+      <ul>
+        <li><a href="api_reference.html#module-trading_signal">module</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1052,15 +990,13 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#signal.valid_signals">valid_signals() (in module signal)</a>
+      <li><a href="api_reference.html#id60">validate_min_notional() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.validate_min_notional">[1]</a>
 </li>
-      <li><a href="api_reference.html#id46">validate_min_notional() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.validate_min_notional">[1]</a>
-</li>
-      <li><a href="api_reference.html#id44">validate_price_filters() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.validate_price_filters">[1]</a>
+      <li><a href="api_reference.html#id58">validate_price_filters() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.validate_price_filters">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api_reference.html#id45">validate_quantity_filters() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.validate_quantity_filters">[1]</a>
+      <li><a href="api_reference.html#id59">validate_quantity_filters() (order_helper.OrderHelper method)</a>, <a href="api_reference.html#order_helper.OrderHelper.validate_quantity_filters">[1]</a>
 </li>
       <li>
     verify_signals
@@ -1085,19 +1021,19 @@
       <li><a href="api_reference.html#woox_errors.WooxAuthenticationError">WooxAuthenticationError</a>
 
       <ul>
-        <li><a href="api_reference.html#id28">(class in woox_errors)</a>
+        <li><a href="api_reference.html#id42">(class in woox_errors)</a>
 </li>
       </ul></li>
       <li><a href="api_reference.html#woox_errors.WooxError">WooxError</a>
 
       <ul>
-        <li><a href="api_reference.html#id26">(class in woox_errors)</a>
+        <li><a href="api_reference.html#id40">(class in woox_errors)</a>
 </li>
       </ul></li>
       <li><a href="api_reference.html#woox_errors.WooxInvalidParameterError">WooxInvalidParameterError</a>
 
       <ul>
-        <li><a href="api_reference.html#id30">(class in woox_errors)</a>
+        <li><a href="api_reference.html#id44">(class in woox_errors)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1105,19 +1041,19 @@
       <li><a href="api_reference.html#woox_errors.WooxRateLimitError">WooxRateLimitError</a>
 
       <ul>
-        <li><a href="api_reference.html#id29">(class in woox_errors)</a>
+        <li><a href="api_reference.html#id43">(class in woox_errors)</a>
 </li>
       </ul></li>
       <li><a href="api_reference.html#woox_errors.WooxResourceNotFoundError">WooxResourceNotFoundError</a>
 
       <ul>
-        <li><a href="api_reference.html#id31">(class in woox_errors)</a>
+        <li><a href="api_reference.html#id45">(class in woox_errors)</a>
 </li>
       </ul></li>
       <li><a href="api_reference.html#woox_errors.WooxServerError">WooxServerError</a>
 
       <ul>
-        <li><a href="api_reference.html#id32">(class in woox_errors)</a>
+        <li><a href="api_reference.html#id46">(class in woox_errors)</a>
 </li>
       </ul></li>
   </ul></td>

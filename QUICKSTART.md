@@ -144,7 +144,27 @@ Live mode will:
 - ✓ Log with `[LIVE]` prefix
 - ✓ Display live price updates every 5 seconds
 
-## Step 5: View Account Summary
+## Step 5: Launch the Dashboard
+
+Monitor your bot and control it via a web interface:
+
+```bash
+./start_dashboard.sh
+```
+
+Or manually:
+
+```bash
+python dashboard.py
+```
+
+Open your browser to `http://127.0.0.1:8050` to see:
+- Real-time charts (Price, RSI, MA)
+- Live P&L and Position tracking
+- Manual trade controls
+- Order History and Activity Logs
+
+## Step 6: View Account Summary
 
 Check your trading account status, P&L, and transaction history:
 

@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dashboard.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dashboard.html#dashboard-features">Dashboard Features</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#control-panel">Control Panel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dashboard.html#manual-trading">Manual Trading</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#real-time-metrics">Real-time Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#interactive-charts">Interactive Charts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#performance-metrics">Performance Metrics</a></li>
@@ -658,8 +659,17 @@
         
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;Trade&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;BASE_URL&#39;</span><span class="p">,</span> <span class="s1">&#39;https://api.woox.io&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span> <span class="k">if</span> <span class="n">api_key</span> <span class="k">else</span> <span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_KEY&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span> <span class="o">=</span> <span class="n">api_secret</span> <span class="k">if</span> <span class="n">api_secret</span> <span class="k">else</span> <span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_SECRET&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Try arguments first, then config, then environment variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span> <span class="k">if</span> <span class="n">api_key</span> <span class="k">else</span> <span class="p">(</span><span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_KEY&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_KEY&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span> <span class="o">=</span> <span class="n">api_secret</span> <span class="k">if</span> <span class="n">api_secret</span> <span class="k">else</span> <span class="p">(</span><span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_SECRET&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;WOOX_API_SECRET&#39;</span><span class="p">))</span>
+        
+        <span class="c1"># Clean credentials</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            
         <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span> <span class="o">=</span> <span class="n">trade_mode</span> <span class="k">if</span> <span class="n">trade_mode</span> <span class="k">else</span> <span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TRADE_MODE&#39;</span><span class="p">,</span> <span class="s1">&#39;paper&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SYMBOL&#39;</span><span class="p">,</span> <span class="s1">&#39;PERP_BTC_USDT&#39;</span><span class="p">)</span>
         
@@ -708,6 +718,7 @@
         
         <span class="c1"># Position tracking</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># {&#39;side&#39;: &#39;long&#39;/&#39;short&#39;, &#39;quantity&#39;: float, &#39;entry_price&#39;: float}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Store last error message for UI feedback</span>
         
         <span class="c1"># Initialize trading strategies</span>
         <span class="n">entry_strategy_name</span> <span class="o">=</span> <span class="n">fresh_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ENTRY_STRATEGY&#39;</span><span class="p">,</span> <span class="s1">&#39;ma_crossover&#39;</span><span class="p">)</span>
@@ -729,6 +740,11 @@
         <span class="c1"># Initialize database connection based on trade mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_file</span> <span class="o">=</span> <span class="s1">&#39;live_transaction.db&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span> <span class="k">else</span> <span class="s1">&#39;paper_transaction.db&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_database</span><span class="p">()</span>
+        
+        <span class="c1"># Perform initial sync if in LIVE mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Performing initial order history sync...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_sync</span><span class="p">()</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trade class initialized for symbol: </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2"> mode&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span></div>
 
@@ -759,7 +775,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error initializing database: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
     
     <span class="k">def</span><span class="w"> </span><span class="nf">_record_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trade_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
-                           <span class="n">signal</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MA_CROSS&quot;</span><span class="p">,</span> <span class="n">order_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;LMT&quot;</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                           <span class="n">signal</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MA_CROSS&quot;</span><span class="p">,</span> <span class="n">order_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;LMT&quot;</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span><span class="p">,</span>
+                           <span class="n">order_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pnl</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a transaction to the database.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
@@ -769,6 +786,8 @@
 <span class="sd">            signal: Trading signal that triggered the trade</span>
 <span class="sd">            order_type: Order type (LMT, MKT, etc.)</span>
 <span class="sd">            code: Transaction code (O=Open, C=Close)</span>
+<span class="sd">            order_data: Optional dictionary with API order details</span>
+<span class="sd">            pnl: Realized PnL for closing trades</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
@@ -784,13 +803,21 @@
             <span class="c1"># This is useful if the user changes the config while the bot is running</span>
             <span class="n">current_config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
             <span class="n">current_mode</span> <span class="o">=</span> <span class="n">current_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TRADE_MODE&#39;</span><span class="p">,</span> <span class="s1">&#39;paper&#39;</span><span class="p">)</span>
-            <span class="n">db_file</span> <span class="o">=</span> <span class="s1">&#39;live_transaction.db&#39;</span> <span class="k">if</span> <span class="n">current_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span> <span class="k">else</span> <span class="s1">&#39;paper_transaction.db&#39;</span>
+            
+            <span class="c1"># In LIVE mode, we skip local recording and rely on the sync mechanism</span>
+            <span class="c1"># This ensures we don&#39;t have duplicate or conflicting records</span>
+            <span class="k">if</span> <span class="n">current_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Skipping local DB write in LIVE mode - relying on API sync&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">db_file</span> <span class="o">=</span> <span class="s1">&#39;paper_transaction.db&#39;</span>
             
             <span class="k">with</span> <span class="n">duckdb</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+                <span class="c1"># Paper Mode Schema</span>
                 <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                INSERT INTO trades VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)</span>
 <span class="s2">                &quot;&quot;&quot;</span><span class="p">,</span> <span class="p">(</span>
-                    <span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span> <span class="s1">&#39;TRADER&#39;</span><span class="p">),</span>  <span class="c1"># acct_id</span>
+                <span class="n">CONFIG</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span> <span class="s1">&#39;TRADER&#39;</span><span class="p">),</span>  <span class="c1"># acct_id</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>  <span class="c1"># symbol</span>
                     <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>  <span class="c1"># trade_datetime as TIMESTAMP</span>
                     <span class="s1">&#39;woox&#39;</span><span class="p">,</span>  <span class="c1"># exchange</span>
@@ -1174,6 +1201,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_strategy</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">current_price</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trade_px_list</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">orderbook</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1321,6 +1349,19 @@
             <span class="k">return</span> <span class="kc">None</span></div>
 
     
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trigger_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger order history sync after a trade.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Import here to avoid potential circular imports if any</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">sync_order_history</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderHistorySync</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Triggering order history sync...&quot;</span><span class="p">)</span>
+                <span class="c1"># Sync all symbols</span>
+                <span class="n">OrderHistorySync</span><span class="p">()</span><span class="o">.</span><span class="n">sync_all</span><span class="p">(</span><span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">days_back</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Order history sync completed&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to sync order history: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 <div class="viewcode-block" id="Trade.openPosition">
 <a class="viewcode-back" href="../api_reference.html#trade.Trade.openPosition">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">openPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">side</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -1335,28 +1376,37 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            True if position opened successfully, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="s2">&quot;Already holding a position&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot open position - already holding a position&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
             
             <span class="c1"># Validate side</span>
             <span class="k">if</span> <span class="n">side</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="s1">&#39;short&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid side: </span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid side: </span><span class="si">%s</span><span class="s2">. Must be &#39;long&#39; or &#39;short&#39;&quot;</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
             
             <span class="c1"># Check if symbol supports short positions (PERP allows short, SPOT doesn&#39;t)</span>
             <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SPOT_&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="s2">&quot;Short not supported on SPOT&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Short positions not supported for spot trading. Use perpetual futures (PERP_).&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
             
             <span class="c1"># Use V3 API to place order if in live mode and credentials are provided</span>
+            <span class="n">order_data</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span><span class="p">:</span>
                 <span class="c1"># Determine order side based on position type</span>
                 <span class="n">order_side</span> <span class="o">=</span> <span class="s2">&quot;BUY&quot;</span> <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;long&quot;</span> <span class="k">else</span> <span class="s2">&quot;SELL&quot;</span>
                 
+                <span class="c1"># Generate client_order_id (using microsecond timestamp)</span>
+                <span class="n">client_order_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">)</span>
+                
                 <span class="n">order_body</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                    <span class="s2">&quot;client_order_id&quot;</span><span class="p">:</span> <span class="n">client_order_id</span><span class="p">,</span>
                     <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="n">order_side</span><span class="p">,</span>
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LIMIT&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">price</span><span class="p">),</span>
@@ -1383,6 +1433,7 @@
                         <span class="n">order_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;orderId&#39;</span><span class="p">),</span> <span class="n">order_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;side&#39;</span><span class="p">),</span> <span class="n">price</span><span class="p">,</span> <span class="n">quantity</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;API Error: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;[LIVE] Failed to place order: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">False</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1409,13 +1460,19 @@
                 <span class="n">price</span><span class="o">=</span><span class="n">price</span><span class="p">,</span>
                 <span class="n">signal</span><span class="o">=</span><span class="s1">&#39;MA_CROSS&#39;</span><span class="p">,</span>
                 <span class="n">order_type</span><span class="o">=</span><span class="s1">&#39;LMT&#39;</span><span class="p">,</span>
-                <span class="n">code</span><span class="o">=</span><span class="s1">&#39;O&#39;</span>  <span class="c1"># O = Open position</span>
+                <span class="n">code</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">,</span>  <span class="c1"># O = Open position</span>
+                <span class="n">order_data</span><span class="o">=</span><span class="n">order_data</span>
             <span class="p">)</span>
             
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Position opened successfully: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span><span class="p">)</span>
+            
+            <span class="c1"># Trigger sync to update dashboard history</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_sync</span><span class="p">()</span>
+            
             <span class="k">return</span> <span class="kc">True</span>
             
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Exception: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error opening position: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">False</span></div>
 
@@ -1450,12 +1507,17 @@
                 <span class="n">pnl_pct</span> <span class="o">=</span> <span class="p">((</span><span class="n">entry_price</span> <span class="o">-</span> <span class="n">price</span><span class="p">)</span> <span class="o">/</span> <span class="n">entry_price</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
             
             <span class="c1"># Use V3 API to place closing order if in live mode and credentials are provided</span>
+            <span class="n">order_data</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trade_mode</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_secret</span><span class="p">:</span>
                 <span class="c1"># Determine closing order side (opposite of position)</span>
                 <span class="n">close_side</span> <span class="o">=</span> <span class="s2">&quot;SELL&quot;</span> <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;long&quot;</span> <span class="k">else</span> <span class="s2">&quot;BUY&quot;</span>
                 
+                <span class="c1"># Generate client_order_id (using microsecond timestamp)</span>
+                <span class="n">client_order_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000000</span><span class="p">)</span>
+                
                 <span class="n">order_body</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">,</span>
+                    <span class="s2">&quot;client_order_id&quot;</span><span class="p">:</span> <span class="n">client_order_id</span><span class="p">,</span>
                     <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="n">close_side</span><span class="p">,</span>
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LIMIT&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">price</span><span class="p">),</span>
@@ -1503,7 +1565,9 @@
                 <span class="n">price</span><span class="o">=</span><span class="n">price</span><span class="p">,</span>
                 <span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="p">,</span>
                 <span class="n">order_type</span><span class="o">=</span><span class="s1">&#39;LMT&#39;</span><span class="p">,</span>
-                <span class="n">code</span><span class="o">=</span><span class="s1">&#39;C&#39;</span>  <span class="c1"># C = Close position</span>
+                <span class="n">code</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span>  <span class="c1"># C = Close position</span>
+                <span class="n">order_data</span><span class="o">=</span><span class="n">order_data</span><span class="p">,</span>
+                <span class="n">pnl</span><span class="o">=</span><span class="n">pnl</span>
             <span class="p">)</span>
             
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -1515,6 +1579,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">current_position</span> <span class="o">=</span> <span class="kc">None</span>
             
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Position closed successfully&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Trigger sync to update dashboard history</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_sync</span><span class="p">()</span>
+            
             <span class="k">return</span> <span class="kc">True</span>
             
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1726,13 +1794,20 @@
                                 <span class="n">trade_amount_usd</span> <span class="o">=</span> <span class="n">pos_size_value</span>
                                 <span class="n">quantity</span> <span class="o">=</span> <span class="n">trade_amount_usd</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_price</span>
                             
+                            <span class="c1"># Round quantity to 5 decimal places to meet API requirements</span>
+                            <span class="n">quantity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">quantity</span><span class="si">:</span><span class="s2">.5f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            
+                            <span class="c1"># Check minimum quantity requirement</span>
+                            <span class="k">if</span> <span class="n">quantity</span> <span class="o">&lt;</span> <span class="mf">0.00001</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculated quantity </span><span class="si">{</span><span class="n">quantity</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> is too small (min 0.00001). Skipping trade.&quot;</span><span class="p">)</span>
+                                <span class="k">continue</span>
+                            
                             <span class="c1"># Use current ask/bid for limit price</span>
                             <span class="k">if</span> <span class="n">signal</span> <span class="o">==</span> <span class="s1">&#39;long&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_ask</span><span class="p">:</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">openPosition</span><span class="p">(</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_ask</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span>
                             <span class="k">elif</span> <span class="n">signal</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_bid</span><span class="p">:</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">openPosition</span><span class="p">(</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_bid</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span>
                     
-                    <span class="n">last_trade_check_time</span> <span class="o">=</span> <span class="n">current_time</span>
                     <span class="n">last_trade_check_time</span> <span class="o">=</span> <span class="n">current_time</span>
                 
                 <span class="c1"># Display current price and entries count</span>

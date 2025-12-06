@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../dashboard.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../dashboard.html#dashboard-features">Dashboard Features</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#control-panel">Control Panel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dashboard.html#manual-trading">Manual Trading</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#real-time-metrics">Real-time Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#interactive-charts">Interactive Charts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dashboard.html#performance-metrics">Performance Metrics</a></li>
@@ -696,6 +697,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_transaction_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get transaction summary from database.</span>
+<span class="sd">        Handles both old schema (paper mode) and new schema (live mode from API).</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">            current_price: Current market price (optional) to calculate unrealized P&amp;L</span>
@@ -703,6 +705,148 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary with transaction statistics</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check which schema we&#39;re using</span>
+            <span class="n">schema_check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT COUNT(*) FROM information_schema.columns </span>
+<span class="s2">                WHERE table_name = &#39;trades&#39; AND column_name = &#39;order_id&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            
+            <span class="n">is_new_schema</span> <span class="o">=</span> <span class="n">schema_check</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">schema_check</span> <span class="k">else</span> <span class="kc">False</span>
+            
+            <span class="k">if</span> <span class="n">is_new_schema</span><span class="p">:</span>
+                <span class="c1"># New schema from WOO X API (live mode)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_new_schema</span><span class="p">(</span><span class="n">current_price</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Old schema (paper mode)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_summary_old_schema</span><span class="p">(</span><span class="n">current_price</span><span class="p">)</span>
+                
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error getting transaction summary: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_summary_new_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get summary from new WOO X API schema.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Total transactions</span>
+            <span class="n">count_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT COUNT(*) as count FROM trades WHERE status = &#39;FILLED&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">count_row</span> <span class="o">=</span> <span class="n">count_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">total_trades</span> <span class="o">=</span> <span class="n">count_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">count_row</span> <span class="k">else</span> <span class="mi">0</span>
+            
+            <span class="c1"># Buy orders</span>
+            <span class="n">buy_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT </span>
+<span class="s2">                    COUNT(*) as count,</span>
+<span class="s2">                    SUM(executed_quantity) as total_quantity,</span>
+<span class="s2">                    SUM(executed_quantity * average_executed_price) as total_value</span>
+<span class="s2">                FROM trades </span>
+<span class="s2">                WHERE side = &#39;BUY&#39; AND status = &#39;FILLED&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">buy_summary</span> <span class="o">=</span> <span class="n">buy_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            
+            <span class="c1"># Sell orders</span>
+            <span class="n">sell_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT </span>
+<span class="s2">                    COUNT(*) as count,</span>
+<span class="s2">                    SUM(executed_quantity) as total_quantity,</span>
+<span class="s2">                    SUM(executed_quantity * average_executed_price) as total_value</span>
+<span class="s2">                FROM trades </span>
+<span class="s2">                WHERE side = &#39;SELL&#39; AND status = &#39;FILLED&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">sell_summary</span> <span class="o">=</span> <span class="n">sell_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            
+            <span class="c1"># Calculate P&amp;L from realized_pnl field</span>
+            <span class="n">pnl_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT SUM(realized_pnl) as total_pnl FROM trades WHERE status = &#39;FILLED&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">pnl_row</span> <span class="o">=</span> <span class="n">pnl_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">realized_pnl</span> <span class="o">=</span> <span class="n">pnl_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">pnl_row</span> <span class="ow">and</span> <span class="n">pnl_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="c1"># Get net position</span>
+            <span class="n">qty_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT </span>
+<span class="s2">                    SUM(CASE WHEN side = &#39;BUY&#39; THEN executed_quantity ELSE -executed_quantity END) as net_qty</span>
+<span class="s2">                FROM trades WHERE status = &#39;FILLED&#39;</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">qty_row</span> <span class="o">=</span> <span class="n">qty_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">net_quantity</span> <span class="o">=</span> <span class="n">qty_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">qty_row</span> <span class="ow">and</span> <span class="n">qty_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="c1"># Calculate unrealized P&amp;L</span>
+            <span class="n">unrealized_pnl</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">total_pnl</span> <span class="o">=</span> <span class="n">realized_pnl</span>
+            
+            <span class="k">if</span> <span class="n">current_price</span> <span class="ow">and</span> <span class="n">net_quantity</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Get average entry price for open position</span>
+                <span class="n">avg_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                    SELECT </span>
+<span class="s2">                        SUM(CASE WHEN side = &#39;BUY&#39; THEN executed_quantity * average_executed_price </span>
+<span class="s2">                                 ELSE -executed_quantity * average_executed_price END) / </span>
+<span class="s2">                        SUM(CASE WHEN side = &#39;BUY&#39; THEN executed_quantity ELSE -executed_quantity END) as avg_price</span>
+<span class="s2">                    FROM trades WHERE status = &#39;FILLED&#39;</span>
+<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="n">avg_row</span> <span class="o">=</span> <span class="n">avg_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="n">avg_entry</span> <span class="o">=</span> <span class="n">avg_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">avg_row</span> <span class="ow">and</span> <span class="n">avg_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="mi">0</span>
+                
+                <span class="k">if</span> <span class="n">avg_entry</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">unrealized_pnl</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_price</span> <span class="o">-</span> <span class="n">avg_entry</span><span class="p">)</span> <span class="o">*</span> <span class="n">net_quantity</span>
+                    <span class="n">total_pnl</span> <span class="o">=</span> <span class="n">realized_pnl</span> <span class="o">+</span> <span class="n">unrealized_pnl</span>
+            
+            <span class="c1"># Winning/losing trades not directly available in new schema</span>
+            <span class="c1"># We&#39;ll estimate from realized_pnl</span>
+            <span class="n">win_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT COUNT(*) FROM trades WHERE status = &#39;FILLED&#39; AND realized_pnl &gt; 0</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">win_row</span> <span class="o">=</span> <span class="n">win_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">winning_trades</span> <span class="o">=</span> <span class="n">win_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">win_row</span> <span class="k">else</span> <span class="mi">0</span>
+            
+            <span class="n">loss_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT COUNT(*) FROM trades WHERE status = &#39;FILLED&#39; AND realized_pnl &lt; 0</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="n">loss_row</span> <span class="o">=</span> <span class="n">loss_cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+            <span class="n">losing_trades</span> <span class="o">=</span> <span class="n">loss_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">loss_row</span> <span class="k">else</span> <span class="mi">0</span>
+            
+            <span class="c1"># Recent trades</span>
+            <span class="n">recent_trades</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                SELECT * FROM trades </span>
+<span class="s2">                WHERE status = &#39;FILLED&#39;</span>
+<span class="s2">                ORDER BY updated_time DESC </span>
+<span class="s2">                LIMIT 10</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            
+            <span class="n">buy_count</span> <span class="o">=</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">buy_summary</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">buy_qty</span> <span class="o">=</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">buy_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">buy_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">buy_value</span> <span class="o">=</span> <span class="n">buy_summary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">buy_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">buy_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="n">sell_count</span> <span class="o">=</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">sell_summary</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">sell_qty</span> <span class="o">=</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">sell_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sell_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">sell_value</span> <span class="o">=</span> <span class="n">sell_summary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">sell_summary</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">sell_summary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="mf">0.0</span>
+            
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;total_trades&#39;</span><span class="p">:</span> <span class="n">total_trades</span><span class="p">,</span>
+                <span class="s1">&#39;buy_count&#39;</span><span class="p">:</span> <span class="n">buy_count</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;buy_quantity&#39;</span><span class="p">:</span> <span class="n">buy_qty</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;buy_proceeds&#39;</span><span class="p">:</span> <span class="o">-</span><span class="p">(</span><span class="n">buy_value</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># Negative for buy cost</span>
+                <span class="s1">&#39;sell_count&#39;</span><span class="p">:</span> <span class="n">sell_count</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;sell_quantity&#39;</span><span class="p">:</span> <span class="n">sell_qty</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;sell_proceeds&#39;</span><span class="p">:</span> <span class="n">sell_value</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s1">&#39;net_pnl&#39;</span><span class="p">:</span> <span class="n">total_pnl</span><span class="p">,</span>
+                <span class="s1">&#39;cash_pnl&#39;</span><span class="p">:</span> <span class="n">realized_pnl</span><span class="p">,</span>
+                <span class="s1">&#39;unrealized_pnl&#39;</span><span class="p">:</span> <span class="n">unrealized_pnl</span><span class="p">,</span>
+                <span class="s1">&#39;net_quantity&#39;</span><span class="p">:</span> <span class="n">net_quantity</span><span class="p">,</span>
+                <span class="s1">&#39;winning_trades&#39;</span><span class="p">:</span> <span class="n">winning_trades</span><span class="p">,</span>
+                <span class="s1">&#39;losing_trades&#39;</span><span class="p">:</span> <span class="n">losing_trades</span><span class="p">,</span>
+                <span class="s1">&#39;recent_trades&#39;</span><span class="p">:</span> <span class="n">recent_trades</span>
+            <span class="p">}</span>
+            
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error in new schema summary: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">{}</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_summary_old_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get summary from old paper trading schema.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Total transactions</span>
             <span class="n">count_cursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
@@ -809,8 +953,7 @@
             
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Error getting transaction summary: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-            <span class="k">return</span> <span class="p">{}</span></div>
-
+            <span class="k">return</span> <span class="p">{}</span>
     
 <div class="viewcode-block" id="Account.get_open_positions">
 <a class="viewcode-back" href="../api_reference.html#account.Account.get_open_positions">[docs]</a>

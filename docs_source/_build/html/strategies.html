@@ -63,6 +63,7 @@
 <li class="toctree-l2"><a class="reference internal" href="dashboard.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dashboard.html#dashboard-features">Dashboard Features</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#control-panel">Control Panel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dashboard.html#manual-trading">Manual Trading</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#real-time-metrics">Real-time Metrics</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#interactive-charts">Interactive Charts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dashboard.html#performance-metrics">Performance Metrics</a></li>
@@ -213,7 +214,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#core-modules">Core Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#trade">trade</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-trade">trade</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade.cron"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade.Trade"><code class="docutils literal notranslate"><span class="pre">Trade</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#trade-class">Trade Class</a></li>
 </ul>
 </li>
@@ -295,10 +298,27 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#test-modules">Test Modules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-trade-workflow">test_trade_workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-signals">test_signals</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#test-orderbook">test_orderbook</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#verify-signals">verify_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_trade_workflow">test_trade_workflow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.print_section"><code class="docutils literal notranslate"><span class="pre">print_section()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.check_database_transactions"><code class="docutils literal notranslate"><span class="pre">check_database_transactions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_position_lifecycle"><code class="docutils literal notranslate"><span class="pre">test_position_lifecycle()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_database_integrity"><code class="docutils literal notranslate"><span class="pre">test_database_integrity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.test_stop_loss_scenario"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_scenario()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_trade_workflow.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_signals">test_signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_orderbook">test_orderbook</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_orderbook.test_orderbook_collection"><code class="docutils literal notranslate"><span class="pre">test_orderbook_collection()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-verify_signals">verify_signals</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#verify_signals.test_signal_generation"><code class="docutils literal notranslate"><span class="pre">test_signal_generation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#verify_signals.test_stop_loss_logic"><code class="docutils literal notranslate"><span class="pre">test_stop_loss_logic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#verify_signals.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-test_api">test_api</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_orderbook"><code class="docutils literal notranslate"><span class="pre">test_orderbook()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api_reference.html#test_api.test_market_trades"><code class="docutils literal notranslate"><span class="pre">test_market_trades()</span></code></a></li>
@@ -309,11 +329,24 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#examples">Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#examples-best-practices">examples_best_practices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#module-examples_best_practices">examples_best_practices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_safe_order_placement"><code class="docutils literal notranslate"><span class="pre">example_safe_order_placement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_market_order"><code class="docutils literal notranslate"><span class="pre">example_market_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_post_only_order"><code class="docutils literal notranslate"><span class="pre">example_post_only_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_account_balance"><code class="docutils literal notranslate"><span class="pre">example_account_balance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_order_validation"><code class="docutils literal notranslate"><span class="pre">example_order_validation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_retry_on_rate_limit"><code class="docutils literal notranslate"><span class="pre">example_retry_on_rate_limit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.example_precision_formatting"><code class="docutils literal notranslate"><span class="pre">example_precision_formatting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#examples_best_practices.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#decorators">Decorators</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_reference.html#cron">cron</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api_reference.html#id51"><code class="docutils literal notranslate"><span class="pre">cron()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api_reference.html#data-structures">Data Structures</a><ul>
@@ -496,7 +529,7 @@
 <p>All strategies inherit from <code class="docutils literal notranslate"><span class="pre">BaseStrategy</span></code> and implement two methods:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">generate_entry_signal(price_history,</span> <span class="pre">orderbook)</span></code> - Determines when to open positions</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">generate_exit_signal(position,</span> <span class="pre">current_price,</span> <span class="pre">orderbook)</span></code> - Determines when to close positions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">generate_exit_signal(position,</span> <span class="pre">current_price,</span> <span class="pre">price_history,</span> <span class="pre">orderbook)</span></code> - Determines when to close positions</p></li>
 </ul>
 </section>
 <section id="built-in-strategies">
@@ -718,6 +751,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">generate_exit_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
                             <span class="n">current_price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+                            <span class="n">price_history</span><span class="p">:</span> <span class="n">deque</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                             <span class="n">orderbook</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate exit signal.</span>
@@ -726,7 +760,7 @@
 <span class="sd">            True to close position, False to hold</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Usually use default stop-loss/take-profit</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">current_price</span><span class="p">,</span> <span class="n">orderbook</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">generate_exit_signal</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">current_price</span><span class="p">,</span> <span class="n">price_history</span><span class="p">,</span> <span class="n">orderbook</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
