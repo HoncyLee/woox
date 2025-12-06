@@ -7,7 +7,7 @@ from dash import dcc, html, Input, Output, State, callback_context, ALL, MATCH
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import threading
 import time
 from trade import Trade
@@ -27,7 +27,8 @@ logger = logging.getLogger('Dashboard')
 app = dash.Dash(
     __name__,
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
+    update_title=None  # Prevent "Updating..." title during callbacks
 )
 app.title = "WOOX Trading Bot Monitor"
 
@@ -561,7 +562,7 @@ app.layout = html.Div([
         html.Div([
             html.H2("📊 WOOX Trading Bot - Detailed Report", 
                     style={'textAlign': 'center', 'marginBottom': '20px', 'color': '#667eea', 'borderBottom': '3px solid #667eea', 'paddingBottom': '10px'}),
-            html.P(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 
+            html.P(f"Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}", 
                    style={'textAlign': 'center', 'color': '#666', 'fontSize': '14px', 'marginBottom': '30px'}),
             
             # Trading Records Section
@@ -590,6 +591,9 @@ app.layout = html.Div([
     
     # Store to track config loading state
     dcc.Store(id='config-loaded-flag', data=False),
+    
+    # Dummy output for print callback
+    html.Div(id='dummy-print-output', style={'display': 'none'}),
 
     # Config Modal
     html.Div(id='config-modal', className='modal', children=[
@@ -1184,7 +1188,7 @@ def update_metrics(n, last_trade_ts):
         
         # Update chart data
         if price:
-            chart_data['timestamps'].append(datetime.now())
+            chart_data['timestamps'].append(datetime.now(timezone.utc))
             chart_data['prices'].append(price)
             chart_data['volumes'].append(trader.current_volume or 0)
             
@@ -1282,7 +1286,7 @@ def update_price_chart(n):
     
     if len(chart_data['timestamps']) > 0:
         # Filter data for last 5 minutes
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         cutoff = now - timedelta(minutes=5)
         
         timestamps = list(chart_data['timestamps'])
@@ -1499,7 +1503,7 @@ def update_pnl_chart(n):
             colors = ['#00c853' if p >= 0 else '#ff1744' for p in pnl_data]
             
             fig.add_trace(go.Scatter(
-                x=[datetime.fromtimestamp(t) for t in timestamps],
+                x=[datetime.fromtimestamp(t, timezone.utc) for t in timestamps],
                 y=pnl_data,
                 mode='lines',
                 name='P&L',
@@ -1564,7 +1568,7 @@ def update_rsi_chart(n):
                     
                     if current_bucket is not None and bucket != current_bucket:
                         prices_resampled.append(last_entry_in_bucket['price'])
-                        timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+                        timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp'], timezone.utc))
                     
                     current_bucket = bucket
                     last_entry_in_bucket = entry
@@ -1572,11 +1576,11 @@ def update_rsi_chart(n):
                 # Add the last partial bucket
                 if last_entry_in_bucket is not None:
                     prices_resampled.append(last_entry_in_bucket['price'])
-                    timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+                    timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp'], timezone.utc))
             else:
                 # Raw data
                 prices_resampled = [entry['price'] for entry in history_list if entry.get('price')]
-                timestamps_resampled = [datetime.fromtimestamp(entry['timestamp']) for entry in history_list if entry.get('timestamp')]
+                timestamps_resampled = [datetime.fromtimestamp(entry['timestamp'], timezone.utc) for entry in history_list if entry.get('timestamp')]
 
             # Calculate RSI
             rsi_values = []
@@ -1690,7 +1694,7 @@ def update_ma_chart(n):
                     
                     if current_bucket is not None and bucket != current_bucket:
                         prices_resampled.append(last_entry_in_bucket['price'])
-                        timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+                        timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp'], timezone.utc))
                     
                     current_bucket = bucket
                     last_entry_in_bucket = entry
@@ -1698,11 +1702,11 @@ def update_ma_chart(n):
                 # Add the last partial bucket
                 if last_entry_in_bucket is not None:
                     prices_resampled.append(last_entry_in_bucket['price'])
-                    timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp']))
+                    timestamps_resampled.append(datetime.fromtimestamp(last_entry_in_bucket['timestamp'], timezone.utc))
             else:
                 # Raw data
                 prices_resampled = [entry['price'] for entry in history_list if entry.get('price')]
-                timestamps_resampled = [datetime.fromtimestamp(entry['timestamp']) for entry in history_list if entry.get('timestamp')]
+                timestamps_resampled = [datetime.fromtimestamp(entry['timestamp'], timezone.utc) for entry in history_list if entry.get('timestamp')]
 
             # Calculate MAs
             ma_short_values = []
@@ -2256,7 +2260,7 @@ def update_activity_log(n):
     Input('interval-component', 'n_intervals')
 )
 def update_print_trading_records(n):
-    global trader, chart_data
+    global trader
     
     try:
         # Collect trading data
@@ -2265,47 +2269,108 @@ def update_print_trading_records(n):
         # Add current position if exists
         if trader and trader.current_position:
             pos = trader.current_position
+            
+            # Calculate Unrealized P&L for current position
+            unrealized_pnl = 0.0
+            side_upper = pos['side'].upper()
+            # Normalize side display
+            display_side = "LONG" if side_upper in ['BUY', 'LONG'] else "SHORT" if side_upper in ['SELL', 'SHORT'] else side_upper
+
+            if trader.current_price:
+                if side_upper in ['BUY', 'LONG']:
+                    unrealized_pnl = (trader.current_price - pos['entry_price']) * pos['quantity']
+                else:
+                    unrealized_pnl = (pos['entry_price'] - trader.current_price) * pos['quantity']
+            
+            pnl_str = f"+${unrealized_pnl:.2f}" if unrealized_pnl >= 0 else f"-${abs(unrealized_pnl):.2f}"
+            pnl_style = {'color': '#00c853', 'fontWeight': 'bold'} if unrealized_pnl >= 0 else {'color': '#ff1744', 'fontWeight': 'bold'}
+            
             rows.append(html.Tr([
                 html.Td("CURRENT", style={'fontWeight': 'bold', 'color': '#2196F3'}),
-                html.Td(pos['side'].upper()),
+                html.Td(display_side),
                 html.Td(f"{pos['quantity']:.6f}"),
                 html.Td(f"${pos['entry_price']:.2f}"),
-                html.Td(f"${trader.current_price:.2f}" if trader.current_price else "N/A"),
-                html.Td("OPEN", style={'color': '#00c853', 'fontWeight': 'bold'}),
+                html.Td(pnl_str, style=pnl_style),
             ]))
         
-        # Add price history data
-        if len(chart_data['timestamps']) > 0:
-            for i, (ts, price, vol) in enumerate(zip(
-                list(chart_data['timestamps'])[-50:], 
-                list(chart_data['prices'])[-50:],
-                list(chart_data['volumes'])[-50:]
-            )):
-                if i % 5 == 0:  # Sample every 5th entry to avoid too much data
-                    rows.append(html.Tr([
-                        html.Td(ts.strftime('%H:%M:%S')),
-                        html.Td("MONITOR"),
-                        html.Td("N/A"),
-                        html.Td("N/A"),
-                        html.Td(f"${price:.2f}"),
-                        html.Td(f"{vol:.2f}"),
-                    ]))
+        # Get actual order history from DB
+        records = get_trading_records()
+        
+        # Limit to last 50 records
+        for r in records[:50]:
+            # Format values
+            dt = r.get('trade_datetime', '')
+            if isinstance(dt, str):
+                try:
+                    dt_obj = datetime.fromisoformat(dt)
+                    if dt_obj.tzinfo is None:
+                        dt_obj = dt_obj.replace(tzinfo=timezone.utc)
+                    dt_str = dt_obj.strftime('%Y-%m-%d %H:%M:%S')
+                except:
+                    dt_str = dt[:19]
+            elif isinstance(dt, datetime):
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                dt_str = dt.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                dt_str = str(dt)
+                
+            symbol = r.get('symbol', '')
+            side = r.get('trade_type', '').upper()
+            qty = float(r.get('quantity', 0))
+            price = float(r.get('price', 0))
+            status = r.get('code', 'FILLED')
+            proceeds = float(r.get('proceeds', 0))
+            
+            # Determine Side Label (Long / Short)
+            side_label = side
+            
+            if 'reduce_only' in r and r['reduce_only'] is not None:
+                 # Live Mode Logic
+                is_reduce = r.get('reduce_only')
+                if side == 'BUY':
+                    side_label = "Short" if is_reduce else "Long"
+                elif side == 'SELL':
+                    side_label = "Long" if is_reduce else "Short"
+            else:
+                # Paper Mode Logic
+                # Check if code is O (Open) or C (Close)
+                code_val = r.get('code', '')
+                if code_val in ['O', 'C']:
+                    if side == 'BUY':
+                        side_label = "Short" if code_val == 'C' else "Long"
+                    elif side == 'SELL':
+                        side_label = "Long" if code_val == 'C' else "Short"
+            
+            # Determine colors
+            side_color = '#00c853' if side == 'BUY' else '#ff1744'
+            
+            # Format Proceeds (P&L)
+            pnl_str = f"+${proceeds:.2f}" if proceeds >= 0 else f"-${abs(proceeds):.2f}"
+            pnl_style = {'color': '#00c853'} if proceeds >= 0 else {'color': '#ff1744'}
+            
+            rows.append(html.Tr([
+                html.Td(dt_str),
+                html.Td(side_label, style={'color': side_color, 'fontWeight': 'bold'}),
+                html.Td(f"{qty:.6f}"),
+                html.Td(f"${price:.2f}"),
+                html.Td(pnl_str, style=pnl_style),
+            ]))
         
         if not rows:
             rows.append(html.Tr([
-                html.Td("No trading data available", colSpan=6, style={'textAlign': 'center', 'color': '#666'})
+                html.Td("No trading data available", colSpan=5, style={'textAlign': 'center', 'color': '#666'})
             ]))
         
         return html.Div([
             html.H3("Order History", style={'color': '#333', 'borderBottom': '2px solid #667eea', 'paddingBottom': '10px', 'marginBottom': '20px'}),
             html.Table([
                 html.Thead(html.Tr([
-                    html.Th("Time", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Side", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Entry Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Current Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
-                    html.Th("Status/Volume", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold'}),
+                    html.Th("Date/Time(UTC)", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
+                    html.Th("Side", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
+                    html.Th("Quantity", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
+                    html.Th("Price", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
+                    html.Th("Proceeds", style={'backgroundColor': '#f0f0f0', 'padding': '12px', 'fontWeight': 'bold', 'whiteSpace': 'nowrap'}),
                 ])),
                 html.Tbody(rows)
             ], style={'width': '100%', 'borderCollapse': 'collapse', 'marginBottom': '30px', 'border': '1px solid #ddd'})
@@ -2647,7 +2712,7 @@ def get_trading_records():
             
         # Fetch records, latest first
         history_hours = int(config.get('ORDER_HISTORY_HOURS', 72))
-        cutoff_time = datetime.now() - timedelta(hours=history_hours)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(hours=history_hours)
         
         if trade_mode == 'live':
             query = f"SELECT * FROM trades WHERE created_time >= '{cutoff_time}' ORDER BY created_time DESC"
@@ -2674,7 +2739,8 @@ def get_trading_records():
                     'code': r.get('status', 'FILLED'), # Map status to code/action
                     'price': r.get('average_executed_price') or r.get('order_price'),
                     'quantity': r.get('executed_quantity') or r.get('order_quantity'),
-                    'proceeds': r.get('realized_pnl', 0) # Or calculate
+                    'proceeds': r.get('realized_pnl', 0), # Or calculate
+                    'reduce_only': r.get('reduce_only')
                 })
             else:
                 # Old schema (Paper)
@@ -2777,6 +2843,26 @@ def update_trading_records(n, last_trade_ts):
         ], style=row_style))
         
     return html.Table([html.Thead(header), html.Tbody(rows)], style={'width': '100%', 'borderCollapse': 'collapse'})
+
+
+# Clientside callback to handle printing and filename
+app.clientside_callback(
+    """
+    function(n_clicks) {
+        if (n_clicks && n_clicks > 0) {
+            // Set title to desired filename
+            document.title = 'OC_API_bot';
+            // Trigger print
+            window.print();
+            return null;
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output('dummy-print-output', 'children'),
+    Input('print-btn', 'n_clicks'),
+    prevent_initial_call=True
+)
 
 
 if __name__ == '__main__':

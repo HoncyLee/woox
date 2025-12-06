@@ -7,7 +7,7 @@ import requests
 import duckdb
 import logging
 from typing import Dict, Any, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from config_loader import CONFIG
 from woox_errors import (
     handle_api_error,
@@ -544,7 +544,7 @@ class Account:
                 if isinstance(trade[2], datetime):
                     trade_dt = trade[2].strftime('%Y-%m-%d %H:%M:%S')
                 elif isinstance(trade[2], (int, float)):
-                    trade_dt = datetime.fromtimestamp(trade[2]).strftime('%Y-%m-%d %H:%M:%S')
+                    trade_dt = datetime.fromtimestamp(trade[2], timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
                 else:
                     trade_dt = str(trade[2])
                 

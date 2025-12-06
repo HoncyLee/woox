@@ -1,6 +1,6 @@
 # Python
 import duckdb
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Connect to DuckDB (file-based)
 #conn = duckdb.connect('live_transaction.db')
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS trades (
 
 # Insert sample data from provided reference
 sample_data = [
-    ("USER01", "TESTTICKER1", datetime(2025, 11, 13, 9, 31, 5), "woox", "SMA1030", "BUY", 10, 335.0000, -3350.00, -1.00, 0.00, "LMT", "O"),
-    ("USER01", "TESTTICKER2", datetime(2025, 11, 13, 11, 5, 36), "woox", "SMA1030", "BUY", 10, 333.0000, -3330.00, -1.00, 0.00, "LMT", "O"),
-    ("USER01", "TESTTICKER1", datetime(2025, 11, 13, 10, 23, 52), "woox", "SMA1030", "SELL", -10, 337.4100, 3374.10, -1.00, 0.00, "LMT", "C")
+    ("USER01", "TESTTICKER1", datetime(2025, 11, 13, 9, 31, 5, tzinfo=timezone.utc), "woox", "SMA1030", "BUY", 10, 335.0000, -3350.00, -1.00, 0.00, "LMT", "O"),
+    ("USER01", "TESTTICKER2", datetime(2025, 11, 13, 11, 5, 36, tzinfo=timezone.utc), "woox", "SMA1030", "BUY", 10, 333.0000, -3330.00, -1.00, 0.00, "LMT", "O"),
+    ("USER01", "TESTTICKER1", datetime(2025, 11, 13, 10, 23, 52, tzinfo=timezone.utc), "woox", "SMA1030", "SELL", -10, 337.4100, 3374.10, -1.00, 0.00, "LMT", "C")
 ]
 
 conn.executemany("""

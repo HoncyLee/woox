@@ -9,7 +9,7 @@ import hashlib
 import time
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from config_loader import load_config
 
@@ -200,8 +200,8 @@ class OrderHistorySync:
                         if u_time > 10000000000:
                             u_time /= 1000.0
                             
-                        created_time = datetime.fromtimestamp(c_time)
-                        updated_time = datetime.fromtimestamp(u_time)
+                        created_time = datetime.fromtimestamp(c_time, timezone.utc)
+                        updated_time = datetime.fromtimestamp(u_time, timezone.utc)
                         
                         # Insert or replace
                         conn.execute("""

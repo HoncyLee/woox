@@ -261,7 +261,7 @@ class Trade:
             pnl: Realized PnL for closing trades
         """
         try:
-            from datetime import datetime
+            from datetime import datetime, timezone
             
             proceeds = -quantity * price if trade_type == 'BUY' else quantity * price
             commission = 0.0  # Update if you have commission info
@@ -290,7 +290,7 @@ class Trade:
                 """, (
                 CONFIG.get('USER', 'TRADER'),  # acct_id
                     self.symbol,  # symbol
-                    datetime.fromtimestamp(time.time()),  # trade_datetime as TIMESTAMP
+                    datetime.now(timezone.utc),  # trade_datetime as TIMESTAMP (UTC)
                     'woox',  # exchange
                     signal,  # signal
                     trade_type,  # trade_type

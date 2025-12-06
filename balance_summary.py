@@ -6,7 +6,7 @@ Displays comprehensive account balance, positions, and P&L information
 
 import sys
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 from account import Account
 import requests
 from typing import Dict, Optional
@@ -174,7 +174,7 @@ def display_transaction_summary(account: Account):
     
     net_pnl = summary.get('net_pnl', 0.0)
     pnl_indicator = "🟢" if net_pnl >= 0 else "🔴"
-    print(f"Net Realized P&L:    {pnl_indicator} {format_currency(net_pnl)}")
+    print(f"Net Cash Flow:       {pnl_indicator} {format_currency(net_pnl)}")
 
 
 def display_recent_trades(account: Account, limit: int = 10):
@@ -189,7 +189,7 @@ def display_recent_trades(account: Account, limit: int = 10):
         print("No recent trades.")
         return
     
-    print(f"{'Date/Time':<20} {'Symbol':<20} {'Type':<6} {'Qty':<12} {'Price':<12} {'P&L':<15}")
+    print(f"{'Date/Time (UTC)':<20} {'Symbol':<20} {'Type':<6} {'Qty':<12} {'Price':<12} {'Value':<15}")
     print_separator("-")
     
     for trade in recent_trades[:limit]:
@@ -205,8 +205,18 @@ def display_recent_trades(account: Account, limit: int = 10):
         proceeds = trade[8]
         
         # Format datetime
+        dt = None
         if isinstance(trade_datetime, str):
-            dt = datetime.fromisoformat(trade_datetime)
+            try:
+                dt = datetime.fromisoformat(trade_datetime)
+            except ValueError:
+                pass
+        elif isinstance(trade_datetime, datetime):
+            dt = trade_datetime
+            
+        if dt:
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
             dt_str = dt.strftime("%Y-%m-%d %H:%M:%S")
         else:
             dt_str = str(trade_datetime)[:19] if trade_datetime else "N/A"
@@ -234,7 +244,7 @@ def main():
     print("🏦  WOOX ACCOUNT BALANCE SUMMARY")
     print("="*70)
     print(f"Mode: {args.mode.upper()}")
-    print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Time: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}")
     print("="*70)
     
     # Initialize account
